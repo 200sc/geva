@@ -1,5 +1,12 @@
 package neural
 
+import (
+	"fmt"
+	"bytes"
+	"math/rand"
+	"strconv"
+)
+
 // A neuron has a list of places to send to
 // and a mapping of places it receives from to weights.
 // These lists are represented as integers, as a neuron has some
@@ -15,57 +22,146 @@ type Neuron struct {
 	// this could be replaced with a data structure of 
 	// a map which externally keeps track of an array of 
 	// keys for random array element access
-	outputs map[int]bool
-	threshold float
-	weights map[int]float
 	val int
+	threshold float64
+	outputs map[int]bool
+	weights map[int]float64
 }
 
-type Network struct {
-	columns [][]Neuron
-}
+func (n_p *Neuron) toString() string {
+	var buffer bytes.Buffer
+
+	n := *n_p
+
+	buffer.WriteString("(")
+	if n.val != 0 {
+		buffer.WriteString(strconv.Itoa(n.val))
+		buffer.WriteString(" ")
+	}
+	buffer.WriteString("t:")
+	buffer.WriteString(strconv.FormatFloat(n.threshold,'f',2,64))
+	if len(n.outputs) > 0 {
+		buffer.WriteString("<")
+		for k := range n.outputs {
+			buffer.WriteString(strconv.Itoa(k))
+			buffer.WriteString(",")
+		}
+		buffer.WriteString(">")
+	}
+	for k, v := range n.weights {
+		buffer.WriteString("(")
+		buffer.WriteString(strconv.Itoa(k))
+		buffer.WriteString(",")
+		buffer.WriteString(strconv.FormatFloat(v,'f',2,64))
+		buffer.WriteString(")")
+	}
+
+	buffer.WriteString(") ")
+	return buffer.String()
+}	
+
+type Network [][]Neuron
+
 
 /**
  * Take a network and duplicate it
  */
-func (nn *Network) copy() Network {
+func (nn_p *Network) copy() Network {
+	
+	nn := *nn_p
 
-	var columns [][]Neuron
-	var ic InputColumn
+	var newNetwork Network
 
-	for i := range nn.columns {
-    	columns[i] = make([]Neuron, len(nn.columns[i]))
-    	copy(columns[i], nn.columns[i])
-	}
-
-	for i := range nn.ic {
-		ic[i] = make([]int len(nn.ic[i]))
-		copy(ic[i], nn.ic[i])
+	for i := range nn {
+    	newNetwork = append(newNetwork, make([]Neuron, len(nn[i])))
+    	copy(newNetwork[i], nn[i])
 	}
 	
-	return Network{ic, columns}
+	return newNetwork
+}
+
+func GenerateNetwork(nOpt_p *NetworkGenerationOptions) *Network {
+
+	nnOpt := *nOpt_p
+	cOpt := *nnOpt.columnOptions
+	nOpt := *cOpt.neuronOptions
+
+	nn := Network{}
+
+	inputColumn := []Neuron{}
+
+	for i := 0; i < nnOpt.inputs; i++ {
+		n := Neuron{threshold: nOpt.defaultThreshold,
+					weights: map[int]float64{0:nOpt.defaultAxonWeight},
+					outputs: make(map[int]bool),
+					val: 0,
+				}
+		inputColumn = append(inputColumn, n)
+	}
+
+	nn = append(nn, inputColumn)
+
+	outputColumn := []Neuron{}
+
+	for i := 0; i < nnOpt.outputs; i++ {
+		n := Neuron{
+			threshold: nOpt.defaultThreshold,
+			weights: make(map[int]float64),
+			outputs: make(map[int]bool),
+			val: 0,
+		}
+		outputColumn = append(outputColumn, n)
+	}
+
+	nn = append(nn, outputColumn)
+
+	columnCount := rand.Intn(nnOpt.maxColumns - nnOpt.minColumns) + nnOpt.minColumns
+
+	for i := 0; i < columnCount; i++ {
+		nn = *(nn.addColumn(&cOpt))
+	}
+
+	for i := 0; i < nnOpt.baseMutations; i++ {
+		nn = *(nn.Mutate(&nnOpt.NetworkMutationOptions))
+		nn.print()	
+	}
+
+	return &nn
+}
+
+// Todo: Improve this
+func (nn_p *Network) print() {
+	for _,col := range *nn_p{
+		for _,n := range col {
+			fmt.Print(n.toString())
+		}
+		fmt.Println("")
+	}
+	fmt.Println("")
 }
 
 /**
  * Run some input through a neural network.
  * This returns the network's output column.
  */
-func (nn *Network) run(inputs []bool) bool {
+func (nn_p *Network) run(inputs []bool) []int {
 
-	channels = [][]chan int
+	nn := *nn_p
+
+	var channels [][]chan int
 
 	doneCh := make(chan bool)
 
-	for x,col := range nn.columns {
-		channels = append(channels, []chan int)
+	for x,col := range nn {
+		channels = append(channels, []chan int{})
 		for y,neuron := range col {
 
 			channels[x] = append(channels[x], make(chan int))
 
 			// Create a goroutine for every channel index
 			// which accepts the neuron at that index
-			go func(n_p *Neuron, inputChannel chan int, channelColumn []chan int, doneCh chan bool) {
-				inputs := make(map[int]int)
+			go func(n_p *Neuron, inputChannel chan int, channelColumn []chan int, doneCh chan bool, y int) {
+				inputs := make(map[int]float64)
 
 				n := *n_p
 
@@ -78,7 +174,7 @@ func (nn *Network) run(inputs []bool) bool {
 				// Those signals are then mapped according to
 				// their column, as our weights are also column-
 				// indexed. 
-				for i := range n.weights {
+				for _ = range n.weights {
 					input := <-inputChannel
 					if input < 0 {
 						// This 1 subraction is to
@@ -88,12 +184,12 @@ func (nn *Network) run(inputs []bool) bool {
 					} else {
 						inputs[(input-1)] = 1
 					}
-					close(inputChannel)
 				}
+				close(inputChannel)
 
 				// Sum the signals received
 				// as according to our weights.
-				out := 0
+				out := 0.0
 				for i,weight := range n.weights {
 					out += weight * inputs[i]
 				}
@@ -105,12 +201,12 @@ func (nn *Network) run(inputs []bool) bool {
 				if out <= n.threshold {
 					// If we didn't add one, the 0-index
 					// would be indistinguishable from others 
-					result = -1 * (n.y + 1)
+					result = -1 * (y + 1)
 					// -1 represents false,
 					// as 0 represents uninitialized. 
 					n.val = -1
 				} else {
-					result = n.y + 1
+					result = y + 1
 					n.val = 1
 				}
 
@@ -124,13 +220,11 @@ func (nn *Network) run(inputs []bool) bool {
 
 				// Send a notification we finished if
 				// we're an output neuron
-				// TODO: ENSURE NO NEURON HAS A DEAD
-				// END EXCEPT FOR OUTPUT NEURONS
 				if len(n.outputs) == 0 {
 					doneCh <- true
 				}
 
-			}(&neuron, channels[x][y], channels[x+1], doneCh)
+			}(&neuron, channels[x][y], channels[x+1], doneCh, y)
 		}
 	}
 
@@ -144,14 +238,14 @@ func (nn *Network) run(inputs []bool) bool {
 	}
 
 	// We need to wait here, on the last columns being populated
-	for i := 0; i < len(nn.columns[len(nn.columns)-1]); i++ {
+	for i := 0; i < len(nn[len(nn)-1]); i++ {
 		<-doneCh
 	}
 	close(doneCh)
 
 	// Create an array of the last columns' values to return
-	output = []int
-	for _,neuron := range nn.columns[len(nn.columns)-1] {
+	output := []int{}
+	for _,neuron := range nn[len(nn)-1] {
 		output = append(output, neuron.val)
 	}
 
