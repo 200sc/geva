@@ -88,6 +88,7 @@ func GenerateNetwork(nOpt_p *NetworkGenerationOptions) *Network {
 
 	nn := Network{}
 
+	// Set up the input column
 	inputColumn := []Neuron{}
 
 	for i := 0; i < nnOpt.inputs; i++ {
@@ -101,6 +102,7 @@ func GenerateNetwork(nOpt_p *NetworkGenerationOptions) *Network {
 
 	nn = append(nn, inputColumn)
 
+	// Set up the output column
 	outputColumn := []Neuron{}
 
 	for i := 0; i < nnOpt.outputs; i++ {
@@ -122,8 +124,7 @@ func GenerateNetwork(nOpt_p *NetworkGenerationOptions) *Network {
 	}
 
 	for i := 0; i < nnOpt.baseMutations; i++ {
-		nn = *(nn.Mutate(&nnOpt.NetworkMutationOptions))
-		nn.print()	
+		nn = *(nn.Mutate(&nnOpt.NetworkMutationOptions))	
 	}
 
 	return &nn

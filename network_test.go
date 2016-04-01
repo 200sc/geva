@@ -8,13 +8,13 @@ func TestNetworkGeneration(*testing.T) {
 
 
 	wOpt := FloatMutationOptions{
-		0.33,
+		0.66,
 		0.05,
 		5,
 	}
 
 	tOpt := FloatMutationOptions{
-		0.33,
+		0.66,
 		0.05,
 		5,
 	}
@@ -40,11 +40,11 @@ func TestNetworkGeneration(*testing.T) {
 	nnmOpt := NetworkMutationOptions{
 		&nmOpt,
 		&cgOpt,
-		0.05,
 		0.02,
-		0.10,
-		0.10,
-		0.10,
+		0.05,
+		0.03,
+		0.03,
+		0.05,
 		0.01,
 		0.02,
 		0.10,
@@ -59,7 +59,8 @@ func TestNetworkGeneration(*testing.T) {
 		20,
 	}
 
-	network := GenerateNetwork(&nngOpt)
-
-	network.print()
+	for i := 0; i < 100000; i++ {
+		GenerateNetwork(&nngOpt)
+		//network.print()
+	}
 }
