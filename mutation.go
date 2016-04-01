@@ -2,7 +2,6 @@ package neural
 
 import (
 	"math/rand"
-	//"fmt"
 )
 type NetworkMutationOptions struct {
 	neuronOptions *NeuronMutationOptions
@@ -18,15 +17,6 @@ type NetworkMutationOptions struct {
 	columnAdditionChance float64
 	neuronMutationChance float64 
 }
-type NeuronMutationOptions struct {
-	thresholdOptions FloatMutationOptions
-	weightOptions FloatMutationOptions
-}
-type FloatMutationOptions struct {
-	mutChance float64
-	mutMagnitude float64
-	mutRange int
-}
 type NetworkGenerationOptions struct {
 	NetworkMutationOptions
 	minColumns int
@@ -35,10 +25,9 @@ type NetworkGenerationOptions struct {
 	outputs int 
 	baseMutations int
 }
-type ColumnGenerationOptions struct {
-	minSize int
-	maxSize int
-	neuronOptions *NeuronGenerationOptions 
+type NeuronMutationOptions struct {
+	thresholdOptions FloatMutationOptions
+	weightOptions FloatMutationOptions
 }
 type NeuronGenerationOptions struct {
 	minAxons int
@@ -46,9 +35,20 @@ type NeuronGenerationOptions struct {
 	defaultThreshold float64
 	defaultAxonWeight float64
 }
+type ColumnGenerationOptions struct {
+	minSize int
+	maxSize int
+	neuronOptions *NeuronGenerationOptions 
+}
+type FloatMutationOptions struct {
+	mutChance float64
+	mutMagnitude float64
+	mutRange int
+}
 
 /**
  * Modify a float to some float close to it in value. 
+ * TODO: Give this a better distribution of randomness.
  */
 func mutateFloat(toMutate float64, opt FloatMutationOptions) float64 {
 	if rand.Float64() >= opt.mutChance {
@@ -76,7 +76,6 @@ func (n *Neuron) mutate(mOpt_p *NeuronMutationOptions) Neuron {
 			outputs:n.outputs, 
 			threshold:newThreshold,
 			weights:newWeights,
-			val:0,
 		}
 } 
 
@@ -230,14 +229,13 @@ func (nn_p *Network) copyOutColumn() []Neuron {
 						        threshold: nn[i][j].threshold,
 						        weights: make(map[int]float64),
 								outputs: make(map[int]bool),
-								val: 0,
 						    })
 	}
 	return outColumn
 }
 
 /**
- * Remove a random neuron from a column.
+ * Remove all connections from a neuron
  */
 func (nn_p *Network) resetNeuron(columnIndex int, neuronIndex int) {
 
@@ -290,7 +288,6 @@ func (nn_p *Network) replaceNeuron(columnIndex int, neuronIndex int, nOpt_p *Neu
 			threshold:nOpt.defaultThreshold,
 			outputs:make(map[int]bool),
 			weights:make(map[int]float64),
-			val:0,
 		}
 
 	// Create new Axons connecting to this neuron
@@ -318,7 +315,6 @@ func (nn_p *Network) addNeuron(columnIndex int, nOpt_p *NeuronGenerationOptions)
 			threshold:nOpt.defaultThreshold,
 			outputs:make(map[int]bool),
 			weights:make(map[int]float64),
-			val:0,
 		})
 
 	// Axons connecting to this neuron

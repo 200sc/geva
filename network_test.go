@@ -2,10 +2,10 @@ package neural
 
 import (
 	"testing"
+	"fmt"
 )
 
 func TestNetworkGeneration(*testing.T) {
-
 
 	wOpt := FloatMutationOptions{
 		0.66,
@@ -27,13 +27,13 @@ func TestNetworkGeneration(*testing.T) {
 	ngOpt := NeuronGenerationOptions{
 		1,
 		3,
-		0.5,
+		0.8,
 		1,
 	}
 
 	cgOpt := ColumnGenerationOptions{
 		2,
-		8,
+		16,
 		&ngOpt,
 	}
 
@@ -52,15 +52,23 @@ func TestNetworkGeneration(*testing.T) {
 
 	nngOpt := NetworkGenerationOptions{
 		nnmOpt,
-		4,
 		10,
-		3,
-		1,
 		20,
+		3,
+		4,
+		50,
 	}
 
-	for i := 0; i < 100000; i++ {
-		GenerateNetwork(&nngOpt)
-		//network.print()
+	network := GenerateNetwork(&nngOpt)
+	network.Print()
+	for {	
+		fmt.Println(network.Run([]bool{true,true,true}))
+		fmt.Println(network.Run([]bool{true,true,false}))
+		fmt.Println(network.Run([]bool{true,false,true}))
+		fmt.Println(network.Run([]bool{true,false,false}))
+		fmt.Println(network.Run([]bool{false,true,true}))	
+		fmt.Println(network.Run([]bool{false,true,false}))
+		fmt.Println(network.Run([]bool{false,false,true}))
+		fmt.Println(network.Run([]bool{false,false,false}))
 	}
 }
