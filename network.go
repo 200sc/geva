@@ -18,16 +18,16 @@ import (
 // outputs and in their weights, 
 // for the purpose of mutation algorithms.
 type Neuron struct {
+	threshold float64
 	// For a performance boost and complexity reduction,
 	// this could be replaced with a data structure of 
 	// a map which externally keeps track of an array of 
-	// keys for random array element access
-	threshold float64
+	// keys for random element access
 	outputs map[int]bool
 	weights map[int]float64
 }
 
-func (n_p *Neuron) toString() string {
+func (n_p *Neuron) String() string {
 	var buffer bytes.Buffer
 
 	n := *n_p
@@ -131,7 +131,7 @@ func GenerateNetwork(nOpt_p *NetworkGenerationOptions) *Network {
 func (nn_p *Network) Print() {
 	for _,col := range *nn_p{
 		for _,n := range col {
-			fmt.Print(n.toString())
+			fmt.Print(n.String())
 		}
 		fmt.Println("")
 	}
@@ -216,6 +216,13 @@ func (nn_p *Network) Run(inputs []bool) []bool {
 							inputs[(input-1)] = 1
 						}
 					}
+					// Technically we probably
+					// don't need to close these channels
+					// but it's best practice and, perhaps
+					// more importantly, lets us know if
+					// we're majorly screwing up by sending
+					// to a channel we're supposed to be
+					// done with. 
 					close(inputChannel)
 
 					// Sum the signals received
@@ -260,10 +267,17 @@ func (nn_p *Network) Run(inputs []bool) []bool {
 	}
 
 	// We need to wait here, on the last columns being populated
-	output := []bool{}
+	output := make([]bool, len(nn[len(nn)-1]))
 	for i := 0; i < len(nn[len(nn)-1]); i++ {
 		val := <-doneCh
-		output = append(output,(val > 0))
+		if val < 0 {
+			// This 1 subraction is to
+			// compensate for the 0-indexing
+			// to 1-indexing shift
+			output[(-1*val)-1] = false
+		} else {
+			output[val-1] = true
+		}
 	}
 	close(doneCh)
 

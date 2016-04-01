@@ -302,6 +302,12 @@ func (nn_p *Network) replaceNeuron(columnIndex int, neuronIndex int, nOpt_p *Neu
 	}
 }
 
+// We could add a removeNeuron function
+// which acted like addNeuron and only removed
+// from the end of the list. An old, random-removal
+// used to exist but was removed due to performance
+// concerns and replaced with replaceNeuron. 
+
 /**
  * Add a neuron to the end of a column.
  */
