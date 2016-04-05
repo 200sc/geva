@@ -5,42 +5,30 @@ import (
 	"rand"
 )
 
-type Population []Network
-
-type PopulationOptions struct {
+type Population struct {
+	members []Network
 	generationOptions *NetworkGenerationOptions
 	size int
-	selection *PopulationSelectionMethod
-	crossover *PopulationCrossoverMethod
+	selection *SelectionMethod
+	crossover *CrossoverMethod
 	testInputs [][]bool
 	testExpected [][]bool
 }
 
-func (p_p *Population) NextGeneration(pOpt_p *PopulationOptions) *Population {
+func (p_p *Population) NextGeneration() *Population {
 	p := *p_p
 
-	nextGen := p.selection.Select(p_p, pOpt_p)
-	return p.crossover.Crossover(nextGen) 
+	nextGen := p.selection.Select(p_p)
+	p.members = p.crossover.Crossover(nextGen) 
+	return &p
 }
 
-type PopulationSelectionMethod interface {
-	Select(p_p *Population, pOpt_p *PopulationOptions) *Population
+type SelectionMethod interface {
+	Select(p_p *Population) []Network
 }
 
-type PopulationCrossoverMethod interface {
-	Crossover(p_p *Population) *Population
-}
-
-// Stores options for Greedy selection
 type GreedySelection struct {
 	selectedProportion int
-}
-
-func (gs_p *GreedySelection) Select(p_p *Population, pOpt_p *PopulationOptions) *Population {
-	//gs := *gs_p
-	//p := *p_p
-
-	return p_p
 }
 
 type DeterministicTournamentSelection struct {
@@ -57,27 +45,82 @@ type TournamentSelection struct {
 	chanceToSelectBest float64
 }
 
-func (ts_p *TournamentSelection) Select(p_p *Population, pOpt_p *PopulationOptions) *Population {
+type ProbabilisticSelection struct {
+	selectedProportion int
+}
+
+func (p_p *Population) Fitness() []chan int {
 	p := *p_p
-	pOpt := *pOpt_p
 
+	channels := make([]chan int, p.size) 
 
-	// Send off goroutines to calculate the population members' fitnesses
-	channels := make([]chan int, pOpt.size) 
-	for i := 0; i < pOpt.size; i++ {
+	for i := 0; i < p.size; i++ {
 
 		go func(n *Network, ch chan int, inputs []bool, expected []bool) {
 			ch <- (*n).Fitness(inputs, expected)
 
-		}(&(p[i]), channels[i], pOpt.testInputs, pOpt.testExpected)
+		}(&(p[i]), channels[i], p.testInputs, p.testExpected)
 	}
+
+	return channels
+}
+
+func (dts_p *DeterministicTournamentSelection) Select(p_p *Population) []Network {
+	p := *p_p
+
+
+	// Send off goroutines to calculate the population members' fitnesses
+	fitnessChannels := p_p.Fitness(p_p)
 
 	// We move as much initialization down here as we can,
 	// because we expect the above goroutines to be the
 	// most expensive time sink in this function. 
 	ts := *ts_p
-	fitnesses := make([]int, pOpt.size)
-	newPopulation := make([]Network pOpt.size)
+	fitnesses := make([]int, p.size)
+	members := make([]Network, p.size)
+
+	// Send off goroutines to process tournament battles
+	for i := 0; i < p.size / ts.selectedProportion; i++ {
+
+		// Get a random set of indexes
+		fighters := Sample(ts.tournamentSize, p.size)
+		fitMap := make(map[int]int)
+
+		// Process fitness channels and map
+		// fitnesses to indexes.
+		bestFitness := math.MaxInt32
+		for _, j := range fighters {
+			// The slice will be initialized to zero
+			// and we return 1 as optimal fitness,
+			// so this is a check for initialization.
+			if fitnesses[j] == 0 {
+				fitnesses[j] <- fitnessChannels[j]
+				close(channels[j])
+			}
+			fitMap[fitnesses[j]] = j
+			if fitnesses[j] < bestFitness {
+				bestFitness = fitnesses[j]
+			}
+		}
+		members[i] = fitMap[bestFitness]
+	}
+
+	return members	
+}
+
+func (ts_p *TournamentSelection) Select(p_p *Population) []Network {
+	p := *p_p
+
+
+	// Send off goroutines to calculate the population members' fitnesses
+	fitnessChannels := p_p.Fitness(p_p)
+
+	// We move as much initialization down here as we can,
+	// because we expect the above goroutines to be the
+	// most expensive time sink in this function. 
+	ts := *ts_p
+	fitnesses := make([]int, p.size)
+	members := make([]Network, p.size)
 	// We have an arbitrary buffer here. 
 	// It should just effect how many goroutines can 
 	// simultaneously end (or all end prior to a
@@ -85,10 +128,10 @@ func (ts_p *TournamentSelection) Select(p_p *Population, pOpt_p *PopulationOptio
 	selectionCh := make(chan int, 20)
 
 	// Send off goroutines to process tournament battles
-	for i := 0; i < pOpt.size / ts.selectedProportion; i++ {
+	for i := 0; i < p.size / ts.selectedProportion; i++ {
 
 		// Get a random set of indexes
-		fighters := Sample(ts.tournamentSize, pOpt.size)
+		fighters := Sample(ts.tournamentSize, p.size)
 		fitMap := make(map[int]int)
 
 		// Process fitness channels and map
@@ -98,7 +141,7 @@ func (ts_p *TournamentSelection) Select(p_p *Population, pOpt_p *PopulationOptio
 			// and we return 1 as optimal fitness,
 			// so this is a check for initialization.
 			if fitnesses[j] == 0 {
-				fitnesses[j] <- channels[j]
+				fitnesses[j] <- fitnessChannels[j]
 				close(channels[j])
 			}
 			fitMap[fitnesses[j]] = j
@@ -136,21 +179,27 @@ func (ts_p *TournamentSelection) Select(p_p *Population, pOpt_p *PopulationOptio
 	}
 
 	// Pull the above indexes as they are calculated
-	for i := 0; i < pOpt.size / ts.selectedProportion; i++ {
-		newPopulation[i] = p[<-selectionCh]
+	for i := 0; i < p.size / ts.selectedProportion; i++ {
+		members[i] = p[<-selectionCh]
 	}
 	close(selectionCh)
 
-	return &newPopulation
+	return members
 }
 
-type ProbabilisticSelection struct {
-	selectedProportion int
-}
-
-func (ps_p *ProbabilisticSelection) Select(p_p *Population, pOpt_p *PopulationOptions) *Population {
-	//ps := *ps_p
+func (ps_p *ProbabilisticSelection) Select(p_p *Population) []Network {
 	//p := *p_p
 
 	return p_p
+}
+
+func (gs_p *GreedySelection) Select(p_p *Population) []Network {
+	//gs := *gs_p
+	//p := *p_p
+
+	return p_p
+}
+
+type CrossoverMethod interface {
+	Crossover(p_p *Population) []Network
 }
