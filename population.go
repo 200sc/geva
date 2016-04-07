@@ -2,17 +2,20 @@ package neural
 
 import (
 	"sort"
-	"rand"
+	"math/rand"
+	"math"
 )
 
 type Population struct {
 	members []Network
 	generationOptions *NetworkGenerationOptions
 	size int
-	selection *SelectionMethod
-	crossover *CrossoverMethod
+	selection SelectionMethod
+	crossover CrossoverMethod
 	testInputs [][]bool
 	testExpected [][]bool
+	weights []int
+	cumulativeweights []int
 }
 
 func (p_p *Population) NextGeneration() *Population {
@@ -45,6 +48,11 @@ type TournamentSelection struct {
 	chanceToSelectBest float64
 }
 
+type DeterministicProbabilisticSelection struct {
+	selectedProportion int
+
+}
+
 type ProbabilisticSelection struct {
 	selectedProportion int
 }
@@ -56,10 +64,10 @@ func (p_p *Population) Fitness() []chan int {
 
 	for i := 0; i < p.size; i++ {
 
-		go func(n *Network, ch chan int, inputs []bool, expected []bool) {
+		go func(n *Network, ch chan int, inputs [][]bool, expected [][]bool) {
 			ch <- (*n).Fitness(inputs, expected)
 
-		}(&(p[i]), channels[i], p.testInputs, p.testExpected)
+		}(&(p.members[i]), channels[i], p.testInputs, p.testExpected)
 	}
 
 	return channels
@@ -70,12 +78,12 @@ func (dts_p *DeterministicTournamentSelection) Select(p_p *Population) []Network
 
 
 	// Send off goroutines to calculate the population members' fitnesses
-	fitnessChannels := p_p.Fitness(p_p)
+	fitnessChannels := p_p.Fitness()
 
 	// We move as much initialization down here as we can,
 	// because we expect the above goroutines to be the
 	// most expensive time sink in this function. 
-	ts := *ts_p
+	ts := *dts_p
 	fitnesses := make([]int, p.size)
 	members := make([]Network, p.size)
 
@@ -94,15 +102,15 @@ func (dts_p *DeterministicTournamentSelection) Select(p_p *Population) []Network
 			// and we return 1 as optimal fitness,
 			// so this is a check for initialization.
 			if fitnesses[j] == 0 {
-				fitnesses[j] <- fitnessChannels[j]
-				close(channels[j])
+				fitnesses[j] = <-fitnessChannels[j]
+				close(fitnessChannels[j])
 			}
 			fitMap[fitnesses[j]] = j
 			if fitnesses[j] < bestFitness {
 				bestFitness = fitnesses[j]
 			}
 		}
-		members[i] = fitMap[bestFitness]
+		members[i] = p.members[fitMap[bestFitness]]
 	}
 
 	return members	
@@ -113,7 +121,7 @@ func (ts_p *TournamentSelection) Select(p_p *Population) []Network {
 
 
 	// Send off goroutines to calculate the population members' fitnesses
-	fitnessChannels := p_p.Fitness(p_p)
+	fitnessChannels := p_p.Fitness()
 
 	// We move as much initialization down here as we can,
 	// because we expect the above goroutines to be the
@@ -141,8 +149,8 @@ func (ts_p *TournamentSelection) Select(p_p *Population) []Network {
 			// and we return 1 as optimal fitness,
 			// so this is a check for initialization.
 			if fitnesses[j] == 0 {
-				fitnesses[j] <- fitnessChannels[j]
-				close(channels[j])
+				fitnesses[j] = <-fitnessChannels[j]
+				close(fitnessChannels[j])
 			}
 			fitMap[fitnesses[j]] = j
 		}
@@ -180,26 +188,36 @@ func (ts_p *TournamentSelection) Select(p_p *Population) []Network {
 
 	// Pull the above indexes as they are calculated
 	for i := 0; i < p.size / ts.selectedProportion; i++ {
-		members[i] = p[<-selectionCh]
+		members[i] = p.members[<-selectionCh]
 	}
 	close(selectionCh)
 
 	return members
 }
 
-func (ps_p *ProbabilisticSelection) Select(p_p *Population) []Network {
-	//p := *p_p
+// func (ps_p *ProbabilisticSelection) Select(p_p *Population) []Network {
+// 	//p := *p_p
 
-	return p_p
-}
+// 	return p_p
+//}
 
-func (gs_p *GreedySelection) Select(p_p *Population) []Network {
-	//gs := *gs_p
-	//p := *p_p
+// func (gs_p *GreedySelection) Select(p_p *Population) []Network {
+// 	//gs := *gs_p
+// 	//p := *p_p
 
-	return p_p
-}
+// 	return p_p
+// }
+
+// func RouletteSlice(sl []int) []int {
+// 	// We want the minimum element (the best element)
+// 	// to have len(sl) weight in the roulette. Each
+// 	// element in the sorted list indexed at i should
+// 	// have len(sl) - i weight. 
+// 	sort.Ints(sl)
+
+// }
+
 
 type CrossoverMethod interface {
-	Crossover(p_p *Population) []Network
+	Crossover(nn []Network) []Network
 }

@@ -71,6 +71,51 @@ func TestNetworkGeneration(*testing.T) {
 	fmt.Println(network.Run([]bool{false,false,false}))
 }
 
+func TestRectifierNetworkGeneration(t *testing.T) {
+	wOpt := FloatMutationOptions{
+		0.66,
+		0.20,
+		5,
+	}
+
+	cgOpt := RectifierColumnGenerationOptions{
+		2,
+		16,
+		0.5,
+	}
+
+	nnmOpt := RectifierNetworkMutationOptions{
+		&wOpt,
+		&cgOpt,
+		0.02,
+		0.05,
+		0.05,
+		0.01,
+		0.02,
+		0.20,
+	}
+
+	nngOpt := RectifierNetworkGenerationOptions{
+		nnmOpt,
+		2,
+		6,
+		3,
+		4,
+		50,
+	}
+
+	network := GenerateRectifierNetwork(&nngOpt)
+	network.Print()
+	fmt.Println(network.Run([]float64{1.0,1.0,1.0}))
+	fmt.Println(network.Run([]float64{1.0,1.0,-1.0}))
+	fmt.Println(network.Run([]float64{1.0,-1.0,1.0}))
+	fmt.Println(network.Run([]float64{1.0,-1.0,-1.0}))
+	fmt.Println(network.Run([]float64{-1.0,1.0,1.0}))	
+	fmt.Println(network.Run([]float64{-1.0,1.0,-1.0}))
+	fmt.Println(network.Run([]float64{-1.0,-1.0,1.0}))
+	fmt.Println(network.Run([]float64{-1.0,-1.0,-1.0}))
+}
+
 func BenchmarkNetworkGeneration(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		wOpt := FloatMutationOptions{

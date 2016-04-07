@@ -33,13 +33,11 @@ func (n_p *RectifierNeuron) String() string {
 	buffer.WriteString("[")
 
 	if len(n) > 0 {
-		i := 0
-		for k := range n {
+		for i, k := range n {
 			buffer.WriteString(strconv.FormatFloat(k,'f',2,64))
 			if i < len(n) - 1 {
 				buffer.WriteString(",")
 			}
-			i++
 		}
 	}
 
@@ -71,7 +69,6 @@ func GenerateRectifierNetwork(nOpt_p *RectifierNetworkGenerationOptions) *Rectif
 
 	nnOpt := *nOpt_p
 	cOpt := *nnOpt.columnOptions
-	nOpt := *cOpt.neuronOptions
 
 	nn := RectifierNetwork{}
 
@@ -90,6 +87,8 @@ func GenerateRectifierNetwork(nOpt_p *RectifierNetworkGenerationOptions) *Rectif
 	for i := 0; i < columnCount; i++ {
 		nn = *(nn.addColumn(&cOpt))
 	}
+
+	nn.Print()
 
 	for i := 0; i < nnOpt.baseMutations; i++ {
 		nn = *(nn.Mutate(&nnOpt.RectifierNetworkMutationOptions))	
@@ -138,7 +137,7 @@ func (nn_p *RectifierNetwork) Run(inputs []float64) []float64 {
 
 					out = math.Max(out,0.0)
 					
-					doneCh <- Output{out, y}
+					doneCh <- RectifierNetworkOutput{out, y}
 
 				}(channels[x][y], doneCh, len(channels[x-1]), y)
 			} else {
@@ -198,13 +197,13 @@ func (nn_p *RectifierNetwork) Run(inputs []float64) []float64 {
 }
 
 // High fitness is bad, and vice versa.
-func (*n_p RectifierNetwork) Fitness(inputs, expected [][]float64) int {
-	fitness := 1
+func (n_p *RectifierNetwork) Fitness(inputs, expected [][]float64) int {
+	fitness := 1.0
 	for i := range inputs {
 		output := (*n_p).Run(inputs[i])
 		for j := range output {
 			fitness += math.Abs(output[j] - expected[i][j])
 		}
 	}
-	return fitness
+	return int(math.Ceil(fitness))
 }

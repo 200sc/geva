@@ -150,7 +150,10 @@ func (nn_p *Network) Run(inputs []bool) []bool {
 
 	channels := make([][]chan int, len(nn))
 	for x,col := range nn {
-		channels[x] = make([]chan int, len(col))
+		channels = append(channels, []chan int{})
+		for _ = range col {
+			channels[x] = append(channels[x], make(chan int))
+		}
 	}
 	for x, col := range nn {
 		for y,neuron := range col {
@@ -281,7 +284,7 @@ func (nn_p *Network) Run(inputs []bool) []bool {
 }
 
 // High fitness is bad, and vice versa.
-func (*n_p Network) Fitness(inputs, expected [][]bool) int {
+func (n_p *Network) Fitness(inputs, expected [][]bool) int {
 	fitness := 1
 	for i := range inputs {
 		output := (*n_p).Run(inputs[i])

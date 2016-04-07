@@ -2,10 +2,12 @@ package neural
 
 import (
 	"math/rand"
+	"fmt"
 )
+
 type RectifierNetworkMutationOptions struct {
 	weightOptions *FloatMutationOptions
-	columnOptions *ColumnGenerationOptions
+	columnOptions *RectifierColumnGenerationOptions
 	// per column
 	neuronReplacementChance float64 
 	neuronAdditionChance float64
@@ -23,7 +25,7 @@ type RectifierNetworkGenerationOptions struct {
 	outputs int 
 	baseMutations int
 } 
-type ColumnGenerationOptions struct {
+type RectifierColumnGenerationOptions struct {
 	minSize int
 	maxSize int
 	defaultAxonWeight float64
@@ -32,11 +34,11 @@ type ColumnGenerationOptions struct {
 /**
  * Mutate this neuron.
  */ 
-func (n *RectifierNeuron) mutate(wOpt_p *FloatMutationOptions) Neuron {
+func (n *RectifierNeuron) mutate(wOpt_p *FloatMutationOptions) RectifierNeuron {
 
 	newNeuron := make(RectifierNeuron, len(*n))
 	for i,weight := range *n {
-		newNeuron[i] = mutateFloat(weight, wOpt_p)
+		newNeuron[i] = mutateFloat(weight, *wOpt_p)
 	}
 
 	return newNeuron
@@ -91,7 +93,7 @@ func (nn *RectifierNetwork) Mutate(mOpt_p *RectifierNetworkMutationOptions) *Rec
 				// taking the neuron just following our first
 				// as our second
 				if axonIndex2 == axonIndex1 {
-					axonIndex2 = (axonIndex2 + 1) % len(col)
+					axonIndex2 = (axonIndex2 + 1) % len(newNetwork[i+1])
 				}
 
 				newNetwork.swapWeights(i, neuronIndex, axonIndex1, axonIndex2)
@@ -127,7 +129,7 @@ func (nn *RectifierNetwork) Mutate(mOpt_p *RectifierNetworkMutationOptions) *Rec
 			// This also applies to rand.Float64() calls
 			// above. 
 			if rand.Float64() < mOpt.neuronMutationChance {
-				newNetwork[x][y] = neuron.mutate(mOpt.neuronOptions)
+				newNetwork[x][y] = neuron.mutate(mOpt.weightOptions)
 			}
 		}
 	}
@@ -139,9 +141,8 @@ func (nn *RectifierNetwork) Mutate(mOpt_p *RectifierNetworkMutationOptions) *Rec
  * Removes a neuron from an index and places a new neuron there in its place.
  * Effectively resetNeuron + addNeuron, if addNeuron took an index.
  */
-func (nn_p *Network) replaceNeuron(columnIndex, neuronIndex, defaultAxonWeight int) {
+func (nn_p *RectifierNetwork) replaceNeuron(columnIndex, neuronIndex int, defaultAxonWeight float64) {
 
-	nOpt := *nOpt_p
 	nn := *nn_p
 
 	neuron := nn[columnIndex][neuronIndex]
@@ -154,7 +155,7 @@ func (nn_p *Network) replaceNeuron(columnIndex, neuronIndex, defaultAxonWeight i
 /**
  * Add a neuron to the end of a column.
  */
-func (nn_p *Network) addNeuron(columnIndex, defaultAxonWeight int) {
+func (nn_p *RectifierNetwork) addNeuron(columnIndex int, defaultAxonWeight float64) {
 
 	nn := *nn_p
 
@@ -176,7 +177,7 @@ func (nn_p *Network) addNeuron(columnIndex, defaultAxonWeight int) {
 /**
  * Remove the column between our output column and the column two indexes prior.
  */
-func (nn_p *Network) removeColumn(cOpt_p *ColumnGenerationOptions) *Network {
+func (nn_p *RectifierNetwork) removeColumn(cOpt_p *RectifierColumnGenerationOptions) *RectifierNetwork {
 
 	nn := *nn_p
 	cOpt := *cOpt_p
@@ -200,7 +201,7 @@ func (nn_p *Network) removeColumn(cOpt_p *ColumnGenerationOptions) *Network {
 	// is larger. 
 	} else if oldLength < len(nn[i+1]) {
 		for j := 0; j < len(nn[i]); j++ {
-			for k := len(nn[i]); k < len(nn[i+1]) k++ {
+			for k := len(nn[i]); k < len(nn[i+1]); k++ {
 				nn[i][j] = append(nn[i][j], cOpt.defaultAxonWeight)
 			}
 		}
@@ -212,7 +213,7 @@ func (nn_p *Network) removeColumn(cOpt_p *ColumnGenerationOptions) *Network {
 /**
  * Add a column between our output column and the column immediately prior.
  */
-func (nn_p *Network) addColumn(cOpt_p *ColumnGenerationOptions) *Network {
+func (nn_p *RectifierNetwork) addColumn(cOpt_p *RectifierColumnGenerationOptions) *RectifierNetwork {
 
 	nn := *nn_p
 	cOpt := *cOpt_p
@@ -229,7 +230,7 @@ func (nn_p *Network) addColumn(cOpt_p *ColumnGenerationOptions) *Network {
 	// a regular column.
 	for j := 0; j < len(nn[i]); j++ {
 		nn[i][j] = make(RectifierNeuron, len(nn[i]))
-		for k := 0; k < len(nn[i]) k++ {
+		for k := 0; k < len(nn[i]); k++ {
 			nn[i][j][k] = cOpt.defaultAxonWeight
 		}
 	}
@@ -250,9 +251,14 @@ func (nn_p *Network) addColumn(cOpt_p *ColumnGenerationOptions) *Network {
 /**
  * Swap two Axons which start from these neurons indexes.
  */
-func (nn_p *Network) swapAxons(columnIndex, neuronIndex, axonIndex1, axonIndex2 int) {
+func (nn_p *RectifierNetwork) swapWeights(columnIndex, neuronIndex, axonIndex1, axonIndex2 int) {
+
+	fmt.Println(columnIndex, neuronIndex, axonIndex1, axonIndex2)
 
 	neuron := (*nn_p)[columnIndex][neuronIndex]
+
+	fmt.Println(len((*nn_p)[columnIndex+1]))
+	fmt.Println(neuron)
 
 	weight1 := neuron[axonIndex1]
 	neuron[axonIndex1] = neuron[axonIndex2]

@@ -1,5 +1,9 @@
 package neural
 
+import (
+	"math/rand"
+)
+
 func KeySet(m map[int]bool) []int {
 	keys := make([]int, len(m))
 
