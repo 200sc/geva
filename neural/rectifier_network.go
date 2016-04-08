@@ -2,8 +2,8 @@ package neural
 
 import (
 	"fmt"
-	"math/rand"
 	"math"
+	"math/rand"
 )
 
 // A neuron has a list of places to send to
@@ -14,13 +14,12 @@ import (
 //
 // For all Neurons which are not in an end column,
 // it's assumed that they have at least one value in their
-// outputs and in their weights, 
+// Outputs and in their weights,
 // for the purpose of mutation algorithms.
-
 
 type RectifierNetworkOutput struct {
 	value float64
-	index int 
+	index int
 }
 
 type RectifierNetwork [][]RectifierNeuron
@@ -29,50 +28,50 @@ type RectifierNetwork [][]RectifierNeuron
  * Take a network and duplicate it
  */
 func (nn_p *RectifierNetwork) Copy() RectifierNetwork {
-	
+
 	nn := *nn_p
 
 	var newNetwork RectifierNetwork
 
 	for i := range nn {
-    	newNetwork = append(newNetwork, make([]RectifierNeuron, len(nn[i])))
-    	copy(newNetwork[i], nn[i])
+		newNetwork = append(newNetwork, make([]RectifierNeuron, len(nn[i])))
+		copy(newNetwork[i], nn[i])
 	}
-	
+
 	return newNetwork
 }
 
 func GenerateRectifierNetwork(nOpt_p *RectifierNetworkGenerationOptions) *RectifierNetwork {
 
 	nnOpt := *nOpt_p
-	cOpt := *nnOpt.columnOptions
+	cOpt := *nnOpt.ColumnOptions
 
 	nn := RectifierNetwork{}
 
 	// Set up the input column
-	inputColumn := make([]RectifierNeuron, nnOpt.inputs)
+	inputColumn := make([]RectifierNeuron, nnOpt.Inputs)
 
 	nn = append(nn, inputColumn)
 
 	// Set up the output column
-	outputColumn := make([]RectifierNeuron, nnOpt.outputs)
+	outputColumn := make([]RectifierNeuron, nnOpt.Outputs)
 
 	nn = append(nn, outputColumn)
 
 	// reset the input column to give it axons
 	for i := 0; i < len(inputColumn); i++ {
 		nn[0][i] = make(RectifierNeuron, len(outputColumn))
-		nn.replaceNeuron(0,i,cOpt.defaultAxonWeight)
+		nn.replaceNeuron(0, i, cOpt.DefaultAxonWeight)
 	}
 
-	columnCount := rand.Intn(nnOpt.maxColumns - nnOpt.minColumns) + nnOpt.minColumns
+	columnCount := rand.Intn(nnOpt.MaxColumns-nnOpt.MinColumns) + nnOpt.MinColumns
 
 	for i := 0; i < columnCount; i++ {
 		nn = *(nn.addColumn(&cOpt))
 	}
 
-	for i := 0; i < nnOpt.baseMutations; i++ {
-		nn = *(nn.Mutate(&nnOpt.RectifierNetworkMutationOptions))	
+	for i := 0; i < nnOpt.BaseMutations; i++ {
+		nn = *(nn.Mutate(&nnOpt.RectifierNetworkMutationOptions))
 	}
 
 	return &nn
@@ -80,8 +79,8 @@ func GenerateRectifierNetwork(nOpt_p *RectifierNetworkGenerationOptions) *Rectif
 
 // Todo: Improve this
 func (nn_p *RectifierNetwork) Print() {
-	for _,col := range *nn_p{
-		for _,n := range col {
+	for _, col := range *nn_p {
+		for _, n := range col {
 			fmt.Print(n.String())
 		}
 		fmt.Println("")
@@ -93,31 +92,31 @@ func (nn_p *RectifierNetwork) Print() {
  * Run some input through a neural network.
  * This returns the network's output column.
  */
-func (nn_p *RectifierNetwork) Run(inputs []float64) []float64 {
+func (nn_p *RectifierNetwork) Run(Inputs []float64) []float64 {
 
 	nn := *nn_p
 
 	doneCh := make(chan RectifierNetworkOutput)
 
 	channels := make([][]chan float64, len(nn))
-	for x,col := range nn {
+	for x, col := range nn {
 		channels = append(channels, []chan float64{})
-		for _ = range col {
+		for range col {
 			channels[x] = append(channels[x], make(chan float64))
 		}
 	}
 	for x, col := range nn {
-		for y,neuron := range col {
-			var l int 
+		for y, neuron := range col {
+			var l int
 			if x == 0 {
 				l = 1
 			} else {
 				l = len(channels[x-1])
 			}
-			if x == len(nn) - 1 {
+			if x == len(nn)-1 {
 				go func(inputChannel chan float64, doneCh chan RectifierNetworkOutput,
-					    inputLength int, y int) {
-					
+					inputLength int, y int) {
+
 					out := 0.0
 
 					for i := 0; i < inputLength; i++ {
@@ -125,15 +124,15 @@ func (nn_p *RectifierNetwork) Run(inputs []float64) []float64 {
 					}
 					close(inputChannel)
 
-					out = math.Max(out,0.0)
-					
+					out = math.Max(out, 0.0)
+
 					doneCh <- RectifierNetworkOutput{out, y}
 
 				}(channels[x][y], doneCh, l, y)
 			} else {
 
 				go func(n RectifierNeuron, inputChannel chan float64,
-						channelColumn []chan float64, inputLength int) {
+					channelColumn []chan float64, inputLength int) {
 
 					out := 0.0
 
@@ -144,11 +143,11 @@ func (nn_p *RectifierNetwork) Run(inputs []float64) []float64 {
 					// It also has each neuron send to every
 					// neuron in the following layer-- a 0
 					// weight is equivalent to not accepting
-					// some input. 
+					// some input.
 					//
 					// At this stage, that means we can
 					// just sum all of our already-weighted
-					// inputs for our value.
+					// Inputs for our value.
 					for i := 0; i < inputLength; i++ {
 						out += <-inputChannel
 					}
@@ -158,7 +157,7 @@ func (nn_p *RectifierNetwork) Run(inputs []float64) []float64 {
 					// Instead of sending a signal 0 or 1
 					// based on a threshold, we send our actual
 					// value (so long as it exceeds 0).
-					out = math.Max(out,0.0)
+					out = math.Max(out, 0.0)
 
 					// As above, we apply the next column's
 					// weights as we send them off.
@@ -172,7 +171,7 @@ func (nn_p *RectifierNetwork) Run(inputs []float64) []float64 {
 
 	// Send the first row their initial values
 	for i, ch := range channels[0] {
-		ch <- inputs[i]
+		ch <- Inputs[i]
 	}
 
 	// We need to wait here, on the last columns being populated
@@ -187,10 +186,10 @@ func (nn_p *RectifierNetwork) Run(inputs []float64) []float64 {
 }
 
 // High fitness is bad, and vice versa.
-func (n_p *RectifierNetwork) Fitness(inputs, expected [][]float64) int {
+func (n_p *RectifierNetwork) Fitness(Inputs, expected [][]float64) int {
 	fitness := 1.0
-	for i := range inputs {
-		output := (*n_p).Run(inputs[i])
+	for i := range Inputs {
+		output := (*n_p).Run(Inputs[i])
 		for j := range output {
 			fitness += math.Abs(output[j] - expected[i][j])
 		}

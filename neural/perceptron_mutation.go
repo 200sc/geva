@@ -3,105 +3,106 @@ package neural
 import (
 	"math/rand"
 )
+
 type NetworkMutationOptions struct {
 	neuronOptions *NeuronMutationOptions
-	columnOptions *ColumnGenerationOptions
+	ColumnOptions *ColumnGenerationOptions
 	// per column
-	neuronReplacementChance float64 
-	neuronAdditionChance float64 
-	axonRemovalChance float64 
-	axonAdditionChance float64 
-	axonSwapChance float64
+	NeuronReplacementChance float64
+	NeuronAdditionChance    float64
+	axonRemovalChance       float64
+	axonAdditionChance      float64
+	axonSwapChance          float64
 	// per network
-	columnRemovalChance float64 
-	columnAdditionChance float64
-	neuronMutationChance float64 
+	ColumnRemovalChance  float64
+	ColumnAdditionChance float64
+	NeuronMutationChance float64
 }
 type NetworkGenerationOptions struct {
 	NetworkMutationOptions
-	minColumns int
-	maxColumns int
-	inputs int
-	outputs int 
-	baseMutations int
+	MinColumns    int
+	MaxColumns    int
+	Inputs        int
+	Outputs       int
+	BaseMutations int
 }
 type NeuronMutationOptions struct {
 	thresholdOptions FloatMutationOptions
-	weightOptions FloatMutationOptions
+	WeightOptions    FloatMutationOptions
 }
 type NeuronGenerationOptions struct {
-	minAxons int
-	maxAxons int
-	defaultThreshold float64
-	defaultAxonWeight float64
+	minAxons          int
+	maxAxons          int
+	defaultThreshold  float64
+	DefaultAxonWeight float64
 }
 type ColumnGenerationOptions struct {
-	minSize int
-	maxSize int
-	neuronOptions *NeuronGenerationOptions 
+	MinSize       int
+	MaxSize       int
+	neuronOptions *NeuronGenerationOptions
 }
 type FloatMutationOptions struct {
-	mutChance float64
-	mutMagnitude float64
-	mutRange int
+	MutChance    float64
+	MutMagnitude float64
+	MutRange     int
 }
 
 /**
- * Modify a float to some float close to it in value. 
+ * Modify a float to some float close to it in value.
  * TODO: Give this a better distribution of randomness.
  */
 func mutateFloat(toMutate float64, opt FloatMutationOptions) float64 {
-	if rand.Float64() >= opt.mutChance {
+	if rand.Float64() >= opt.MutChance {
 		return toMutate
 	}
-	
-	out := (opt.mutMagnitude * float64(rand.Intn(opt.mutRange*2))) + toMutate
-	return out - (opt.mutMagnitude * float64(opt.mutRange))
+
+	out := (opt.MutMagnitude * float64(rand.Intn(opt.MutRange*2))) + toMutate
+	return out - (opt.MutMagnitude * float64(opt.MutRange))
 }
 
 /**
  * Mutate this Perceptron.
- */ 
+ */
 func (n *Perceptron) mutate(mOpt_p *NeuronMutationOptions) Perceptron {
 	mOpt := *mOpt_p
 
 	newThreshold := mutateFloat(n.threshold, mOpt.thresholdOptions)
 
 	newWeights := map[int]float64{}
-	for i,weight := range n.weights {
-		newWeights[i] = mutateFloat(weight, mOpt.weightOptions)
+	for i, weight := range n.weights {
+		newWeights[i] = mutateFloat(weight, mOpt.WeightOptions)
 	}
 
 	return Perceptron{
-			outputs:n.outputs, 
-			threshold:newThreshold,
-			weights:newWeights,
-		}
-} 
+		Outputs:   n.Outputs,
+		threshold: newThreshold,
+		weights:   newWeights,
+	}
+}
 
 /**
  * Mutate this network.
  */
 func (nn *Network) Mutate(mOpt_p *NetworkMutationOptions) *Network {
-	
+
 	mOpt := *mOpt_p
 
 	newNetwork := nn.Copy()
 
-	if rand.Float64() < mOpt.columnRemovalChance {
+	if rand.Float64() < mOpt.ColumnRemovalChance {
 		// We currently only remove the len-1th column
 		// We can't remove a column if we have just one
 		// hidden layer or the output column to remove
 		if len(newNetwork) > 2 {
-			newNetwork = *(newNetwork.removeColumn(mOpt.columnOptions))
+			newNetwork = *(newNetwork.removeColumn(mOpt.ColumnOptions))
 		}
 	}
 
-	if rand.Float64() < mOpt.columnAdditionChance {
+	if rand.Float64() < mOpt.ColumnAdditionChance {
 		// We currently only add a column in the len-1th space
 		// In the future a check against some maximum column count
 		// should be here
-		newNetwork = *(newNetwork.addColumn(mOpt.columnOptions))
+		newNetwork = *(newNetwork.addColumn(mOpt.ColumnOptions))
 	}
 
 	for i := 0; i < len(newNetwork)-1; i++ {
@@ -130,8 +131,8 @@ func (nn *Network) Mutate(mOpt_p *NetworkMutationOptions) *Network {
 
 				// We can't swap axons on neurons who
 				// don't have output axons.
-				if len(col[neuronIndex1].outputs) > 0 && 
-				   len(col[neuronIndex2].outputs) > 0 {
+				if len(col[neuronIndex1].Outputs) > 0 &&
+					len(col[neuronIndex2].Outputs) > 0 {
 					newNetwork.swapAxons(i, neuronIndex1, neuronIndex2)
 				}
 			}
@@ -141,11 +142,11 @@ func (nn *Network) Mutate(mOpt_p *NetworkMutationOptions) *Network {
 		// to the next column
 		if rand.Float64() < mOpt.axonRemovalChance {
 			// We don't want to remove the only
-			// axon a neuron has. 
+			// axon a neuron has.
 			neuronIndex := rand.Intn(len(col))
-			if len(col[neuronIndex].outputs) > 1 {
+			if len(col[neuronIndex].Outputs) > 1 {
 				newNetwork.removeAxon(i, neuronIndex)
-			}	 
+			}
 		}
 
 		// Add an additional axon from this column
@@ -163,46 +164,46 @@ func (nn *Network) Mutate(mOpt_p *NetworkMutationOptions) *Network {
 			// and skipping an iteration of mutation
 			// is much better for us performance-wise.
 
-			axonWeight := (*((mOpt.columnOptions).neuronOptions)).defaultAxonWeight
+			axonWeight := (*((mOpt.ColumnOptions).neuronOptions)).DefaultAxonWeight
 
 			neuronIndex := rand.Intn(len(col))
-			if len(newNetwork[i+1]) != len(col[neuronIndex].outputs) {
+			if len(newNetwork[i+1]) != len(col[neuronIndex].Outputs) {
 				newNetwork.addAxon(i, neuronIndex, axonWeight)
 			}
 		}
 
 		if i != 0 {
-			if rand.Float64() < mOpt.neuronAdditionChance {
+			if rand.Float64() < mOpt.NeuronAdditionChance {
 				// In the future a check on some max length
 				// for a column should exist.
-				newNetwork.addNeuron(i, (*mOpt.columnOptions).neuronOptions)
+				newNetwork.addNeuron(i, (*mOpt.ColumnOptions).neuronOptions)
 			}
 
-			if rand.Float64() < mOpt.neuronReplacementChance {
+			if rand.Float64() < mOpt.NeuronReplacementChance {
 				// We can't remove a column's only neuron
 				if len(col) > 1 {
 					neuronIndex := rand.Intn(len(col))
-					newNetwork.replaceNeuron(i, neuronIndex, (*mOpt.columnOptions).neuronOptions)
+					newNetwork.replaceNeuron(i, neuronIndex, (*mOpt.ColumnOptions).neuronOptions)
 				}
 			}
 		}
 	}
 
 	// Mutate individual neurons
-	for x,column := range newNetwork {
+	for x, column := range newNetwork {
 		for y, neuron := range column {
 
 			// For performance in the future,
 			// We should replace having x * y random calls
 			// with picking an average number of neurons
-			// to always mutate where the average is 
-			// calculated by x * y * mutChance. Then
-			// we'd make x * y * mutChance random index
-			// to-mutate determinations. 
+			// to always mutate where the average is
+			// calculated by x * y * MutChance. Then
+			// we'd make x * y * MutChance random index
+			// to-mutate determinations.
 			//
 			// This also applies to rand.Float64() calls
-			// above. 
-			if rand.Float64() < mOpt.neuronMutationChance {
+			// above.
+			if rand.Float64() < mOpt.NeuronMutationChance {
 				newNetwork[x][y] = neuron.mutate(mOpt.neuronOptions)
 			}
 		}
@@ -214,22 +215,22 @@ func (nn *Network) Mutate(mOpt_p *NetworkMutationOptions) *Network {
 /**
  * Create a copy of this network's output column.
  * Used when adding and removing columns next to the output column.
- */ 
+ */
 func (nn_p *Network) copyOutColumn() []Perceptron {
 
 	nn := *nn_p
 
-	i := len(nn) - 1 
+	i := len(nn) - 1
 
 	// Create a new outColumn
 	outColumn := []Perceptron{}
 	for j := 0; j < len(nn[i]); j++ {
-		outColumn = append(outColumn, 
-						    Perceptron{
-						        threshold: nn[i][j].threshold,
-						        weights: make(map[int]float64),
-								outputs: make(map[int]bool),
-						    })
+		outColumn = append(outColumn,
+			Perceptron{
+				threshold: nn[i][j].threshold,
+				weights:   make(map[int]float64),
+				Outputs:   make(map[int]bool),
+			})
 	}
 	return outColumn
 }
@@ -246,16 +247,16 @@ func (nn_p *Network) resetNeuron(columnIndex int, neuronIndex int) {
 
 	// Axons connecting to this neuron
 	for index := range neuron.weights {
-		if _, ok := prevCol[index].outputs[neuronIndex]; !ok {
+		if _, ok := prevCol[index].Outputs[neuronIndex]; !ok {
 			panic("Neuron weight missing paired output from previous column")
 		}
-		delete(prevCol[index].outputs, neuronIndex)
+		delete(prevCol[index].Outputs, neuronIndex)
 	}
 
 	// Axons leaving from this neuron
-	if columnIndex != (len(nn)-1) {
+	if columnIndex != (len(nn) - 1) {
 		nextCol := nn[columnIndex+1]
-		for index := range neuron.outputs {
+		for index := range neuron.Outputs {
 			delete(nextCol[index].weights, neuronIndex)
 		}
 	}
@@ -276,29 +277,29 @@ func (nn_p *Network) replaceNeuron(columnIndex int, neuronIndex int, nOpt_p *Neu
 
 	// Delete Axons connecting to this neuron
 	for index := range neuron.weights {
-		delete(prevCol[index].outputs, neuronIndex)
+		delete(prevCol[index].Outputs, neuronIndex)
 	}
 
 	// Delete Axons leaving from this neuron
-	for index := range neuron.outputs {
+	for index := range neuron.Outputs {
 		delete(nextCol[index].weights, neuronIndex)
 	}
 
 	nn[columnIndex][neuronIndex] = Perceptron{
-			threshold:nOpt.defaultThreshold,
-			outputs:make(map[int]bool),
-			weights:make(map[int]float64),
-		}
+		threshold: nOpt.defaultThreshold,
+		Outputs:   make(map[int]bool),
+		weights:   make(map[int]float64),
+	}
 
 	// Create new Axons connecting to this neuron
 	axonCount := rand.Intn(nOpt.maxAxons-nOpt.minAxons) + nOpt.minAxons
 	for i := 0; i < axonCount; i++ {
-		nn.addAxonBack(columnIndex, neuronIndex, nOpt.defaultAxonWeight)
+		nn.addAxonBack(columnIndex, neuronIndex, nOpt.DefaultAxonWeight)
 	}
 	// Create new Axons leaving from this neuron
 	axonCount = rand.Intn(nOpt.maxAxons-nOpt.minAxons) + nOpt.minAxons
 	for i := 0; i < axonCount; i++ {
-		nn.addAxon(columnIndex, neuronIndex, nOpt.defaultAxonWeight)
+		nn.addAxon(columnIndex, neuronIndex, nOpt.DefaultAxonWeight)
 	}
 }
 
@@ -306,7 +307,7 @@ func (nn_p *Network) replaceNeuron(columnIndex int, neuronIndex int, nOpt_p *Neu
 // which acted like addNeuron and only removed
 // from the end of the list. An old, random-removal
 // used to exist but was removed due to performance
-// concerns and replaced with replaceNeuron. 
+// concerns and replaced with replaceNeuron.
 
 /**
  * Add a neuron to the end of a column.
@@ -316,22 +317,22 @@ func (nn_p *Network) addNeuron(columnIndex int, nOpt_p *NeuronGenerationOptions)
 	nn := *nn_p
 	nOpt := *nOpt_p
 
-	nn[columnIndex] = append(nn[columnIndex], 
+	nn[columnIndex] = append(nn[columnIndex],
 		Perceptron{
-			threshold:nOpt.defaultThreshold,
-			outputs:make(map[int]bool),
-			weights:make(map[int]float64),
+			threshold: nOpt.defaultThreshold,
+			Outputs:   make(map[int]bool),
+			weights:   make(map[int]float64),
 		})
 
 	// Axons connecting to this neuron
 	axonCount := rand.Intn(nOpt.maxAxons-nOpt.minAxons) + nOpt.minAxons
 	for i := 0; i < axonCount; i++ {
-		nn.addAxonBack(columnIndex, len(nn[columnIndex])-1, nOpt.defaultAxonWeight)
+		nn.addAxonBack(columnIndex, len(nn[columnIndex])-1, nOpt.DefaultAxonWeight)
 	}
 	// Axons leaving from this neuron
 	axonCount = rand.Intn(nOpt.maxAxons-nOpt.minAxons) + nOpt.minAxons
 	for i := 0; i < axonCount; i++ {
-		nn.addAxon(columnIndex, len(nn[columnIndex])-1, nOpt.defaultAxonWeight)
+		nn.addAxon(columnIndex, len(nn[columnIndex])-1, nOpt.DefaultAxonWeight)
 	}
 }
 
@@ -354,16 +355,16 @@ func (nn_p *Network) removeColumn(cOpt_p *ColumnGenerationOptions) *Network {
 		nn.resetNeuron(i, j)
 	}
 
-	nn = append(nn[:i],nn[i+1:]...)
+	nn = append(nn[:i], nn[i+1:]...)
 
 	i--
 
-	// Add in some random connections from the 
+	// Add in some random connections from the
 	// new final column to the output column.
 	for j := 0; j < len(nn[i]); j++ {
 		axonCount := rand.Intn(nOpt.maxAxons-nOpt.minAxons) + nOpt.minAxons
 		for k := 0; k < axonCount; k++ {
-			nn.addAxon(i,j, nOpt.defaultAxonWeight)
+			nn.addAxon(i, j, nOpt.DefaultAxonWeight)
 		}
 	}
 
@@ -378,7 +379,7 @@ func (nn_p *Network) addColumn(cOpt_p *ColumnGenerationOptions) *Network {
 	nn := *nn_p
 	cOpt := *cOpt_p
 
-	i := len(nn) - 1 
+	i := len(nn) - 1
 
 	outColumn := nn.copyOutColumn()
 
@@ -391,7 +392,7 @@ func (nn_p *Network) addColumn(cOpt_p *ColumnGenerationOptions) *Network {
 	// empty column.
 	nn = append(nn, outColumn)
 
-	newSize := rand.Intn(cOpt.maxSize-cOpt.minSize) + cOpt.minSize
+	newSize := rand.Intn(cOpt.MaxSize-cOpt.MinSize) + cOpt.MinSize
 
 	// Repopulate the empty column with new neurons
 	// and connections to the bordering columns.
@@ -416,12 +417,12 @@ func (nn_p *Network) swapAxons(columnIndex int, neuronIndex1 int, neuronIndex2 i
 	// with a data structure that kept track
 	// of a key list along with a map, or
 	// otherwise provided random-element
-	// access to a map. 
-	axonList1 := KeySet(neuron1.outputs)
+	// access to a map.
+	axonList1 := KeySet(neuron1.Outputs)
 	axonIndex1 := axonList1[rand.Intn(len(axonList1))]
 	axon1 := nn[columnIndex+1][axonIndex1]
-	
-	axonList2 := KeySet(neuron2.outputs)
+
+	axonList2 := KeySet(neuron2.Outputs)
 	axonIndex2 := axonList2[rand.Intn(len(axonList2))]
 	axon2 := nn[columnIndex+1][axonIndex2]
 
@@ -437,11 +438,11 @@ func (nn_p *Network) swapAxons(columnIndex int, neuronIndex1 int, neuronIndex2 i
 	delete(axon2.weights, neuronIndex2)
 
 	// Swap sendpoints
-	neuron1.outputs[axonIndex2] = true
-	neuron2.outputs[axonIndex1] = true
+	neuron1.Outputs[axonIndex2] = true
+	neuron2.Outputs[axonIndex1] = true
 	// Clean up old sendpoints
-	delete(neuron1.outputs, axonIndex1)
-	delete(neuron2.outputs, axonIndex2)
+	delete(neuron1.Outputs, axonIndex1)
+	delete(neuron2.Outputs, axonIndex2)
 }
 
 /**
@@ -451,27 +452,27 @@ func (nn *Network) removeAxon(columnIndex int, neuronIndex int) {
 
 	neuron := (*nn)[columnIndex][neuronIndex]
 
-	axonIndex := KeySet(neuron.outputs)[rand.Intn(len(neuron.outputs))]
+	axonIndex := KeySet(neuron.Outputs)[rand.Intn(len(neuron.Outputs))]
 	axon := (*nn)[columnIndex+1][axonIndex]
 
 	// Delete the endpoint
 	delete(axon.weights, neuronIndex)
 
-	// Delete the sendpoint 
-	delete(neuron.outputs, axonIndex)
+	// Delete the sendpoint
+	delete(neuron.Outputs, axonIndex)
 }
 
 /**
  * Add a random Axon which starts from this neuron's index.
  */
-func (nn_p *Network) addAxon(columnIndex int, neuronIndex int, defaultAxonWeight float64) {
+func (nn_p *Network) addAxon(columnIndex int, neuronIndex int, DefaultAxonWeight float64) {
 
 	nn := *nn_p
 
 	nextCol := nn[columnIndex+1]
 	neuron := nn[columnIndex][neuronIndex]
 
-	if len(neuron.outputs) >= len(nextCol) {
+	if len(neuron.Outputs) >= len(nextCol) {
 		return
 	}
 
@@ -486,22 +487,22 @@ func (nn_p *Network) addAxon(columnIndex int, neuronIndex int, defaultAxonWeight
 	}
 
 	// We then remove all indexes which
-	// already exist in our neuron's outputs
-	for choice := range neuron.outputs {
+	// already exist in our neuron's Outputs
+	for choice := range neuron.Outputs {
 		delete(choices, choice)
 	}
 
 	choice := KeySet(choices)[rand.Intn(len(choices))]
 
-	nextCol[choice].weights[neuronIndex] = defaultAxonWeight
-	neuron.outputs[choice] = true
+	nextCol[choice].weights[neuronIndex] = DefaultAxonWeight
+	neuron.Outputs[choice] = true
 }
 
 /**
  * Add a random Axon which ends at this neuron's index.
  */
-func (nn_p *Network) addAxonBack(columnIndex int, neuronIndex int, defaultAxonWeight float64) {
-	
+func (nn_p *Network) addAxonBack(columnIndex int, neuronIndex int, DefaultAxonWeight float64) {
+
 	nn := *nn_p
 
 	nextCol := nn[columnIndex-1]
@@ -529,8 +530,8 @@ func (nn_p *Network) addAxonBack(columnIndex int, neuronIndex int, defaultAxonWe
 
 	choice := KeySet(choices)[rand.Intn(len(choices))]
 
-	nextCol[choice].outputs[neuronIndex] = true
-	neuron.weights[choice] = defaultAxonWeight
+	nextCol[choice].Outputs[neuronIndex] = true
+	neuron.weights[choice] = DefaultAxonWeight
 }
 
 func KeySet(m map[int]bool) []int {
@@ -538,8 +539,8 @@ func KeySet(m map[int]bool) []int {
 
 	i := 0
 	for k := range m {
-	    keys[i] = k
-	    i++
+		keys[i] = k
+		i++
 	}
 
 	return keys

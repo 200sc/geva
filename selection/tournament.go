@@ -1,22 +1,26 @@
 package selection
 
 import (
-	"goevo"
 	"goevo/neural"
+	"goevo/population"
 	"math/rand"
 	"sort"
 )
 
 type TournamentSelection struct {
-	tournamentSize int
+	TournamentSize int
 	// 2 for 1/2, 3 for 1/3, etc
 	// The remaining fraction will
 	// be taken from crossover
-	selectedProportion int
-	chanceToSelectBest float64
+	ParentProportion   int
+	ChanceToSelectBest float64
 }
 
-func (ts_p *TournamentSelection) Select(p_p *goevo.Population) []neural.Network {
+func (ts TournamentSelection) GetParentProportion() int {
+	return ts.ParentProportion
+}
+
+func (ts TournamentSelection) Select(p_p *population.Population) []neural.Network {
 	p := *p_p
 
 	// Send off goroutines to calculate the population members' fitnesses
@@ -25,7 +29,6 @@ func (ts_p *TournamentSelection) Select(p_p *goevo.Population) []neural.Network 
 	// We move as much initialization down here as we can,
 	// because we expect the above goroutines to be the
 	// most expensive time sink in this function.
-	ts := *ts_p
 	fitnesses := make([]int, p.Size)
 	members := make([]neural.Network, p.Size)
 	// We have an arbitrary buffer here.
@@ -35,10 +38,10 @@ func (ts_p *TournamentSelection) Select(p_p *goevo.Population) []neural.Network 
 	selectionCh := make(chan int, 20)
 
 	// Send off goroutines to process tournament battles
-	for i := 0; i < p.Size/ts.selectedProportion; i++ {
+	for i := 0; i < p.Size/ts.ParentProportion; i++ {
 
 		// Get a random set of indexes
-		fighters := Sample(ts.tournamentSize, p.Size)
+		fighters := Sample(ts.TournamentSize, p.Size)
 		fitMap := make(map[int]int)
 
 		// Process fitness channels and map
@@ -82,11 +85,11 @@ func (ts_p *TournamentSelection) Select(p_p *goevo.Population) []neural.Network 
 			// index has a very minimal bias
 			selectionCh <- fitMap[keys[len(keys)-1]]
 
-		}(fitMap, selectionCh, ts.chanceToSelectBest)
+		}(fitMap, selectionCh, ts.ChanceToSelectBest)
 	}
 
 	// Pull the above indexes as they are calculated
-	for i := 0; i < p.Size/ts.selectedProportion; i++ {
+	for i := 0; i < p.Size/ts.ParentProportion; i++ {
 		members[i] = p.Members[<-selectionCh]
 	}
 	close(selectionCh)

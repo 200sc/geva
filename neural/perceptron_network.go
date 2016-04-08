@@ -7,28 +7,27 @@ import (
 
 type Network [][]Perceptron
 
-
 /**
  * Take a network and duplicate it
  */
 func (nn_p *Network) Copy() Network {
-	
+
 	nn := *nn_p
 
 	var newNetwork Network
 
 	for i := range nn {
-    	newNetwork = append(newNetwork, make([]Perceptron, len(nn[i])))
-    	copy(newNetwork[i], nn[i])
+		newNetwork = append(newNetwork, make([]Perceptron, len(nn[i])))
+		copy(newNetwork[i], nn[i])
 	}
-	
+
 	return newNetwork
 }
 
 func GenerateNetwork(nOpt_p *NetworkGenerationOptions) *Network {
 
 	nnOpt := *nOpt_p
-	cOpt := *nnOpt.columnOptions
+	cOpt := *nnOpt.ColumnOptions
 	nOpt := *cOpt.neuronOptions
 
 	nn := Network{}
@@ -36,11 +35,11 @@ func GenerateNetwork(nOpt_p *NetworkGenerationOptions) *Network {
 	// Set up the input column
 	inputColumn := []Perceptron{}
 
-	for i := 0; i < nnOpt.inputs; i++ {
+	for i := 0; i < nnOpt.Inputs; i++ {
 		n := Perceptron{threshold: nOpt.defaultThreshold,
-					weights: map[int]float64{0:nOpt.defaultAxonWeight},
-					outputs: make(map[int]bool),
-				}
+			weights: map[int]float64{0: nOpt.DefaultAxonWeight},
+			Outputs: make(map[int]bool),
+		}
 		inputColumn = append(inputColumn, n)
 	}
 
@@ -49,25 +48,25 @@ func GenerateNetwork(nOpt_p *NetworkGenerationOptions) *Network {
 	// Set up the output column
 	outputColumn := []Perceptron{}
 
-	for i := 0; i < nnOpt.outputs; i++ {
+	for i := 0; i < nnOpt.Outputs; i++ {
 		n := Perceptron{
 			threshold: nOpt.defaultThreshold,
-			weights: make(map[int]float64),
-			outputs: make(map[int]bool),
+			weights:   make(map[int]float64),
+			Outputs:   make(map[int]bool),
 		}
 		outputColumn = append(outputColumn, n)
 	}
 
 	nn = append(nn, outputColumn)
 
-	columnCount := rand.Intn(nnOpt.maxColumns - nnOpt.minColumns) + nnOpt.minColumns
+	columnCount := rand.Intn(nnOpt.MaxColumns-nnOpt.MinColumns) + nnOpt.MinColumns
 
 	for i := 0; i < columnCount; i++ {
 		nn = *(nn.addColumn(&cOpt))
 	}
 
-	for i := 0; i < nnOpt.baseMutations; i++ {
-		nn = *(nn.Mutate(&nnOpt.NetworkMutationOptions))	
+	for i := 0; i < nnOpt.BaseMutations; i++ {
+		nn = *(nn.Mutate(&nnOpt.NetworkMutationOptions))
 	}
 
 	return &nn
@@ -75,8 +74,8 @@ func GenerateNetwork(nOpt_p *NetworkGenerationOptions) *Network {
 
 // Todo: Improve this
 func (nn_p *Network) Print() {
-	for _,col := range *nn_p{
-		for _,n := range col {
+	for _, col := range *nn_p {
+		for _, n := range col {
 			fmt.Print(n.String())
 		}
 		fmt.Println("")
@@ -88,44 +87,44 @@ func (nn_p *Network) Print() {
  * Run some input through a neural network.
  * This returns the network's output column.
  */
-func (nn_p *Network) Run(inputs []bool) []bool {
+func (nn_p *Network) Run(Inputs []bool) []bool {
 
 	nn := *nn_p
 
 	doneCh := make(chan int)
 
 	channels := make([][]chan int, len(nn))
-	for x,col := range nn {
+	for x, col := range nn {
 		channels = append(channels, []chan int{})
-		for _ = range col {
+		for range col {
 			channels[x] = append(channels[x], make(chan int))
 		}
 	}
 	for x, col := range nn {
-		for y,neuron := range col {
-			if x == len(nn) - 1 {
+		for y, neuron := range col {
+			if x == len(nn)-1 {
 				go func(n Perceptron, inputChannel chan int, doneCh chan int, y int) {
-					inputs := make(map[int]float64)
+					Inputs := make(map[int]float64)
 
-					for _ = range n.weights {
+					for range n.weights {
 						input := <-inputChannel
 						if input < 0 {
-							inputs[(-1*input)-1] = 0
+							Inputs[(-1*input)-1] = 0
 						} else {
-							inputs[(input-1)] = 1
+							Inputs[(input - 1)] = 1
 						}
 					}
 					close(inputChannel)
 
 					out := 0.0
-					for i,weight := range n.weights {
-						out += weight * inputs[i]
+					for i, weight := range n.weights {
+						out += weight * Inputs[i]
 					}
-					
-					var result int 
+
+					var result int
 					if out <= n.threshold {
 						// If we didn't add one, the 0-index
-						// would be indistinguishable from others 
+						// would be indistinguishable from others
 						result = -1 * (y + 1)
 					} else {
 						result = y + 1
@@ -139,26 +138,26 @@ func (nn_p *Network) Run(inputs []bool) []bool {
 				// Create a goroutine for every channel index
 				// which accepts the neuron at that index
 				go func(n Perceptron, inputChannel chan int, channelColumn []chan int, y int, x int) {
-					inputs := make(map[int]float64)
+					Inputs := make(map[int]float64)
 
-					// Wait on all expected inputs.
+					// Wait on all expected Inputs.
 					// An input is the form of a positive
 					// or negative index from the previous column.
 					// If it's negative, the signal we received from
 					// that column is false. If it's positive, true.
-					// 
+					//
 					// Those signals are then mapped according to
 					// their column, as our weights are also column-
-					// indexed. 
+					// indexed.
 					for i := 0; i < len(n.weights); i++ {
 						input := <-inputChannel
 						if input < 0 {
 							// This 1 subraction is to
 							// compensate for the 0-indexing
 							// to 1-indexing shift
-							inputs[(-1*input)-1] = 0
+							Inputs[(-1*input)-1] = 0
 						} else {
-							inputs[(input-1)] = 1
+							Inputs[(input - 1)] = 1
 						}
 					}
 					// Technically we probably
@@ -167,33 +166,33 @@ func (nn_p *Network) Run(inputs []bool) []bool {
 					// more importantly, lets us know if
 					// we're majorly screwing up by sending
 					// to a channel we're supposed to be
-					// done with. 
+					// done with.
 					close(inputChannel)
 
 					// Sum the signals received
 					// as according to our weights.
 					out := 0.0
-					for i,weight := range n.weights {
-						out += weight * inputs[i]
+					for i, weight := range n.weights {
+						out += weight * Inputs[i]
 					}
-					
-					// Our result is either negative or 
+
+					// Our result is either negative or
 					// postive based on whether our sum
 					// exceeds our threshold.
-					var result int 
+					var result int
 					if out <= n.threshold {
 						// If we didn't add one, the 0-index
-						// would be indistinguishable from others 
+						// would be indistinguishable from others
 						result = -1 * (y + 1)
 					} else {
 						result = y + 1
 					}
 
-					// Send our result to all of 
+					// Send our result to all of
 					// this neuron's output channels.
 					// If this is the last column,
-					// outputs should be empty.
-					for outY,_ := range n.outputs {
+					// Outputs should be empty.
+					for outY := range n.Outputs {
 						channelColumn[outY] <- result
 					}
 
@@ -204,11 +203,11 @@ func (nn_p *Network) Run(inputs []bool) []bool {
 
 	// Send the first row their initial values
 	for i, ch := range channels[0] {
-		if inputs[i] {
+		if Inputs[i] {
 			ch <- 1
- 		} else {
- 			ch <- -1
- 		}
+		} else {
+			ch <- -1
+		}
 	}
 
 	// We need to wait here, on the last columns being populated
@@ -230,15 +229,25 @@ func (nn_p *Network) Run(inputs []bool) []bool {
 }
 
 // High fitness is bad, and vice versa.
-func (n_p *Network) Fitness(inputs, expected [][]bool) int {
+func (n_p *Network) Fitness(Inputs, expected [][]float64) int {
 	fitness := 1
-	for i := range inputs {
-		output := (*n_p).Run(inputs[i])
+	for i := range Inputs {
+		bool_Inputs := toBoolSlice(Inputs[i])
+		bool_expected := toBoolSlice(expected[i])
+		output := (*n_p).Run(bool_Inputs)
 		for j := range output {
-			if output[j] != expected[i][j] {
+			if output[j] != bool_expected[j] {
 				fitness++
 			}
 		}
 	}
 	return fitness
+}
+
+func toBoolSlice(s []float64) []bool {
+	out := make([]bool, len(s))
+	for i, v := range s {
+		out[i] = (v >= 0.5)
+	}
+	return out
 }

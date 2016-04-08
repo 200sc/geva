@@ -1,17 +1,17 @@
 package selection
 
 import (
-	"goevo"
 	"goevo/neural"
+	"goevo/population"
 	"math"
 )
 
 type DeterministicTournamentSelection struct {
-	tournamentSize     int
-	selectedProportion int
+	TournamentSize   int
+	ParentProportion int
 }
 
-func (dts_p *DeterministicTournamentSelection) Select(p_p *goevo.Population) []neural.Network {
+func (dts_p *DeterministicTournamentSelection) Select(p_p *population.Population) []neural.Network {
 	p := *p_p
 
 	// Send off goroutines to calculate the population members' fitnesses
@@ -25,10 +25,10 @@ func (dts_p *DeterministicTournamentSelection) Select(p_p *goevo.Population) []n
 	members := make([]neural.Network, p.Size)
 
 	// Send off goroutines to process tournament battles
-	for i := 0; i < p.Size/ts.selectedProportion; i++ {
+	for i := 0; i < p.Size/ts.ParentProportion; i++ {
 
 		// Get a random set of indexes
-		fighters := Sample(ts.tournamentSize, p.Size)
+		fighters := Sample(ts.TournamentSize, p.Size)
 		fitMap := make(map[int]int)
 
 		// Process fitness channels and map

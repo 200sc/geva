@@ -13,15 +13,15 @@ import (
 //
 // For all Perceptrons which are not in an end column,
 // it's assumed that they have at least one value in their
-// outputs and in their weights, 
+// Outputs and in their weights,
 // for the purpose of mutation algorithms.
 type Perceptron struct {
 	threshold float64
 	// For a performance boost and complexity reduction,
-	// this could be replaced with a data structure of 
-	// a map which externally keeps track of an array of 
+	// this could be replaced with a data structure of
+	// a map which externally keeps track of an array of
 	// keys for random element access
-	outputs map[int]bool
+	Outputs map[int]bool
 	weights map[int]float64
 }
 
@@ -32,21 +32,21 @@ func (n_p *Perceptron) String() string {
 
 	buffer.WriteString("[")
 	buffer.WriteString("t:")
-	buffer.WriteString(strconv.FormatFloat(n.threshold,'f',2,64))
+	buffer.WriteString(strconv.FormatFloat(n.threshold, 'f', 2, 64))
 	for k, v := range n.weights {
 		buffer.WriteString("(")
 		buffer.WriteString(strconv.Itoa(k))
 		buffer.WriteString(",")
-		buffer.WriteString(strconv.FormatFloat(v,'f',2,64))
+		buffer.WriteString(strconv.FormatFloat(v, 'f', 2, 64))
 		buffer.WriteString(")")
 	}
 
-	if len(n.outputs) > 0 {
+	if len(n.Outputs) > 0 {
 		buffer.WriteString("->")
 		i := 0
-		for k := range n.outputs {
+		for k := range n.Outputs {
 			buffer.WriteString(strconv.Itoa(k))
-			if i < len(n.outputs) - 1 {
+			if i < len(n.Outputs)-1 {
 				buffer.WriteString(",")
 			}
 			i++
@@ -55,4 +55,4 @@ func (n_p *Perceptron) String() string {
 
 	buffer.WriteString("] ")
 	return buffer.String()
-}	
+}
