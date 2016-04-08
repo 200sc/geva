@@ -79,8 +79,8 @@ func TestRectifierNetworkGeneration(t *testing.T) {
 	}
 
 	cgOpt := RectifierColumnGenerationOptions{
-		3,
-		5,
+		2,
+		16,
 		0.1,
 	}
 
@@ -98,7 +98,7 @@ func TestRectifierNetworkGeneration(t *testing.T) {
 	nngOpt := RectifierNetworkGenerationOptions{
 		nnmOpt,
 		5,
-		8,
+		20,
 		3,
 		4,
 		50,
