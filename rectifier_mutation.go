@@ -2,7 +2,6 @@ package neural
 
 import (
 	"math/rand"
-	"fmt"
 )
 
 type RectifierNetworkMutationOptions struct {
@@ -253,12 +252,7 @@ func (nn_p *RectifierNetwork) addColumn(cOpt_p *RectifierColumnGenerationOptions
  */
 func (nn_p *RectifierNetwork) swapWeights(columnIndex, neuronIndex, axonIndex1, axonIndex2 int) {
 
-	fmt.Println(columnIndex, neuronIndex, axonIndex1, axonIndex2)
-
 	neuron := (*nn_p)[columnIndex][neuronIndex]
-
-	fmt.Println(len((*nn_p)[columnIndex+1]))
-	fmt.Println(neuron)
 
 	weight1 := neuron[axonIndex1]
 	neuron[axonIndex1] = neuron[axonIndex2]

@@ -82,13 +82,17 @@ func GenerateRectifierNetwork(nOpt_p *RectifierNetworkGenerationOptions) *Rectif
 
 	nn = append(nn, outputColumn)
 
+	// reset the input column to give it axons
+	for i := 0; i < len(inputColumn); i++ {
+		nn[0][i] = make(RectifierNeuron, len(outputColumn))
+		nn.replaceNeuron(0,i,cOpt.defaultAxonWeight)
+	}
+
 	columnCount := rand.Intn(nnOpt.maxColumns - nnOpt.minColumns) + nnOpt.minColumns
 
 	for i := 0; i < columnCount; i++ {
 		nn = *(nn.addColumn(&cOpt))
 	}
-
-	nn.Print()
 
 	for i := 0; i < nnOpt.baseMutations; i++ {
 		nn = *(nn.Mutate(&nnOpt.RectifierNetworkMutationOptions))	
@@ -120,10 +124,19 @@ func (nn_p *RectifierNetwork) Run(inputs []float64) []float64 {
 
 	channels := make([][]chan float64, len(nn))
 	for x,col := range nn {
-		channels[x] = make([]chan float64, len(col))
+		channels = append(channels, []chan float64{})
+		for _ = range col {
+			channels[x] = append(channels[x], make(chan float64))
+		}
 	}
 	for x, col := range nn {
 		for y,neuron := range col {
+			var l int 
+			if x == 0 {
+				l = 1
+			} else {
+				l = len(channels[x-1])
+			}
 			if x == len(nn) - 1 {
 				go func(inputChannel chan float64, doneCh chan RectifierNetworkOutput,
 					    inputLength int, y int) {
@@ -139,7 +152,7 @@ func (nn_p *RectifierNetwork) Run(inputs []float64) []float64 {
 					
 					doneCh <- RectifierNetworkOutput{out, y}
 
-				}(channels[x][y], doneCh, len(channels[x-1]), y)
+				}(channels[x][y], doneCh, l, y)
 			} else {
 
 				go func(n RectifierNeuron, inputChannel chan float64,
@@ -175,7 +188,7 @@ func (nn_p *RectifierNetwork) Run(inputs []float64) []float64 {
 					for i, weight := range n {
 						channelColumn[i] <- out * weight
 					}
-				}(neuron, channels[x][y], channels[x+1], len(channels[x-1]))
+				}(neuron, channels[x][y], channels[x+1], l)
 			}
 		}
 	}

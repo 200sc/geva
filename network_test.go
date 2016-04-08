@@ -73,32 +73,32 @@ func TestNetworkGeneration(*testing.T) {
 
 func TestRectifierNetworkGeneration(t *testing.T) {
 	wOpt := FloatMutationOptions{
-		0.66,
+		0.40,
 		0.20,
 		5,
 	}
 
 	cgOpt := RectifierColumnGenerationOptions{
-		2,
-		16,
-		0.5,
+		3,
+		5,
+		0.1,
 	}
 
 	nnmOpt := RectifierNetworkMutationOptions{
 		&wOpt,
 		&cgOpt,
 		0.02,
-		0.05,
-		0.05,
+		0.06,
+		0.06,
 		0.01,
-		0.02,
-		0.20,
+		0.01,
+		0.33,
 	}
 
 	nngOpt := RectifierNetworkGenerationOptions{
 		nnmOpt,
-		2,
-		6,
+		5,
+		8,
 		3,
 		4,
 		50,
