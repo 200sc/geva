@@ -50,7 +50,7 @@ func (nn *RectifierNetwork) Mutate(mOpt_p *RectifierNetworkMutationOptions) *Rec
 	
 	mOpt := *mOpt_p
 
-	newNetwork := nn.copy()
+	newNetwork := nn.Copy()
 
 	if rand.Float64() < mOpt.columnRemovalChance {
 		// We currently only remove the len-1th column

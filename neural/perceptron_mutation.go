@@ -60,9 +60,9 @@ func mutateFloat(toMutate float64, opt FloatMutationOptions) float64 {
 }
 
 /**
- * Mutate this neuron.
+ * Mutate this Perceptron.
  */ 
-func (n *Neuron) mutate(mOpt_p *NeuronMutationOptions) Neuron {
+func (n *Perceptron) mutate(mOpt_p *NeuronMutationOptions) Perceptron {
 	mOpt := *mOpt_p
 
 	newThreshold := mutateFloat(n.threshold, mOpt.thresholdOptions)
@@ -72,7 +72,7 @@ func (n *Neuron) mutate(mOpt_p *NeuronMutationOptions) Neuron {
 		newWeights[i] = mutateFloat(weight, mOpt.weightOptions)
 	}
 
-	return Neuron{
+	return Perceptron{
 			outputs:n.outputs, 
 			threshold:newThreshold,
 			weights:newWeights,
@@ -86,7 +86,7 @@ func (nn *Network) Mutate(mOpt_p *NetworkMutationOptions) *Network {
 	
 	mOpt := *mOpt_p
 
-	newNetwork := nn.copy()
+	newNetwork := nn.Copy()
 
 	if rand.Float64() < mOpt.columnRemovalChance {
 		// We currently only remove the len-1th column
@@ -215,17 +215,17 @@ func (nn *Network) Mutate(mOpt_p *NetworkMutationOptions) *Network {
  * Create a copy of this network's output column.
  * Used when adding and removing columns next to the output column.
  */ 
-func (nn_p *Network) copyOutColumn() []Neuron {
+func (nn_p *Network) copyOutColumn() []Perceptron {
 
 	nn := *nn_p
 
 	i := len(nn) - 1 
 
 	// Create a new outColumn
-	outColumn := []Neuron{}
+	outColumn := []Perceptron{}
 	for j := 0; j < len(nn[i]); j++ {
 		outColumn = append(outColumn, 
-						    Neuron{
+						    Perceptron{
 						        threshold: nn[i][j].threshold,
 						        weights: make(map[int]float64),
 								outputs: make(map[int]bool),
@@ -284,7 +284,7 @@ func (nn_p *Network) replaceNeuron(columnIndex int, neuronIndex int, nOpt_p *Neu
 		delete(nextCol[index].weights, neuronIndex)
 	}
 
-	nn[columnIndex][neuronIndex] = Neuron{
+	nn[columnIndex][neuronIndex] = Perceptron{
 			threshold:nOpt.defaultThreshold,
 			outputs:make(map[int]bool),
 			weights:make(map[int]float64),
@@ -317,7 +317,7 @@ func (nn_p *Network) addNeuron(columnIndex int, nOpt_p *NeuronGenerationOptions)
 	nOpt := *nOpt_p
 
 	nn[columnIndex] = append(nn[columnIndex], 
-		Neuron{
+		Perceptron{
 			threshold:nOpt.defaultThreshold,
 			outputs:make(map[int]bool),
 			weights:make(map[int]float64),
@@ -385,7 +385,7 @@ func (nn_p *Network) addColumn(cOpt_p *ColumnGenerationOptions) *Network {
 	for j := 0; j < len(nn[i]); j++ {
 		nn.resetNeuron(i, j)
 	}
-	nn[i] = []Neuron{}
+	nn[i] = []Perceptron{}
 
 	// Place the new outColumn after the
 	// empty column.
@@ -531,4 +531,16 @@ func (nn_p *Network) addAxonBack(columnIndex int, neuronIndex int, defaultAxonWe
 
 	nextCol[choice].outputs[neuronIndex] = true
 	neuron.weights[choice] = defaultAxonWeight
+}
+
+func KeySet(m map[int]bool) []int {
+	keys := make([]int, len(m))
+
+	i := 0
+	for k := range m {
+	    keys[i] = k
+	    i++
+	}
+
+	return keys
 }

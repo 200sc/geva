@@ -174,3 +174,42 @@ func BenchmarkNetworkGeneration(b *testing.B) {
 		network.Run([]bool{true,true,true})
 	}
 }
+
+func BenchmarkRectifierNetworkGeneration(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		wOpt := FloatMutationOptions{
+			0.66,
+			0.05,
+			5,
+		}
+
+		cgOpt := RectifierColumnGenerationOptions{
+			2,
+			16,
+			0.1,
+		}
+
+		nnmOpt := RectifierNetworkMutationOptions{
+			&wOpt,
+			&cgOpt,
+			0.02,
+			0.05,
+			0.05,
+			0.01,
+			0.02,
+			0.10,
+		}
+
+		nngOpt := RectifierNetworkGenerationOptions{
+			nnmOpt,
+			10,
+			20,
+			3,
+			4,
+			50,
+		}
+
+		network := GenerateRectifierNetwork(&nngOpt)
+		network.Run([]float64{1.0,1.0,1.0})
+	}
+}

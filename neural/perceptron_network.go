@@ -2,77 +2,23 @@ package neural
 
 import (
 	"fmt"
-	"bytes"
 	"math/rand"
-	"strconv"
 )
 
-// A neuron has a list of places to send to
-// and a mapping of places it receives from to weights.
-// These lists are represented as integers, as a neuron has some
-// presence in a "column" of neurons-- it recieves
-// from the previous column and sends to the following.
-//
-// For all Neurons which are not in an end column,
-// it's assumed that they have at least one value in their
-// outputs and in their weights, 
-// for the purpose of mutation algorithms.
-type Neuron struct {
-	threshold float64
-	// For a performance boost and complexity reduction,
-	// this could be replaced with a data structure of 
-	// a map which externally keeps track of an array of 
-	// keys for random element access
-	outputs map[int]bool
-	weights map[int]float64
-}
-
-func (n_p *Neuron) String() string {
-	var buffer bytes.Buffer
-
-	n := *n_p
-
-	buffer.WriteString("[")
-	buffer.WriteString("t:")
-	buffer.WriteString(strconv.FormatFloat(n.threshold,'f',2,64))
-	for k, v := range n.weights {
-		buffer.WriteString("(")
-		buffer.WriteString(strconv.Itoa(k))
-		buffer.WriteString(",")
-		buffer.WriteString(strconv.FormatFloat(v,'f',2,64))
-		buffer.WriteString(")")
-	}
-
-	if len(n.outputs) > 0 {
-		buffer.WriteString("->")
-		i := 0
-		for k := range n.outputs {
-			buffer.WriteString(strconv.Itoa(k))
-			if i < len(n.outputs) - 1 {
-				buffer.WriteString(",")
-			}
-			i++
-		}
-	}
-
-	buffer.WriteString("] ")
-	return buffer.String()
-}	
-
-type Network [][]Neuron
+type Network [][]Perceptron
 
 
 /**
  * Take a network and duplicate it
  */
-func (nn_p *Network) copy() Network {
+func (nn_p *Network) Copy() Network {
 	
 	nn := *nn_p
 
 	var newNetwork Network
 
 	for i := range nn {
-    	newNetwork = append(newNetwork, make([]Neuron, len(nn[i])))
+    	newNetwork = append(newNetwork, make([]Perceptron, len(nn[i])))
     	copy(newNetwork[i], nn[i])
 	}
 	
@@ -88,10 +34,10 @@ func GenerateNetwork(nOpt_p *NetworkGenerationOptions) *Network {
 	nn := Network{}
 
 	// Set up the input column
-	inputColumn := []Neuron{}
+	inputColumn := []Perceptron{}
 
 	for i := 0; i < nnOpt.inputs; i++ {
-		n := Neuron{threshold: nOpt.defaultThreshold,
+		n := Perceptron{threshold: nOpt.defaultThreshold,
 					weights: map[int]float64{0:nOpt.defaultAxonWeight},
 					outputs: make(map[int]bool),
 				}
@@ -101,10 +47,10 @@ func GenerateNetwork(nOpt_p *NetworkGenerationOptions) *Network {
 	nn = append(nn, inputColumn)
 
 	// Set up the output column
-	outputColumn := []Neuron{}
+	outputColumn := []Perceptron{}
 
 	for i := 0; i < nnOpt.outputs; i++ {
-		n := Neuron{
+		n := Perceptron{
 			threshold: nOpt.defaultThreshold,
 			weights: make(map[int]float64),
 			outputs: make(map[int]bool),
@@ -158,7 +104,7 @@ func (nn_p *Network) Run(inputs []bool) []bool {
 	for x, col := range nn {
 		for y,neuron := range col {
 			if x == len(nn) - 1 {
-				go func(n Neuron, inputChannel chan int, doneCh chan int, y int) {
+				go func(n Perceptron, inputChannel chan int, doneCh chan int, y int) {
 					inputs := make(map[int]float64)
 
 					for _ = range n.weights {
@@ -192,7 +138,7 @@ func (nn_p *Network) Run(inputs []bool) []bool {
 
 				// Create a goroutine for every channel index
 				// which accepts the neuron at that index
-				go func(n Neuron, inputChannel chan int, channelColumn []chan int, y int, x int) {
+				go func(n Perceptron, inputChannel chan int, channelColumn []chan int, y int, x int) {
 					inputs := make(map[int]float64)
 
 					// Wait on all expected inputs.
