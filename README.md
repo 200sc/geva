@@ -15,3 +15,5 @@ More neuron types, or a modular network which could take any sort of neuron type
 We'd like to add Demetic Grouping.
 
 Once the above is done, we'd like to add Genetic Programs and Genetic Algorithms.
+
+Then, a conversion to the JVM (Probably Scala).
