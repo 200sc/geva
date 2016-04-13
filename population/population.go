@@ -58,6 +58,8 @@ func (p_p *Population) Print() {
 // 	sort.Ints(sl)
 // }
 
+// Used as Generic-esque helpers for populations
+
 type SelectionMethod interface {
 	Select(p_p *Population) []neural.Network
 	GetParentProportion() int

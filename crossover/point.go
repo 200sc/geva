@@ -33,9 +33,17 @@ func (pc PointCrossover) Crossover(nn []neural.Network, populated int) []neural.
 		n1 := nn[index1]
 		n2 := nn[index2]
 
+		// Inc here is the value we use to ensure
+		// distance between points-- each random
+		// point is given an equal portion to be fit into.
+		// This means a higher number of points will be
+		// more uniform for smaller networks. numPoints
+		// higher than 5 is not recommended, but hey
+		// what do I know
 		inc := 1.0 / float64(pc.NumPoints)
 		points := make([]float64, pc.NumPoints)
 
+		// Generate a series of random points to split on
 		i := 0
 		for pointRange := 0.0; pointRange < 1.0; pointRange += inc {
 			r := (rand.Float64() / float64(pc.NumPoints)) + pointRange
@@ -50,6 +58,9 @@ func (pc PointCrossover) Crossover(nn []neural.Network, populated int) []neural.
 
 		nn[j] = activeNetwork.Make()
 
+		// Populate our new empty network by
+		// combining the two parent networks
+		// as according to the above split points
 		for _, v := range points {
 			end = int(math.Ceil(float64(activeNetwork.Length()) * v))
 			nn[j] = nn[j].Append(activeNetwork.Slice(start, end))
@@ -63,6 +74,7 @@ func (pc PointCrossover) Crossover(nn []neural.Network, populated int) []neural.
 			}
 			start = end
 		}
+		// Add on the remaining columns from the last network.
 		end = int(math.Ceil(float64(activeNetwork.Length()) * points[len(points)-1]))
 		nn[j] = nn[j].Append(activeNetwork.SliceToEnd(end))
 	}

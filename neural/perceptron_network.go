@@ -228,6 +228,10 @@ func (nn_p *PerceptronNetwork) Run(Inputs []bool) []bool {
 	return output
 }
 
+// Generics helper methods.
+// Satisfy the Network interface
+// and allow Networks to be used as slices
+
 func (n PerceptronNetwork) Get(x, y int) Neuron {
 	return n[x][y]
 }
