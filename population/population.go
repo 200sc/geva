@@ -17,6 +17,9 @@ type Population struct {
 	CumulativeWeights []int // ^
 }
 
+// This will change as more things take place
+// in a generation. Selection, Crossover, and Mutation
+// are granted.
 func (p_p *Population) NextGeneration() *Population {
 	p := *p_p
 
@@ -27,6 +30,12 @@ func (p_p *Population) NextGeneration() *Population {
 	}
 	return &p
 }
+
+// Relative misnomer
+// This doesn't calculate the fitness of the population,
+// at least not immediately.
+// It starts a bunch of goroutines which will then eventually get their fitnesses
+// back to you via the channels this returns.
 
 func (p_p *Population) Fitness() []chan int {
 	p := *p_p

@@ -11,26 +11,26 @@ import (
 
 func TestPopulationRun(t *testing.T) {
 	wOpt := neural.FloatMutationOptions{
-		0.40,
-		0.20,
+		0.50,
+		0.10,
 		5,
 	}
 
 	cgOpt := neural.RectifierColumnGenerationOptions{
 		3,
 		4,
-		0.1,
+		0.5,
 	}
 
 	nnmOpt := neural.RectifierNetworkMutationOptions{
 		&wOpt,
 		&cgOpt,
-		0.02,
+		0.05,
 		0.00,
-		0.06,
+		0.05,
 		0.00,
 		0.00,
-		0.33,
+		0.30,
 	}
 
 	nngOpt := neural.RectifierNetworkGenerationOptions{
@@ -42,16 +42,21 @@ func TestPopulationRun(t *testing.T) {
 		25,
 	}
 
-	members := make([]neural.Network, 10)
-	for i := 0; i < 10; i++ {
+	popSize := 50
+
+	members := make([]neural.Network, popSize)
+	for i := 0; i < popSize; i++ {
 		members[i] = nngOpt.Generate()
 	}
 
 	s := selection.TournamentSelection{
 		2,
 		2,
-		0.8,
+		1.0,
 	}
+	// s := selection.GreedySelection{
+	// 	2,
+	// }
 
 	c := crossover.PointCrossover{
 		1,
@@ -65,7 +70,7 @@ func TestPopulationRun(t *testing.T) {
 	p := population.Population{
 		members,
 		&nngOpt,
-		10,
+		popSize,
 		s,
 		c,
 		in,
@@ -75,9 +80,13 @@ func TestPopulationRun(t *testing.T) {
 	}
 
 	p.Print()
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 100; i++ {
 		fmt.Println("Gen", i)
 		p = *(p.NextGeneration())
-		p.Print()
+		fmt.Println(p.Members[0].Fitness(p.TestInputs, p.TestExpected))
+		fmt.Println(p.Members[1].Fitness(p.TestInputs, p.TestExpected))
+		fmt.Println(p.Members[2].Fitness(p.TestInputs, p.TestExpected))
+		fmt.Println(p.Members[3].Fitness(p.TestInputs, p.TestExpected))
+		fmt.Println(p.Members[4].Fitness(p.TestInputs, p.TestExpected))
 	}
 }
