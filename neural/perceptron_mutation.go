@@ -4,9 +4,9 @@ import (
 	"math/rand"
 )
 
-type NetworkMutationOptions struct {
-	neuronOptions *NeuronMutationOptions
-	ColumnOptions *ColumnGenerationOptions
+type PerceptronNetworkMutationOptions struct {
+	neuronOptions *PerceptronMutationOptions
+	ColumnOptions *PerceptronColumnGenerationOptions
 	// per column
 	NeuronReplacementChance float64
 	NeuronAdditionChance    float64
@@ -18,33 +18,36 @@ type NetworkMutationOptions struct {
 	ColumnAdditionChance float64
 	NeuronMutationChance float64
 }
-type NetworkGenerationOptions struct {
-	NetworkMutationOptions
+type PerceptronNetworkGenerationOptions struct {
+	PerceptronNetworkMutationOptions
 	MinColumns    int
 	MaxColumns    int
 	Inputs        int
 	Outputs       int
 	BaseMutations int
 }
-type NeuronMutationOptions struct {
+type PerceptronMutationOptions struct {
 	thresholdOptions FloatMutationOptions
 	WeightOptions    FloatMutationOptions
 }
-type NeuronGenerationOptions struct {
+type PerceptronGenerationOptions struct {
 	minAxons          int
 	maxAxons          int
 	defaultThreshold  float64
 	DefaultAxonWeight float64
 }
-type ColumnGenerationOptions struct {
+type PerceptronColumnGenerationOptions struct {
 	MinSize       int
 	MaxSize       int
-	neuronOptions *NeuronGenerationOptions
+	neuronOptions *PerceptronGenerationOptions
 }
-type FloatMutationOptions struct {
-	MutChance    float64
-	MutMagnitude float64
-	MutRange     int
+
+func (genOpt PerceptronNetworkGenerationOptions) Generate() Network {
+	return *GeneratePerceptronNetwork(&genOpt)
+}
+
+func (genOpt PerceptronNetworkGenerationOptions) Mutate(n Network) Network {
+	return n.(PerceptronNetwork).Mutate(&(genOpt.PerceptronNetworkMutationOptions))
 }
 
 /**
@@ -63,7 +66,7 @@ func mutateFloat(toMutate float64, opt FloatMutationOptions) float64 {
 /**
  * Mutate this Perceptron.
  */
-func (n *Perceptron) mutate(mOpt_p *NeuronMutationOptions) Perceptron {
+func (n *Perceptron) mutate(mOpt_p *PerceptronMutationOptions) Perceptron {
 	mOpt := *mOpt_p
 
 	newThreshold := mutateFloat(n.threshold, mOpt.thresholdOptions)
@@ -83,7 +86,7 @@ func (n *Perceptron) mutate(mOpt_p *NeuronMutationOptions) Perceptron {
 /**
  * Mutate this network.
  */
-func (nn *Network) Mutate(mOpt_p *NetworkMutationOptions) *Network {
+func (nn PerceptronNetwork) Mutate(mOpt_p *PerceptronNetworkMutationOptions) *PerceptronNetwork {
 
 	mOpt := *mOpt_p
 
@@ -216,7 +219,7 @@ func (nn *Network) Mutate(mOpt_p *NetworkMutationOptions) *Network {
  * Create a copy of this network's output column.
  * Used when adding and removing columns next to the output column.
  */
-func (nn_p *Network) copyOutColumn() []Perceptron {
+func (nn_p *PerceptronNetwork) copyOutColumn() []Perceptron {
 
 	nn := *nn_p
 
@@ -238,7 +241,7 @@ func (nn_p *Network) copyOutColumn() []Perceptron {
 /**
  * Remove all connections from a neuron
  */
-func (nn_p *Network) resetNeuron(columnIndex int, neuronIndex int) {
+func (nn_p *PerceptronNetwork) resetNeuron(columnIndex int, neuronIndex int) {
 
 	nn := *nn_p
 
@@ -266,7 +269,7 @@ func (nn_p *Network) resetNeuron(columnIndex int, neuronIndex int) {
  * Removes a neuron from an index and places a new neuron there in its place.
  * Effectively resetNeuron + addNeuron, if addNeuron took an index.
  */
-func (nn_p *Network) replaceNeuron(columnIndex int, neuronIndex int, nOpt_p *NeuronGenerationOptions) {
+func (nn_p *PerceptronNetwork) replaceNeuron(columnIndex int, neuronIndex int, nOpt_p *PerceptronGenerationOptions) {
 
 	nOpt := *nOpt_p
 	nn := *nn_p
@@ -312,7 +315,7 @@ func (nn_p *Network) replaceNeuron(columnIndex int, neuronIndex int, nOpt_p *Neu
 /**
  * Add a neuron to the end of a column.
  */
-func (nn_p *Network) addNeuron(columnIndex int, nOpt_p *NeuronGenerationOptions) {
+func (nn_p *PerceptronNetwork) addNeuron(columnIndex int, nOpt_p *PerceptronGenerationOptions) {
 
 	nn := *nn_p
 	nOpt := *nOpt_p
@@ -339,7 +342,7 @@ func (nn_p *Network) addNeuron(columnIndex int, nOpt_p *NeuronGenerationOptions)
 /**
  * Remove the column between our output column and the column two indexes prior.
  */
-func (nn_p *Network) removeColumn(cOpt_p *ColumnGenerationOptions) *Network {
+func (nn_p *PerceptronNetwork) removeColumn(cOpt_p *PerceptronColumnGenerationOptions) *PerceptronNetwork {
 
 	nn := *nn_p
 	cOpt := *cOpt_p
@@ -374,7 +377,7 @@ func (nn_p *Network) removeColumn(cOpt_p *ColumnGenerationOptions) *Network {
 /**
  * Add a column between our output column and the column immediately prior.
  */
-func (nn_p *Network) addColumn(cOpt_p *ColumnGenerationOptions) *Network {
+func (nn_p *PerceptronNetwork) addColumn(cOpt_p *PerceptronColumnGenerationOptions) *PerceptronNetwork {
 
 	nn := *nn_p
 	cOpt := *cOpt_p
@@ -406,7 +409,7 @@ func (nn_p *Network) addColumn(cOpt_p *ColumnGenerationOptions) *Network {
 /**
  * Swap two Axons which start from these neurons indexes.
  */
-func (nn_p *Network) swapAxons(columnIndex int, neuronIndex1 int, neuronIndex2 int) {
+func (nn_p *PerceptronNetwork) swapAxons(columnIndex int, neuronIndex1 int, neuronIndex2 int) {
 
 	nn := *nn_p
 
@@ -448,7 +451,7 @@ func (nn_p *Network) swapAxons(columnIndex int, neuronIndex1 int, neuronIndex2 i
 /**
  * Remove a random Axon which starts from this neuron's index.
  */
-func (nn *Network) removeAxon(columnIndex int, neuronIndex int) {
+func (nn *PerceptronNetwork) removeAxon(columnIndex int, neuronIndex int) {
 
 	neuron := (*nn)[columnIndex][neuronIndex]
 
@@ -465,7 +468,7 @@ func (nn *Network) removeAxon(columnIndex int, neuronIndex int) {
 /**
  * Add a random Axon which starts from this neuron's index.
  */
-func (nn_p *Network) addAxon(columnIndex int, neuronIndex int, DefaultAxonWeight float64) {
+func (nn_p *PerceptronNetwork) addAxon(columnIndex int, neuronIndex int, DefaultAxonWeight float64) {
 
 	nn := *nn_p
 
@@ -501,7 +504,7 @@ func (nn_p *Network) addAxon(columnIndex int, neuronIndex int, DefaultAxonWeight
 /**
  * Add a random Axon which ends at this neuron's index.
  */
-func (nn_p *Network) addAxonBack(columnIndex int, neuronIndex int, DefaultAxonWeight float64) {
+func (nn_p *PerceptronNetwork) addAxonBack(columnIndex int, neuronIndex int, DefaultAxonWeight float64) {
 
 	nn := *nn_p
 

@@ -25,10 +25,8 @@ type Perceptron struct {
 	weights map[int]float64
 }
 
-func (n_p *Perceptron) String() string {
+func (n Perceptron) String() string {
 	var buffer bytes.Buffer
-
-	n := *n_p
 
 	buffer.WriteString("[")
 	buffer.WriteString("t:")

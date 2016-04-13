@@ -5,16 +5,16 @@ import (
 	"math/rand"
 )
 
-type Network [][]Perceptron
+type PerceptronNetwork [][]Perceptron
 
 /**
  * Take a network and duplicate it
  */
-func (nn_p *Network) Copy() Network {
+func (nn_p *PerceptronNetwork) Copy() PerceptronNetwork {
 
 	nn := *nn_p
 
-	var newNetwork Network
+	var newNetwork PerceptronNetwork
 
 	for i := range nn {
 		newNetwork = append(newNetwork, make([]Perceptron, len(nn[i])))
@@ -24,13 +24,13 @@ func (nn_p *Network) Copy() Network {
 	return newNetwork
 }
 
-func GenerateNetwork(nOpt_p *NetworkGenerationOptions) *Network {
+func GeneratePerceptronNetwork(nOpt_p *PerceptronNetworkGenerationOptions) *PerceptronNetwork {
 
 	nnOpt := *nOpt_p
 	cOpt := *nnOpt.ColumnOptions
 	nOpt := *cOpt.neuronOptions
 
-	nn := Network{}
+	nn := PerceptronNetwork{}
 
 	// Set up the input column
 	inputColumn := []Perceptron{}
@@ -66,15 +66,15 @@ func GenerateNetwork(nOpt_p *NetworkGenerationOptions) *Network {
 	}
 
 	for i := 0; i < nnOpt.BaseMutations; i++ {
-		nn = *(nn.Mutate(&nnOpt.NetworkMutationOptions))
+		nn = *(nn.Mutate(&nnOpt.PerceptronNetworkMutationOptions))
 	}
 
 	return &nn
 }
 
 // Todo: Improve this
-func (nn_p *Network) Print() {
-	for _, col := range *nn_p {
+func (nn PerceptronNetwork) Print() {
+	for _, col := range nn {
 		for _, n := range col {
 			fmt.Print(n.String())
 		}
@@ -87,7 +87,7 @@ func (nn_p *Network) Print() {
  * Run some input through a neural network.
  * This returns the network's output column.
  */
-func (nn_p *Network) Run(Inputs []bool) []bool {
+func (nn_p *PerceptronNetwork) Run(Inputs []bool) []bool {
 
 	nn := *nn_p
 
@@ -228,13 +228,37 @@ func (nn_p *Network) Run(Inputs []bool) []bool {
 	return output
 }
 
+func (n PerceptronNetwork) Get(x, y int) Neuron {
+	return n[x][y]
+}
+func (n PerceptronNetwork) Slice(start, end int) Network {
+	return n[start:end]
+}
+func (n PerceptronNetwork) SliceToEnd(start int) Network {
+	return n[start:]
+}
+func (n PerceptronNetwork) SliceFromStart(end int) Network {
+	return n[:end]
+}
+func (n PerceptronNetwork) Length() int {
+	return len(n)
+}
+func (n PerceptronNetwork) Append(data interface{}) Network {
+	n = append(n, data.(PerceptronNetwork)...)
+	return n
+}
+func (n PerceptronNetwork) Make() Network {
+	out := make(PerceptronNetwork, 0)
+	return out
+}
+
 // High fitness is bad, and vice versa.
-func (n_p *Network) Fitness(Inputs, expected [][]float64) int {
+func (n PerceptronNetwork) Fitness(inputs, expected [][]float64) int {
 	fitness := 1
-	for i := range Inputs {
-		bool_Inputs := toBoolSlice(Inputs[i])
+	for i := range inputs {
+		bool_inputs := toBoolSlice(inputs[i])
 		bool_expected := toBoolSlice(expected[i])
-		output := (*n_p).Run(bool_Inputs)
+		output := n.Run(bool_inputs)
 		for j := range output {
 			if output[j] != bool_expected[j] {
 				fitness++

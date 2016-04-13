@@ -1,8 +1,8 @@
 package neural
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 )
 
 func TestNetworkGeneration(*testing.T) {
@@ -19,25 +19,25 @@ func TestNetworkGeneration(*testing.T) {
 		5,
 	}
 
-	nmOpt := NeuronMutationOptions{
+	nmOpt := PerceptronMutationOptions{
 		tOpt,
 		wOpt,
 	}
 
-	ngOpt := NeuronGenerationOptions{
+	ngOpt := PerceptronGenerationOptions{
 		1,
 		3,
 		0.8,
 		1,
 	}
 
-	cgOpt := ColumnGenerationOptions{
+	cgOpt := PerceptronColumnGenerationOptions{
 		2,
 		16,
 		&ngOpt,
 	}
 
-	nnmOpt := NetworkMutationOptions{
+	nnmOpt := PerceptronNetworkMutationOptions{
 		&nmOpt,
 		&cgOpt,
 		0.02,
@@ -50,7 +50,7 @@ func TestNetworkGeneration(*testing.T) {
 		0.10,
 	}
 
-	nngOpt := NetworkGenerationOptions{
+	nngOpt := PerceptronNetworkGenerationOptions{
 		nnmOpt,
 		10,
 		20,
@@ -59,16 +59,16 @@ func TestNetworkGeneration(*testing.T) {
 		50,
 	}
 
-	network := GenerateNetwork(&nngOpt)
+	network := GeneratePerceptronNetwork(&nngOpt)
 	network.Print()
-	fmt.Println(network.Run([]bool{true,true,true}))
-	fmt.Println(network.Run([]bool{true,true,false}))
-	fmt.Println(network.Run([]bool{true,false,true}))
-	fmt.Println(network.Run([]bool{true,false,false}))
-	fmt.Println(network.Run([]bool{false,true,true}))	
-	fmt.Println(network.Run([]bool{false,true,false}))
-	fmt.Println(network.Run([]bool{false,false,true}))
-	fmt.Println(network.Run([]bool{false,false,false}))
+	fmt.Println(network.Run([]bool{true, true, true}))
+	fmt.Println(network.Run([]bool{true, true, false}))
+	fmt.Println(network.Run([]bool{true, false, true}))
+	fmt.Println(network.Run([]bool{true, false, false}))
+	fmt.Println(network.Run([]bool{false, true, true}))
+	fmt.Println(network.Run([]bool{false, true, false}))
+	fmt.Println(network.Run([]bool{false, false, true}))
+	fmt.Println(network.Run([]bool{false, false, false}))
 }
 
 func TestRectifierNetworkGeneration(t *testing.T) {
@@ -106,14 +106,14 @@ func TestRectifierNetworkGeneration(t *testing.T) {
 
 	network := GenerateRectifierNetwork(&nngOpt)
 	network.Print()
-	fmt.Println(network.Run([]float64{1.0,1.0,1.0}))
-	fmt.Println(network.Run([]float64{1.0,1.0,-1.0}))
-	fmt.Println(network.Run([]float64{1.0,-1.0,1.0}))
-	fmt.Println(network.Run([]float64{1.0,-1.0,-1.0}))
-	fmt.Println(network.Run([]float64{-1.0,1.0,1.0}))	
-	fmt.Println(network.Run([]float64{-1.0,1.0,-1.0}))
-	fmt.Println(network.Run([]float64{-1.0,-1.0,1.0}))
-	fmt.Println(network.Run([]float64{-1.0,-1.0,-1.0}))
+	fmt.Println(network.Run([]float64{1.0, 1.0, 1.0}))
+	fmt.Println(network.Run([]float64{1.0, 1.0, -1.0}))
+	fmt.Println(network.Run([]float64{1.0, -1.0, 1.0}))
+	fmt.Println(network.Run([]float64{1.0, -1.0, -1.0}))
+	fmt.Println(network.Run([]float64{-1.0, 1.0, 1.0}))
+	fmt.Println(network.Run([]float64{-1.0, 1.0, -1.0}))
+	fmt.Println(network.Run([]float64{-1.0, -1.0, 1.0}))
+	fmt.Println(network.Run([]float64{-1.0, -1.0, -1.0}))
 }
 
 func BenchmarkNetworkGeneration(b *testing.B) {
@@ -170,8 +170,8 @@ func BenchmarkNetworkGeneration(b *testing.B) {
 			50,
 		}
 
-		network := GenerateNetwork(&nngOpt)
-		network.Run([]bool{true,true,true})
+		network := GeneratePerceptronNetwork(&nngOpt)
+		network.Run([]bool{true, true, true})
 	}
 }
 
@@ -210,6 +210,6 @@ func BenchmarkRectifierNetworkGeneration(b *testing.B) {
 		}
 
 		network := GenerateRectifierNetwork(&nngOpt)
-		network.Run([]float64{1.0,1.0,1.0})
+		network.Run([]float64{1.0, 1.0, 1.0})
 	}
 }

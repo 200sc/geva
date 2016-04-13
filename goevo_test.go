@@ -1,6 +1,7 @@
 package goevo
 
 import (
+	"fmt"
 	"goevo/crossover"
 	"goevo/neural"
 	"goevo/population"
@@ -16,8 +17,8 @@ func TestPopulationRun(t *testing.T) {
 	}
 
 	cgOpt := neural.RectifierColumnGenerationOptions{
-		2,
-		16,
+		3,
+		4,
 		0.1,
 	}
 
@@ -25,36 +26,41 @@ func TestPopulationRun(t *testing.T) {
 		&wOpt,
 		&cgOpt,
 		0.02,
+		0.00,
 		0.06,
-		0.06,
-		0.01,
-		0.01,
+		0.00,
+		0.00,
 		0.33,
 	}
 
 	nngOpt := neural.RectifierNetworkGenerationOptions{
 		nnmOpt,
-		5,
-		20,
 		3,
 		4,
-		50,
+		3,
+		1,
+		25,
 	}
 
 	members := make([]neural.Network, 10)
 	for i := 0; i < 10; i++ {
-		members[i] = neural.GenerateRectifierNetwork(&nngOpt)
+		members[i] = nngOpt.Generate()
 	}
 
 	s := selection.TournamentSelection{
-		4,
 		2,
-		0.9,
+		2,
+		0.8,
 	}
 
 	c := crossover.PointCrossover{
-		2,
+		1,
 	}
+
+	in := make([][]float64, 1)
+	in[0] = []float64{3.0, 2.0, -1.0}
+	out := make([][]float64, 1)
+	out[0] = []float64{4.0}
 
 	p := population.Population{
 		members,
@@ -62,9 +68,16 @@ func TestPopulationRun(t *testing.T) {
 		10,
 		s,
 		c,
-		make([][]float64, 1),
-		make([][]float64, 1),
+		in,
+		out,
 		make([]int, 1),
 		make([]int, 1),
+	}
+
+	p.Print()
+	for i := 0; i < 10; i++ {
+		fmt.Println("Gen", i)
+		p = *(p.NextGeneration())
+		p.Print()
 	}
 }

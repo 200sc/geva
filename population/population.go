@@ -1,12 +1,13 @@
 package population
 
 import (
+	//"fmt"
 	"goevo/neural"
 )
 
 type Population struct {
 	Members           []neural.Network
-	GenerationOptions *neural.NetworkGenerationOptions
+	Type              NetworkType
 	Size              int
 	Selection         SelectionMethod
 	Crossover         CrossoverMethod
@@ -21,6 +22,9 @@ func (p_p *Population) NextGeneration() *Population {
 
 	nextGen := p.Selection.Select(p_p)
 	p.Members = p.Crossover.Crossover(nextGen, p.Size/p.Selection.GetParentProportion())
+	for _, v := range p.Members {
+		v = p.Type.Mutate(v)
+	}
 	return &p
 }
 
@@ -30,14 +34,20 @@ func (p_p *Population) Fitness() []chan int {
 	channels := make([]chan int, p.Size)
 
 	for i := 0; i < p.Size; i++ {
+		channels[i] = make(chan int)
 
-		go func(n *neural.Network, ch chan int, Inputs [][]float64, expected [][]float64) {
-			ch <- (*n).Fitness(Inputs, expected)
+		go func(n *neural.Network, ch chan int, inputs [][]float64, expected [][]float64) {
+			ch <- (*n).Fitness(inputs, expected)
 
 		}(&(p.Members[i]), channels[i], p.TestInputs, p.TestExpected)
 	}
-
 	return channels
+}
+
+func (p_p *Population) Print() {
+	for _, v := range p_p.Members {
+		v.Print()
+	}
 }
 
 // func RouletteSlice(sl []int) []int {
@@ -55,4 +65,9 @@ type SelectionMethod interface {
 
 type CrossoverMethod interface {
 	Crossover(nn []neural.Network, populated int) []neural.Network
+}
+
+type NetworkType interface {
+	Generate() neural.Network
+	Mutate(neural.Network) neural.Network
 }

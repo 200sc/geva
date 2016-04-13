@@ -1,6 +1,7 @@
 package crossover
 
 import (
+	//"fmt"
 	"goevo/neural"
 	"math"
 	"math/rand"
@@ -17,7 +18,7 @@ type PointCrossover struct {
 
 func (pc PointCrossover) Crossover(nn []neural.Network, populated int) []neural.Network {
 
-	for j := populated + 1; j < len(nn); j++ {
+	for j := populated; j < len(nn); j++ {
 
 		// In the future, the actual method for selecting
 		// pairs to crossover should be variable.
@@ -46,9 +47,12 @@ func (pc PointCrossover) Crossover(nn []neural.Network, populated int) []neural.
 		activeIndex := 1
 		start := 0
 		end := 0
+
+		nn[j] = activeNetwork.Make()
+
 		for _, v := range points {
-			end = int(math.Ceil(float64(len(activeNetwork)) * v))
-			nn[j] = append(nn[j], activeNetwork[start:end]...)
+			end = int(math.Ceil(float64(activeNetwork.Length()) * v))
+			nn[j] = nn[j].Append(activeNetwork.Slice(start, end))
 
 			if activeIndex == 1 {
 				activeNetwork = n2
@@ -57,8 +61,10 @@ func (pc PointCrossover) Crossover(nn []neural.Network, populated int) []neural.
 				activeNetwork = n1
 				activeIndex = 1
 			}
+			start = end
 		}
-		nn[j] = append(nn[j], activeNetwork[end:]...)
+		end = int(math.Ceil(float64(activeNetwork.Length()) * points[len(points)-1]))
+		nn[j] = nn[j].Append(activeNetwork.SliceToEnd(end))
 	}
 
 	return nn

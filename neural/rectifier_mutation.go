@@ -30,6 +30,14 @@ type RectifierColumnGenerationOptions struct {
 	DefaultAxonWeight float64
 }
 
+func (genOpt RectifierNetworkGenerationOptions) Generate() Network {
+	return *GenerateRectifierNetwork(&genOpt)
+}
+
+func (genOpt RectifierNetworkGenerationOptions) Mutate(n Network) Network {
+	return n.(RectifierNetwork).Mutate(&(genOpt.RectifierNetworkMutationOptions))
+}
+
 /**
  * Mutate this neuron.
  */
@@ -46,7 +54,7 @@ func (n *RectifierNeuron) mutate(wOpt_p *FloatMutationOptions) RectifierNeuron {
 /**
  * Mutate this network.
  */
-func (nn *RectifierNetwork) Mutate(mOpt_p *RectifierNetworkMutationOptions) *RectifierNetwork {
+func (nn RectifierNetwork) Mutate(mOpt_p *RectifierNetworkMutationOptions) *RectifierNetwork {
 
 	mOpt := *mOpt_p
 

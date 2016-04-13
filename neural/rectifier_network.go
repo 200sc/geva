@@ -78,8 +78,8 @@ func GenerateRectifierNetwork(nOpt_p *RectifierNetworkGenerationOptions) *Rectif
 }
 
 // Todo: Improve this
-func (nn_p *RectifierNetwork) Print() {
-	for _, col := range *nn_p {
+func (nn RectifierNetwork) Print() {
+	for _, col := range nn {
 		for _, n := range col {
 			fmt.Print(n.String())
 		}
@@ -185,11 +185,35 @@ func (nn_p *RectifierNetwork) Run(Inputs []float64) []float64 {
 	return output
 }
 
+func (n RectifierNetwork) Get(x, y int) Neuron {
+	return n[x][y]
+}
+func (n RectifierNetwork) Slice(start, end int) Network {
+	return n[start:end]
+}
+func (n RectifierNetwork) SliceToEnd(start int) Network {
+	return n[start:]
+}
+func (n RectifierNetwork) SliceFromStart(end int) Network {
+	return n[:end]
+}
+func (n RectifierNetwork) Length() int {
+	return len(n)
+}
+func (n RectifierNetwork) Append(data interface{}) Network {
+	n = append(n, data.(RectifierNetwork)...)
+	return n
+}
+func (n RectifierNetwork) Make() Network {
+	out := make(RectifierNetwork, 0)
+	return out
+}
+
 // High fitness is bad, and vice versa.
-func (n_p *RectifierNetwork) Fitness(Inputs, expected [][]float64) int {
+func (n RectifierNetwork) Fitness(Inputs, expected [][]float64) int {
 	fitness := 1.0
 	for i := range Inputs {
-		output := (*n_p).Run(Inputs[i])
+		output := n.Run(Inputs[i])
 		for j := range output {
 			fitness += math.Abs(output[j] - expected[i][j])
 		}

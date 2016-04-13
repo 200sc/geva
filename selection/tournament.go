@@ -1,6 +1,7 @@
 package selection
 
 import (
+	//"fmt"
 	"goevo/neural"
 	"goevo/population"
 	"math/rand"
