@@ -48,12 +48,17 @@ func TestPopulationRun(t *testing.T) {
 	for i := 0; i < popSize; i++ {
 		members[i] = nngOpt.Generate()
 	}
-
-	s := selection.TournamentSelection{
+	s := selection.StochasticUniversalSelection{
 		2,
-		2,
+		false,
 		1.0,
 	}
+
+	// s := selection.TournamentSelection{
+	// 	2,
+	// 	2,
+	// 	1.0,
+	// }
 	// s := selection.GreedySelection{
 	// 	2,
 	// }
