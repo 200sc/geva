@@ -3,18 +3,17 @@ package population
 import (
 	//"fmt"
 	"goevo/neural"
+	"math"
 )
 
 type Population struct {
-	Members           []neural.Network
-	Type              NetworkType
-	Size              int
-	Selection         SelectionMethod
-	Crossover         CrossoverMethod
-	TestInputs        [][]float64
-	TestExpected      [][]float64
-	Weights           []int //unused right now
-	CumulativeWeights []int // ^
+	Members      []neural.Network
+	Type         NetworkType
+	Size         int
+	Selection    SelectionMethod
+	Crossover    CrossoverMethod
+	TestInputs   [][]float64
+	TestExpected [][]float64
 }
 
 // This will change as more things take place
@@ -51,6 +50,41 @@ func (p_p *Population) Fitness() []chan int {
 		}(&(p.Members[i]), channels[i], p.TestInputs, p.TestExpected)
 	}
 	return channels
+}
+
+func (p_p *Population) Weights(power float64) ([]float64, []float64) {
+	p := *p_p
+
+	fitnessChannels := p_p.Fitness()
+	fitnesses := make([]int, p.Size)
+	weights := make([]float64, p.Size)
+	cumulativeWeights := make([]float64, p.Size)
+
+	maxFitness := 0
+
+	for i := 0; i < p.Size; i++ {
+		v := <-fitnessChannels[i]
+		if v > maxFitness {
+			maxFitness = v
+		}
+		fitnesses[i] = v
+	}
+
+	// Transform values which are low to equivalent high
+	// values on the same scale, applying the power
+	// as a further bias scaling towards the best
+	// individuals.
+	for i := 0; i < p.Size; i++ {
+		weights[i] = math.Pow(float64((fitnesses[i]*-1)+maxFitness+1), power)
+	}
+
+	cumulativeWeights[0] = weights[0]
+
+	for i := 0; i < p.Size-1; i++ {
+		cumulativeWeights[i+1] = cumulativeWeights[i] + weights[i+1]
+	}
+
+	return weights, cumulativeWeights
 }
 
 func (p_p *Population) Print() {
