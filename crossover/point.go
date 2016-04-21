@@ -56,7 +56,7 @@ func (pc PointCrossover) Crossover(nn []neural.Network, populated int) []neural.
 		start := 0
 		end := 0
 
-		nn[j] = activeNetwork.Make()
+		nn[j] = activeNetwork.Make(0)
 
 		// Populate our new empty network by
 		// combining the two parent networks

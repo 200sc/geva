@@ -46,7 +46,6 @@ func (p_p *Population) Fitness() []chan int {
 
 		go func(n *neural.Network, ch chan int, inputs [][]float64, expected [][]float64) {
 			ch <- (*n).Fitness(inputs, expected)
-
 		}(&(p.Members[i]), channels[i], p.TestInputs, p.TestExpected)
 	}
 	return channels

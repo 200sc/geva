@@ -47,6 +47,10 @@ func (dts_p *DeterministicTournamentSelection) Select(p_p *population.Population
 				bestFitness = fitnesses[j]
 			}
 		}
+		// Here's the point of difference between deterministic and non-deterministic
+		// tournament selection-- deterministic will always pick the most fit fighter
+		// as the winner of each round. non-deterministic has the built-in variable
+		// where it might not pick the most fit fighter.
 		members[i] = p.Members[fitMap[bestFitness]]
 	}
 

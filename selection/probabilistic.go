@@ -15,6 +15,9 @@ func (ps ProbabilisticSelection) GetParentProportion() int {
 	return ps.ParentProportion
 }
 
+// This specific algorithm is based on the algorithm described by
+// Adam Liposki and Dorota Lipowska in "Roulette-wheel selection
+// via stochastic acceptance" http://arxiv.org/pdf/1109.3627v2.pdf
 func (ps ProbabilisticSelection) Select(p_p *population.Population) []neural.Network {
 	p := *p_p
 

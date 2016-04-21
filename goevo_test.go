@@ -6,10 +6,15 @@ import (
 	"goevo/neural"
 	"goevo/population"
 	"goevo/selection"
+	"math/rand"
 	"testing"
+	"time"
 )
 
 func TestPopulationRun(t *testing.T) {
+
+	rand.Seed(time.Now().UTC().UnixNano())
+
 	wOpt := neural.FloatMutationOptions{
 		0.50,
 		0.10,
@@ -66,8 +71,11 @@ func TestPopulationRun(t *testing.T) {
 	// 	2,
 	// }
 
-	c := crossover.PointCrossover{
-		1,
+	// c := crossover.PointCrossover{
+	// 	1,
+	// }
+	c := crossover.UniformCrossover{
+		0.5,
 	}
 
 	in := make([][]float64, 1)
@@ -89,10 +97,8 @@ func TestPopulationRun(t *testing.T) {
 	for i := 0; i < 100; i++ {
 		fmt.Println("Gen", i)
 		p = *(p.NextGeneration())
+		w, _ := p.Weights(1.0)
+		fmt.Println(w)
 		fmt.Println(p.Members[0].Fitness(p.TestInputs, p.TestExpected))
-		fmt.Println(p.Members[1].Fitness(p.TestInputs, p.TestExpected))
-		fmt.Println(p.Members[2].Fitness(p.TestInputs, p.TestExpected))
-		fmt.Println(p.Members[3].Fitness(p.TestInputs, p.TestExpected))
-		fmt.Println(p.Members[4].Fitness(p.TestInputs, p.TestExpected))
 	}
 }

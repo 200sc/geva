@@ -2,10 +2,14 @@ package neural
 
 import (
 	"fmt"
+	"math/rand"
 	"testing"
+	"time"
 )
 
 func TestNetworkGeneration(*testing.T) {
+
+	rand.Seed(time.Now().UTC().UnixNano())
 
 	wOpt := FloatMutationOptions{
 		0.66,

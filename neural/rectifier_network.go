@@ -188,6 +188,9 @@ func (nn_p *RectifierNetwork) Run(Inputs []float64) []float64 {
 func (n RectifierNetwork) Get(x, y int) Neuron {
 	return n[x][y]
 }
+func (n RectifierNetwork) Set(x, y int, i interface{}) {
+	n[x][y] = i.(RectifierNeuron)
+}
 func (n RectifierNetwork) Slice(start, end int) Network {
 	return n[start:end]
 }
@@ -200,12 +203,22 @@ func (n RectifierNetwork) SliceFromStart(end int) Network {
 func (n RectifierNetwork) Length() int {
 	return len(n)
 }
+func (n RectifierNetwork) ColLength(i int) int {
+	return len(n[i])
+}
 func (n RectifierNetwork) Append(data interface{}) Network {
 	n = append(n, data.(RectifierNetwork)...)
 	return n
 }
-func (n RectifierNetwork) Make() Network {
-	out := make(RectifierNetwork, 0)
+func (n RectifierNetwork) Make(size int) Network {
+	out := make(RectifierNetwork, size)
+	return out
+}
+func (n RectifierNetwork) CopyStructure() Network {
+	out := make(RectifierNetwork, len(n))
+	for i := 0; i < len(n); i++ {
+		out[i] = make([]RectifierNeuron, len(n[i]))
+	}
 	return out
 }
 

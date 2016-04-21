@@ -235,6 +235,9 @@ func (nn_p *PerceptronNetwork) Run(Inputs []bool) []bool {
 func (n PerceptronNetwork) Get(x, y int) Neuron {
 	return n[x][y]
 }
+func (n PerceptronNetwork) Set(x, y int, i interface{}) {
+	n[x][y] = i.(Perceptron)
+}
 func (n PerceptronNetwork) Slice(start, end int) Network {
 	return n[start:end]
 }
@@ -247,12 +250,28 @@ func (n PerceptronNetwork) SliceFromStart(end int) Network {
 func (n PerceptronNetwork) Length() int {
 	return len(n)
 }
+func (n PerceptronNetwork) ColLength(i int) int {
+	return len(n[i])
+}
 func (n PerceptronNetwork) Append(data interface{}) Network {
 	n = append(n, data.(PerceptronNetwork)...)
 	return n
 }
-func (n PerceptronNetwork) Make() Network {
-	out := make(PerceptronNetwork, 0)
+func (n PerceptronNetwork) Make(size int) Network {
+	return make(PerceptronNetwork, size)
+}
+func (n PerceptronNetwork) CopyStructure() Network {
+	out := make(PerceptronNetwork, len(n))
+	for i := 0; i < len(n); i++ {
+		out[i] = make([]Perceptron, len(n[i]))
+	}
+	return out
+}
+func (n PerceptronNetwork) Make_ColSize(size int, colSize int) Network {
+	out := make(PerceptronNetwork, size)
+	for i := 0; i < size; i++ {
+		out[i] = make([]Perceptron, colSize)
+	}
 	return out
 }
 
