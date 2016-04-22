@@ -11,6 +11,10 @@ type ModularNetworkOutput struct {
 	index int
 }
 
+// An activator function just maps float values to other
+// float values. The function can be as simplistic or complicated
+// as desired-- eventually a set of common activators will be
+// collected.
 type ActivatorFunc func(float64) float64
 
 type ModularBody [][]ModularNeuron

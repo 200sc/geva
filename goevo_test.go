@@ -6,7 +6,6 @@ import (
 	"goevo/neural"
 	"goevo/population"
 	"goevo/selection"
-	"math"
 	"math/rand"
 	"testing"
 	"time"
@@ -19,7 +18,7 @@ func TestPopulationRun(t *testing.T) {
 	wOpt := neural.FloatMutationOptions{
 		0.20,
 		0.05,
-		5,
+		20,
 	}
 
 	cgOpt := neural.ModularColumnGenerationOptions{
@@ -53,15 +52,11 @@ func TestPopulationRun(t *testing.T) {
 		// 	}
 		// 	return 0.0
 		// },
-		// Rectifier example
-		// (far better suited for our test problem)
-		func(x float64) float64 {
-			return math.Max(x, 0.0)
-		},
+		neural.Rectifier,
 	}
 
 	popSize := 100
-	numGens := 300
+	numGens := 1000
 
 	members := make([]neural.ModularNetwork, popSize)
 	for i := 0; i < popSize; i++ {
@@ -69,7 +64,7 @@ func TestPopulationRun(t *testing.T) {
 	}
 	s := selection.ProbabilisticSelection{
 		2,
-		1.4,
+		1.5,
 	}
 	// s := selection.StochasticUniversalSelection{
 	// 	2,
@@ -85,12 +80,12 @@ func TestPopulationRun(t *testing.T) {
 	// 	2,
 	// }
 
-	c := crossover.AverageCrossover{
-		1,
-	}
-	// c := crossover.PointCrossover{
+	// c := crossover.AverageCrossover{
 	// 	1,
 	// }
+	c := crossover.PointCrossover{
+		1,
+	}
 	// c := crossover.UniformCrossover{
 	// 	0.5,
 	// }
@@ -100,9 +95,9 @@ func TestPopulationRun(t *testing.T) {
 	in[1] = []float64{10.0, 20.0, 10.0}
 	in[2] = []float64{2.0, 100.0, 1.0}
 	out := make([][]float64, 3)
-	out[0] = []float64{5.0}
-	out[1] = []float64{40.0}
-	out[2] = []float64{103.0}
+	out[0] = []float64{15.0}
+	out[1] = []float64{120.0}
+	out[2] = []float64{309.0}
 
 	p := population.Population{
 		members,
