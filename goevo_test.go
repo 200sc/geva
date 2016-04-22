@@ -46,12 +46,22 @@ func TestPopulationRun(t *testing.T) {
 		3,
 		1,
 		25,
+		// Perceptron example
+		// func(x float64) float64 {
+		// 	if x > 0.5 {
+		// 		return 1
+		// 	}
+		// 	return 0.0
+		// },
+		// Rectifier example
+		// (far better suited for our test problem)
 		func(x float64) float64 {
 			return math.Max(x, 0.0)
 		},
 	}
 
-	popSize := 50
+	popSize := 100
+	numGens := 300
 
 	members := make([]neural.ModularNetwork, popSize)
 	for i := 0; i < popSize; i++ {
@@ -59,7 +69,7 @@ func TestPopulationRun(t *testing.T) {
 	}
 	s := selection.ProbabilisticSelection{
 		2,
-		1.3,
+		1.4,
 	}
 	// s := selection.StochasticUniversalSelection{
 	// 	2,
@@ -102,7 +112,7 @@ func TestPopulationRun(t *testing.T) {
 	}
 
 	p.Print()
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < numGens; i++ {
 		fmt.Println("Gen", i)
 		p = *(p.NextGeneration())
 		w, _ := p.Weights(1.0)
