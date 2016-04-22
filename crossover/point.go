@@ -16,7 +16,7 @@ type PointCrossover struct {
 	NumPoints int
 }
 
-func (pc PointCrossover) Crossover(nn []neural.ModularNetwork, populated int) []neural.ModularNetwork {
+func (pc PointCrossover) Crossover(nn []neural.Network, populated int) []neural.Network {
 
 	for j := populated; j < len(nn); j++ {
 
@@ -56,7 +56,7 @@ func (pc PointCrossover) Crossover(nn []neural.ModularNetwork, populated int) []
 		start := 0
 		end := 0
 
-		newBody := make(neural.ModularBody, 0)
+		newBody := make(neural.Body, 0)
 
 		// Populate our new empty network by
 		// combining the two parent networks
@@ -78,7 +78,7 @@ func (pc PointCrossover) Crossover(nn []neural.ModularNetwork, populated int) []
 		end = int(math.Ceil(float64(len(activeNetwork)) * points[len(points)-1]))
 		newBody = append(newBody, activeNetwork[end:]...)
 
-		nn[j] = neural.ModularNetwork{
+		nn[j] = neural.Network{
 			Body:      newBody,
 			Activator: nn[index1].Activator,
 		}

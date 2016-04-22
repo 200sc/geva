@@ -18,7 +18,7 @@ type UniformCrossover struct {
 	ChosenProportion float64
 }
 
-func (pc_p UniformCrossover) Crossover(nn []neural.ModularNetwork, populated int) []neural.ModularNetwork {
+func (pc_p UniformCrossover) Crossover(nn []neural.Network, populated int) []neural.Network {
 
 	for j := populated; j < len(nn); j++ {
 
@@ -47,7 +47,7 @@ func (pc_p UniformCrossover) Crossover(nn []neural.ModularNetwork, populated int
 				}
 			}
 		}
-		nn[j] = neural.ModularNetwork{
+		nn[j] = neural.Network{
 			Body:      newBody,
 			Activator: nn[index1].Activator,
 		}

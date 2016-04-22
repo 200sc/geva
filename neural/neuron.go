@@ -5,9 +5,9 @@ import (
 	"strconv"
 )
 
-type ModularNeuron []float64
+type Neuron []float64
 
-func (n ModularNeuron) String() string {
+func (n Neuron) String() string {
 	var buffer bytes.Buffer
 
 	buffer.WriteString("[")

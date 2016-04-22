@@ -11,7 +11,7 @@ type DeterministicTournamentSelection struct {
 	ParentProportion int
 }
 
-func (dts_p *DeterministicTournamentSelection) Select(p_p *population.Population) []neural.ModularNetwork {
+func (dts_p *DeterministicTournamentSelection) Select(p_p *population.Population) []neural.Network {
 	p := *p_p
 
 	// Send off goroutines to calculate the population members' fitnesses
@@ -22,7 +22,7 @@ func (dts_p *DeterministicTournamentSelection) Select(p_p *population.Population
 	// most expensive time sink in this function.
 	ts := *dts_p
 	fitnesses := make([]int, p.Size)
-	members := make([]neural.ModularNetwork, p.Size)
+	members := make([]neural.Network, p.Size)
 
 	// Send off goroutines to process tournament battles
 	for i := 0; i < p.Size/ts.ParentProportion; i++ {

@@ -21,13 +21,13 @@ func TestPopulationRun(t *testing.T) {
 		20,
 	}
 
-	cgOpt := neural.ModularColumnGenerationOptions{
+	cgOpt := neural.ColumnGenerationOptions{
 		3,
 		4,
 		0.5,
 	}
 
-	nnmOpt := neural.ModularNetworkMutationOptions{
+	nnmOpt := neural.NetworkMutationOptions{
 		&wOpt,
 		&cgOpt,
 		0.05,
@@ -38,7 +38,7 @@ func TestPopulationRun(t *testing.T) {
 		0.30,
 	}
 
-	nngOpt := neural.ModularNetworkGenerationOptions{
+	nngOpt := neural.NetworkGenerationOptions{
 		nnmOpt,
 		1,
 		2,
@@ -58,13 +58,13 @@ func TestPopulationRun(t *testing.T) {
 	popSize := 100
 	numGens := 1000
 
-	members := make([]neural.ModularNetwork, popSize)
+	members := make([]neural.Network, popSize)
 	for i := 0; i < popSize; i++ {
 		members[i] = nngOpt.Generate()
 	}
 	s := selection.ProbabilisticSelection{
 		2,
-		1.5,
+		1.7,
 	}
 	// s := selection.StochasticUniversalSelection{
 	// 	2,
@@ -83,12 +83,12 @@ func TestPopulationRun(t *testing.T) {
 	// c := crossover.AverageCrossover{
 	// 	1,
 	// }
-	c := crossover.PointCrossover{
-		1,
+	//c := crossover.PointCrossover{
+	//	1,
+	//}
+	c := crossover.UniformCrossover{
+		0.75,
 	}
-	// c := crossover.UniformCrossover{
-	// 	0.5,
-	// }
 
 	in := make([][]float64, 3)
 	in[0] = []float64{3.0, 2.0, 0.0}
@@ -109,7 +109,6 @@ func TestPopulationRun(t *testing.T) {
 		out,
 	}
 
-	p.Print()
 	for i := 0; i < numGens; i++ {
 		fmt.Println("Gen", i)
 		p = *(p.NextGeneration())

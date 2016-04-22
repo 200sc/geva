@@ -7,8 +7,8 @@ import (
 )
 
 type Population struct {
-	Members      []neural.ModularNetwork
-	Mutation     *neural.ModularNetworkGenerationOptions
+	Members      []neural.Network
+	Mutation     *neural.NetworkGenerationOptions
 	Size         int
 	Selection    SelectionMethod
 	Crossover    CrossoverMethod
@@ -44,7 +44,7 @@ func (p_p *Population) Fitness() []chan int {
 	for i := 0; i < p.Size; i++ {
 		channels[i] = make(chan int)
 
-		go func(n *neural.ModularNetwork, ch chan int, inputs [][]float64, expected [][]float64) {
+		go func(n *neural.Network, ch chan int, inputs [][]float64, expected [][]float64) {
 			ch <- (*n).Fitness(inputs, expected)
 		}(&(p.Members[i]), channels[i], p.TestInputs, p.TestExpected)
 	}
@@ -103,10 +103,10 @@ func (p_p *Population) Print() {
 // Used as Generic-esque helpers for populations
 
 type SelectionMethod interface {
-	Select(p_p *Population) []neural.ModularNetwork
+	Select(p_p *Population) []neural.Network
 	GetParentProportion() int
 }
 
 type CrossoverMethod interface {
-	Crossover(nn []neural.ModularNetwork, populated int) []neural.ModularNetwork
+	Crossover(nn []neural.Network, populated int) []neural.Network
 }

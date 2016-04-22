@@ -20,7 +20,7 @@ type AverageCrossover struct {
 	WeightMod float64
 }
 
-func (ac AverageCrossover) Crossover(nn []neural.ModularNetwork, populated int) []neural.ModularNetwork {
+func (ac AverageCrossover) Crossover(nn []neural.Network, populated int) []neural.Network {
 
 	for j := populated; j < len(nn); j++ {
 
@@ -42,14 +42,14 @@ func (ac AverageCrossover) Crossover(nn []neural.ModularNetwork, populated int) 
 		// Some vector math libraries would be good here (and elsewhere of course)
 		for i := 0; i < len(n1); i++ {
 			for k := 0; k < len(n1[i]); k++ {
-				newNeuron := make(neural.ModularNeuron, len(n1[i][k]))
+				newNeuron := make(neural.Neuron, len(n1[i][k]))
 				for m := 0; m < len(n1[i][k]); m++ {
 					newNeuron[m] = ((n1[i][k][m] * ac.WeightMod) + n2[i][k][m]) / (ac.WeightMod + 1)
 				}
 				newBody[i][k] = newNeuron
 			}
 		}
-		nn[j] = neural.ModularNetwork{
+		nn[j] = neural.Network{
 			Body:      newBody,
 			Activator: nn[index1].Activator,
 		}

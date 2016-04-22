@@ -4,9 +4,9 @@ import (
 	"math/rand"
 )
 
-type ModularNetworkMutationOptions struct {
+type NetworkMutationOptions struct {
 	WeightOptions *FloatMutationOptions
-	ColumnOptions *ModularColumnGenerationOptions
+	ColumnOptions *ColumnGenerationOptions
 	// per column
 	NeuronReplacementChance float64
 	NeuronAdditionChance    float64
@@ -16,8 +16,8 @@ type ModularNetworkMutationOptions struct {
 	ColumnAdditionChance float64
 	NeuronMutationChance float64
 }
-type ModularNetworkGenerationOptions struct {
-	ModularNetworkMutationOptions
+type NetworkGenerationOptions struct {
+	NetworkMutationOptions
 	MinColumns    int
 	MaxColumns    int
 	Inputs        int
@@ -25,7 +25,7 @@ type ModularNetworkGenerationOptions struct {
 	BaseMutations int
 	Activator     ActivatorFunc
 }
-type ModularColumnGenerationOptions struct {
+type ColumnGenerationOptions struct {
 	MinSize           int
 	MaxSize           int
 	DefaultAxonWeight float64
@@ -36,12 +36,12 @@ type FloatMutationOptions struct {
 	MutRange     int
 }
 
-func (genOpt ModularNetworkGenerationOptions) Generate() ModularNetwork {
-	return *GenerateModularNetwork(&genOpt)
+func (genOpt NetworkGenerationOptions) Generate() Network {
+	return *GenerateNetwork(&genOpt)
 }
 
-func (genOpt ModularNetworkGenerationOptions) Mutate(n ModularNetwork) *ModularNetwork {
-	return n.Mutate(&(genOpt.ModularNetworkMutationOptions))
+func (genOpt NetworkGenerationOptions) Mutate(n Network) *Network {
+	return n.Mutate(&(genOpt.NetworkMutationOptions))
 }
 
 /**
@@ -60,9 +60,9 @@ func mutateFloat(toMutate float64, opt FloatMutationOptions) float64 {
 /**
  * Mutate this neuron.
  */
-func (n *ModularNeuron) mutate(wOpt_p *FloatMutationOptions) ModularNeuron {
+func (n *Neuron) mutate(wOpt_p *FloatMutationOptions) Neuron {
 
-	newNeuron := make(ModularNeuron, len(*n))
+	newNeuron := make(Neuron, len(*n))
 	for i, weight := range *n {
 		newNeuron[i] = mutateFloat(weight, *wOpt_p)
 	}
@@ -70,7 +70,7 @@ func (n *ModularNeuron) mutate(wOpt_p *FloatMutationOptions) ModularNeuron {
 	return newNeuron
 }
 
-func (modNet ModularNetwork) Mutate(mOpt_p *ModularNetworkMutationOptions) *ModularNetwork {
+func (modNet Network) Mutate(mOpt_p *NetworkMutationOptions) *Network {
 	newBody := modNet.Body.Mutate(mOpt_p)
 	modNet.Body = *newBody
 	return &modNet
@@ -79,7 +79,7 @@ func (modNet ModularNetwork) Mutate(mOpt_p *ModularNetworkMutationOptions) *Modu
 /**
  * Mutate this network.
  */
-func (nn ModularBody) Mutate(mOpt_p *ModularNetworkMutationOptions) *ModularBody {
+func (nn Body) Mutate(mOpt_p *NetworkMutationOptions) *Body {
 
 	mOpt := *mOpt_p
 
@@ -173,7 +173,7 @@ func (nn ModularBody) Mutate(mOpt_p *ModularNetworkMutationOptions) *ModularBody
  * Removes a neuron from an index and places a new neuron there in its place.
  * Effectively resetNeuron + addNeuron, if addNeuron took an index.
  */
-func (nn_p *ModularBody) replaceNeuron(columnIndex, neuronIndex int, DefaultAxonWeight float64) {
+func (nn_p *Body) replaceNeuron(columnIndex, neuronIndex int, DefaultAxonWeight float64) {
 
 	nn := *nn_p
 
@@ -187,11 +187,11 @@ func (nn_p *ModularBody) replaceNeuron(columnIndex, neuronIndex int, DefaultAxon
 /**
  * Add a neuron to the end of a column.
  */
-func (nn_p *ModularBody) addNeuron(columnIndex int, DefaultAxonWeight float64) {
+func (nn_p *Body) addNeuron(columnIndex int, DefaultAxonWeight float64) {
 
 	nn := *nn_p
 
-	newNeuron := make(ModularNeuron, len(nn[columnIndex+1]))
+	newNeuron := make(Neuron, len(nn[columnIndex+1]))
 
 	// Set this new neuron's weights for the next column
 	for i := 0; i < len(nn[columnIndex+1]); i++ {
@@ -209,7 +209,7 @@ func (nn_p *ModularBody) addNeuron(columnIndex int, DefaultAxonWeight float64) {
 /**
  * Remove the column between our output column and the column two indexes prior.
  */
-func (nn_p *ModularBody) removeColumn(cOpt_p *ModularColumnGenerationOptions) *ModularBody {
+func (nn_p *Body) removeColumn(cOpt_p *ColumnGenerationOptions) *Body {
 
 	nn := *nn_p
 	cOpt := *cOpt_p
@@ -245,7 +245,7 @@ func (nn_p *ModularBody) removeColumn(cOpt_p *ModularColumnGenerationOptions) *M
 /**
  * Add a column between our output column and the column immediately prior.
  */
-func (nn_p *ModularBody) addColumn(cOpt_p *ModularColumnGenerationOptions) *ModularBody {
+func (nn_p *Body) addColumn(cOpt_p *ColumnGenerationOptions) *Body {
 
 	nn := *nn_p
 	cOpt := *cOpt_p
@@ -255,13 +255,13 @@ func (nn_p *ModularBody) addColumn(cOpt_p *ModularColumnGenerationOptions) *Modu
 	// The outColumn is just an array of no weights,
 	// so we don't need to worry about copying the
 	// old column over.
-	outColumn := make([]ModularNeuron, len(nn[i]))
+	outColumn := make([]Neuron, len(nn[i]))
 
 	// Add a bunch of default weights to
 	// the current out column, converting it into
 	// a regular column.
 	for j := 0; j < len(nn[i]); j++ {
-		nn[i][j] = make(ModularNeuron, len(nn[i]))
+		nn[i][j] = make(Neuron, len(nn[i]))
 		for k := 0; k < len(nn[i]); k++ {
 			nn[i][j][k] = cOpt.DefaultAxonWeight
 		}
@@ -283,7 +283,7 @@ func (nn_p *ModularBody) addColumn(cOpt_p *ModularColumnGenerationOptions) *Modu
 /**
  * Swap two Axons which start from these neurons indexes.
  */
-func (nn_p *ModularBody) swapWeights(columnIndex, neuronIndex, axonIndex1, axonIndex2 int) {
+func (nn_p *Body) swapWeights(columnIndex, neuronIndex, axonIndex1, axonIndex2 int) {
 
 	neuron := (*nn_p)[columnIndex][neuronIndex]
 
