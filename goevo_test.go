@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"goevo/crossover"
 	"goevo/neural"
+	"goevo/pairing"
 	"goevo/population"
 	"goevo/selection"
 	"math/rand"
@@ -35,7 +36,7 @@ func TestPopulationRun(t *testing.T) {
 		0.05,
 		0.00,
 		0.00,
-		0.30,
+		0.10,
 	}
 
 	nngOpt := neural.NetworkGenerationOptions{
@@ -63,7 +64,7 @@ func TestPopulationRun(t *testing.T) {
 		members[i] = nngOpt.Generate()
 	}
 	s := selection.ProbabilisticSelection{
-		2,
+		3,
 		1.7,
 	}
 	// s := selection.StochasticUniversalSelection{
@@ -90,6 +91,8 @@ func TestPopulationRun(t *testing.T) {
 		0.75,
 	}
 
+	pair := pairing.RandomPairing{}
+
 	in := make([][]float64, 3)
 	in[0] = []float64{3.0, 2.0, 0.0}
 	in[1] = []float64{10.0, 20.0, 10.0}
@@ -105,6 +108,7 @@ func TestPopulationRun(t *testing.T) {
 		popSize,
 		s,
 		c,
+		pair,
 		in,
 		out,
 	}

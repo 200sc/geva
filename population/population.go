@@ -12,6 +12,7 @@ type Population struct {
 	Size         int
 	Selection    SelectionMethod
 	Crossover    CrossoverMethod
+	Pairing      PairingMethod
 	TestInputs   [][]float64
 	TestExpected [][]float64
 }
@@ -23,7 +24,8 @@ func (p_p *Population) NextGeneration() *Population {
 	p := *p_p
 
 	nextGen := p.Selection.Select(p_p)
-	p.Members = p.Crossover.Crossover(nextGen, p.Size/p.Selection.GetParentProportion())
+	pairs := p.Pairing.Pair(nextGen, p.Size/p.Selection.GetParentProportion())
+	p.Members = p.Crossover.Crossover(nextGen, p.Size/p.Selection.GetParentProportion(), pairs)
 	for i, v := range p.Members {
 		p.Members[i] = *p.Mutation.Mutate(v)
 	}
@@ -108,5 +110,9 @@ type SelectionMethod interface {
 }
 
 type CrossoverMethod interface {
-	Crossover(nn []neural.Network, populated int) []neural.Network
+	Crossover(nn []neural.Network, populated int, pairs [][]int) []neural.Network
+}
+
+type PairingMethod interface {
+	Pair(nn []neural.Network, populated int) [][]int
 }

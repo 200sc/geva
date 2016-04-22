@@ -18,22 +18,14 @@ type UniformCrossover struct {
 	ChosenProportion float64
 }
 
-func (pc_p UniformCrossover) Crossover(nn []neural.Network, populated int) []neural.Network {
+func (pc_p UniformCrossover) Crossover(nn []neural.Network, populated int, pairs [][]int) []neural.Network {
+
+	pairIndex := 0
 
 	for j := populated; j < len(nn); j++ {
 
-		// In the future, the actual method for selecting
-		// pairs to crossover should be variable.
-		// Here it is random.
-		index1 := rand.Intn(populated)
-		index2 := rand.Intn(populated)
-
-		if index1 == index2 {
-			index2 = (index2 + 1) % populated
-		}
-
-		n1 := nn[index1].Body
-		n2 := nn[index2].Body
+		n1 := nn[pairs[pairIndex][0]].Body
+		n2 := nn[pairs[pairIndex][1]].Body
 
 		newBody := n1.CopyStructure()
 		// This assumes that each network has the same dimensions!
@@ -49,8 +41,10 @@ func (pc_p UniformCrossover) Crossover(nn []neural.Network, populated int) []neu
 		}
 		nn[j] = neural.Network{
 			Body:      newBody,
-			Activator: nn[index1].Activator,
+			Activator: nn[pairs[pairIndex][0]].Activator,
 		}
+
+		pairIndex++
 	}
 
 	return nn
