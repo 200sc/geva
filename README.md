@@ -14,6 +14,8 @@ Our way of judging fitness, 1 being the best and high being bad, also makes conv
 
 We'd like to add Demetic Grouping.
 
+We'd like to add a Hall of Fame approach or addition to new generations.
+
 Once the above is done, we'd like to add Genetic Programs and Genetic Algorithms.
 
 Then, a conversion to the JVM (Probably Scala).
