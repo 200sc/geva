@@ -59,7 +59,7 @@ func mutateFloat(toMutate float64, opt FloatMutationOptions) float64 {
 		return toMutate
 	}
 
-	out := (opt.MutMagnitude * float64(rand.Intn(opt.MutRange*2))) + toMutate
+	out := (opt.MutMagnitude * float64(rand.Intn((opt.MutRange*2)+1))) + toMutate
 	return out - (opt.MutMagnitude * float64(opt.MutRange))
 }
 

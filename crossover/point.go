@@ -16,7 +16,7 @@ type PointCrossover struct {
 	NumPoints int
 }
 
-func (pc PointCrossover) Crossover(nn []neural.Network, populated int) []neural.Network {
+func (pc PointCrossover) Crossover(nn []neural.ModularNetwork, populated int) []neural.ModularNetwork {
 
 	for j := populated; j < len(nn); j++ {
 
@@ -30,8 +30,8 @@ func (pc PointCrossover) Crossover(nn []neural.Network, populated int) []neural.
 			index2 = (index2 + 1) % populated
 		}
 
-		n1 := nn[index1]
-		n2 := nn[index2]
+		n1 := nn[index1].Body
+		n2 := nn[index2].Body
 
 		// Inc here is the value we use to ensure
 		// distance between points-- each random
@@ -56,14 +56,14 @@ func (pc PointCrossover) Crossover(nn []neural.Network, populated int) []neural.
 		start := 0
 		end := 0
 
-		nn[j] = activeNetwork.Make(0)
+		newBody := make(neural.ModularBody, 0)
 
 		// Populate our new empty network by
 		// combining the two parent networks
 		// as according to the above split points
 		for _, v := range points {
-			end = int(math.Ceil(float64(activeNetwork.Length()) * v))
-			nn[j] = nn[j].Append(activeNetwork.Slice(start, end))
+			end = int(math.Ceil(float64(len(activeNetwork)) * v))
+			newBody = append(newBody, activeNetwork[start:end]...)
 
 			if activeIndex == 1 {
 				activeNetwork = n2
@@ -75,8 +75,13 @@ func (pc PointCrossover) Crossover(nn []neural.Network, populated int) []neural.
 			start = end
 		}
 		// Add on the remaining columns from the last network.
-		end = int(math.Ceil(float64(activeNetwork.Length()) * points[len(points)-1]))
-		nn[j] = nn[j].Append(activeNetwork.SliceToEnd(end))
+		end = int(math.Ceil(float64(len(activeNetwork)) * points[len(points)-1]))
+		newBody = append(newBody, activeNetwork[end:]...)
+
+		nn[j] = neural.ModularNetwork{
+			Body:      newBody,
+			Activator: nn[index1].Activator,
+		}
 	}
 
 	return nn

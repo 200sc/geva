@@ -18,7 +18,7 @@ type UniformCrossover struct {
 	ChosenProportion float64
 }
 
-func (pc_p UniformCrossover) Crossover(nn []neural.Network, populated int) []neural.Network {
+func (pc_p UniformCrossover) Crossover(nn []neural.ModularNetwork, populated int) []neural.ModularNetwork {
 
 	for j := populated; j < len(nn); j++ {
 
@@ -32,20 +32,24 @@ func (pc_p UniformCrossover) Crossover(nn []neural.Network, populated int) []neu
 			index2 = (index2 + 1) % populated
 		}
 
-		n1 := nn[index1]
-		n2 := nn[index2]
+		n1 := nn[index1].Body
+		n2 := nn[index2].Body
 
-		nn[j] = n1.CopyStructure()
+		newBody := n1.CopyStructure()
 		// This assumes that each network has the same dimensions!
-		for i := 0; i < n1.Length(); i++ {
-			for k := 0; k < n1.ColLength(i); k++ {
+		for i := 0; i < len(n1); i++ {
+			for k := 0; k < len(n1[i]); k++ {
 				if rand.Float64() < pc_p.ChosenProportion {
 					// This assumes our value is copied.
-					nn[j].Set(i, k, n1.Get(i, k))
+					newBody[i][k] = n1[i][k]
 				} else {
-					nn[j].Set(i, k, n2.Get(i, k))
+					newBody[i][k] = n2[i][k]
 				}
 			}
+		}
+		nn[j] = neural.ModularNetwork{
+			Body:      newBody,
+			Activator: nn[index1].Activator,
 		}
 	}
 

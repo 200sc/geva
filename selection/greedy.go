@@ -21,13 +21,13 @@ func (gs GreedySelection) GetParentProportion() int {
 // I'm assuming here that it means picking the top x members of the
 // population where x is the proportion of members who are parents
 // in the new generation.
-func (gs GreedySelection) Select(p_p *population.Population) []neural.Network {
+func (gs GreedySelection) Select(p_p *population.Population) []neural.ModularNetwork {
 	p := *p_p
 
 	fitnessChannels := p_p.Fitness()
 
 	fitnesses := make(map[int][]int)
-	members := make([]neural.Network, p.Size)
+	members := make([]neural.ModularNetwork, p.Size)
 
 	// Send off goroutines to process tournament battles
 	for i := 0; i < p.Size; i++ {

@@ -21,7 +21,7 @@ func (ts TournamentSelection) GetParentProportion() int {
 	return ts.ParentProportion
 }
 
-func (ts TournamentSelection) Select(p_p *population.Population) []neural.Network {
+func (ts TournamentSelection) Select(p_p *population.Population) []neural.ModularNetwork {
 	p := *p_p
 
 	// Send off goroutines to calculate the population members' fitnesses
@@ -31,7 +31,7 @@ func (ts TournamentSelection) Select(p_p *population.Population) []neural.Networ
 	// because we expect the above goroutines to be the
 	// most expensive time sink in this function.
 	fitnesses := make([]int, p.Size)
-	members := make([]neural.Network, p.Size)
+	members := make([]neural.ModularNetwork, p.Size)
 	// We have an arbitrary buffer here.
 	// It should just effect how many goroutines can
 	// simultaneously end (or all end prior to a

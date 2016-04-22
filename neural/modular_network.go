@@ -6,50 +6,65 @@ import (
 	"math/rand"
 )
 
-type RectifierNetworkOutput struct {
+type ModularNetworkOutput struct {
 	value float64
 	index int
 }
 
-type RectifierNetwork [][]RectifierNeuron
+type ActivatorFunc func(float64) float64
+
+type ModularBody [][]ModularNeuron
+
+type ModularNetwork struct {
+	Activator ActivatorFunc
+	Body      ModularBody
+}
+
+func (modNet_p *ModularNetwork) Copy() ModularNetwork {
+	newBody := modNet_p.Body.Copy()
+	return ModularNetwork{
+		Body:      newBody,
+		Activator: modNet_p.Activator,
+	}
+}
 
 /**
  * Take a network and duplicate it
  */
-func (nn_p *RectifierNetwork) Copy() RectifierNetwork {
+func (nn_p *ModularBody) Copy() ModularBody {
 
 	nn := *nn_p
 
-	var newNetwork RectifierNetwork
+	var newNetwork ModularBody
 
 	for i := range nn {
-		newNetwork = append(newNetwork, make([]RectifierNeuron, len(nn[i])))
+		newNetwork = append(newNetwork, make([]ModularNeuron, len(nn[i])))
 		copy(newNetwork[i], nn[i])
 	}
 
 	return newNetwork
 }
 
-func GenerateRectifierNetwork(nOpt_p *RectifierNetworkGenerationOptions) *RectifierNetwork {
+func GenerateModularNetwork(nOpt_p *ModularNetworkGenerationOptions) *ModularNetwork {
 
 	nnOpt := *nOpt_p
 	cOpt := *nnOpt.ColumnOptions
 
-	nn := RectifierNetwork{}
+	nn := make(ModularBody, 0)
 
 	// Set up the input column
-	inputColumn := make([]RectifierNeuron, nnOpt.Inputs)
+	inputColumn := make([]ModularNeuron, nnOpt.Inputs)
 
 	nn = append(nn, inputColumn)
 
 	// Set up the output column
-	outputColumn := make([]RectifierNeuron, nnOpt.Outputs)
+	outputColumn := make([]ModularNeuron, nnOpt.Outputs)
 
 	nn = append(nn, outputColumn)
 
 	// reset the input column to give it axons
 	for i := 0; i < len(inputColumn); i++ {
-		nn[0][i] = make(RectifierNeuron, len(outputColumn))
+		nn[0][i] = make(ModularNeuron, len(outputColumn))
 		nn.replaceNeuron(0, i, cOpt.DefaultAxonWeight)
 	}
 
@@ -60,15 +75,20 @@ func GenerateRectifierNetwork(nOpt_p *RectifierNetworkGenerationOptions) *Rectif
 	}
 
 	for i := 0; i < nnOpt.BaseMutations; i++ {
-		nn = *(nn.Mutate(&nnOpt.RectifierNetworkMutationOptions))
+		nn = *(nn.Mutate(&nnOpt.ModularNetworkMutationOptions))
 	}
 
-	return &nn
+	modNet := ModularNetwork{
+		Body:      nn,
+		Activator: nnOpt.Activator,
+	}
+
+	return &modNet
 }
 
-// Todo: Improve this
-func (nn RectifierNetwork) Print() {
-	for _, col := range nn {
+// Todo: Print Activator
+func (nn ModularNetwork) Print() {
+	for _, col := range nn.Body {
 		for _, n := range col {
 			fmt.Print(n.String())
 		}
@@ -81,11 +101,13 @@ func (nn RectifierNetwork) Print() {
  * Run some input through a neural network.
  * This returns the network's output column.
  */
-func (nn_p *RectifierNetwork) Run(Inputs []float64) []float64 {
+func (modNet_p *ModularNetwork) Run(Inputs []float64) []float64 {
 
-	nn := *nn_p
+	modNet := *modNet_p
+	act := modNet.Activator
+	nn := modNet.Body
 
-	doneCh := make(chan RectifierNetworkOutput)
+	doneCh := make(chan ModularNetworkOutput)
 
 	channels := make([][]chan float64, len(nn))
 	for x, col := range nn {
@@ -103,8 +125,8 @@ func (nn_p *RectifierNetwork) Run(Inputs []float64) []float64 {
 				l = len(channels[x-1])
 			}
 			if x == len(nn)-1 {
-				go func(inputChannel chan float64, doneCh chan RectifierNetworkOutput,
-					inputLength int, y int) {
+				go func(inputChannel chan float64, doneCh chan ModularNetworkOutput,
+					inputLength int, y int, fn ActivatorFunc) {
 
 					out := 0.0
 
@@ -113,15 +135,15 @@ func (nn_p *RectifierNetwork) Run(Inputs []float64) []float64 {
 					}
 					close(inputChannel)
 
-					out = math.Max(out, 0.0)
+					out = fn(out)
 
-					doneCh <- RectifierNetworkOutput{out, y}
+					doneCh <- ModularNetworkOutput{out, y}
 
-				}(channels[x][y], doneCh, l, y)
+				}(channels[x][y], doneCh, l, y, act)
 			} else {
 
-				go func(n RectifierNeuron, inputChannel chan float64,
-					channelColumn []chan float64, inputLength int) {
+				go func(n ModularNeuron, inputChannel chan float64,
+					channelColumn []chan float64, inputLength int, fn ActivatorFunc) {
 
 					out := 0.0
 
@@ -142,18 +164,14 @@ func (nn_p *RectifierNetwork) Run(Inputs []float64) []float64 {
 					}
 					close(inputChannel)
 
-					// This is the 'rectifier'.
-					// Instead of sending a signal 0 or 1
-					// based on a threshold, we send our actual
-					// value (so long as it exceeds 0).
-					out = math.Max(out, 0.0)
+					out = fn(out)
 
 					// As above, we apply the next column's
 					// weights as we send them off.
 					for i, weight := range n {
 						channelColumn[i] <- out * weight
 					}
-				}(neuron, channels[x][y], channels[x+1], l)
+				}(neuron, channels[x][y], channels[x+1], l, act)
 			}
 		}
 	}
@@ -174,45 +192,16 @@ func (nn_p *RectifierNetwork) Run(Inputs []float64) []float64 {
 	return output
 }
 
-func (n RectifierNetwork) Get(x, y int) Neuron {
-	return n[x][y]
-}
-func (n RectifierNetwork) Set(x, y int, i interface{}) {
-	n[x][y] = i.(RectifierNeuron)
-}
-func (n RectifierNetwork) Slice(start, end int) Network {
-	return n[start:end]
-}
-func (n RectifierNetwork) SliceToEnd(start int) Network {
-	return n[start:]
-}
-func (n RectifierNetwork) SliceFromStart(end int) Network {
-	return n[:end]
-}
-func (n RectifierNetwork) Length() int {
-	return len(n)
-}
-func (n RectifierNetwork) ColLength(i int) int {
-	return len(n[i])
-}
-func (n RectifierNetwork) Append(data interface{}) Network {
-	n = append(n, data.(RectifierNetwork)...)
-	return n
-}
-func (n RectifierNetwork) Make(size int) Network {
-	out := make(RectifierNetwork, size)
-	return out
-}
-func (n RectifierNetwork) CopyStructure() Network {
-	out := make(RectifierNetwork, len(n))
-	for i := 0; i < len(n); i++ {
-		out[i] = make([]RectifierNeuron, len(n[i]))
+func (b ModularBody) CopyStructure() ModularBody {
+	body := make(ModularBody, len(b))
+	for i := 0; i < len(b); i++ {
+		body[i] = make([]ModularNeuron, len(b[i]))
 	}
-	return out
+	return body
 }
 
 // High fitness is bad, and vice versa.
-func (n RectifierNetwork) Fitness(Inputs, expected [][]float64) int {
+func (n ModularNetwork) Fitness(Inputs, expected [][]float64) int {
 	fitness := 1.0
 	for i := range Inputs {
 		output := n.Run(Inputs[i])
