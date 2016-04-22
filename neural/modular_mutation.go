@@ -30,6 +30,11 @@ type ModularColumnGenerationOptions struct {
 	MaxSize           int
 	DefaultAxonWeight float64
 }
+type FloatMutationOptions struct {
+	MutChance    float64
+	MutMagnitude float64
+	MutRange     int
+}
 
 func (genOpt ModularNetworkGenerationOptions) Generate() ModularNetwork {
 	return *GenerateModularNetwork(&genOpt)
@@ -37,6 +42,19 @@ func (genOpt ModularNetworkGenerationOptions) Generate() ModularNetwork {
 
 func (genOpt ModularNetworkGenerationOptions) Mutate(n ModularNetwork) *ModularNetwork {
 	return n.Mutate(&(genOpt.ModularNetworkMutationOptions))
+}
+
+/**
+ * Modify a float to some float close to it in value.
+ * TODO: Give this a better distribution of randomness.
+ */
+func mutateFloat(toMutate float64, opt FloatMutationOptions) float64 {
+	if rand.Float64() >= opt.MutChance {
+		return toMutate
+	}
+
+	out := (opt.MutMagnitude * float64(rand.Intn((opt.MutRange*2)+1))) + toMutate
+	return out - (opt.MutMagnitude * float64(opt.MutRange))
 }
 
 /**

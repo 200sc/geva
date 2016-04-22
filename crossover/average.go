@@ -19,6 +19,6 @@ type AverageCrossover struct {
 	weightMod float64
 }
 
-func (pc_p *AverageCrossover) Crossover(nn []neural.Network, populated int) []neural.Network {
+func (pc_p *AverageCrossover) Crossover(nn []neural.ModularNetwork, populated int) []neural.ModularNetwork {
 	return nn
 }
