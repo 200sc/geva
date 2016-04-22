@@ -16,6 +16,8 @@ We'd like to add Demetic Grouping.
 
 We'd like to add a Hall of Fame approach or addition to new generations.
 
+We could add a way to evaluate fitness based on a random group of test inputs, instead of always evaluating all fitnesses by all test inputs.
+
 Once the above is done, we'd like to add Genetic Programs and Genetic Algorithms.
 
 Then, a conversion to the JVM (Probably Scala).
