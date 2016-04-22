@@ -85,9 +85,12 @@ func TestPopulationRun(t *testing.T) {
 	// 	2,
 	// }
 
-	c := crossover.PointCrossover{
+	c := crossover.AverageCrossover{
 		1,
 	}
+	// c := crossover.PointCrossover{
+	// 	1,
+	// }
 	// c := crossover.UniformCrossover{
 	// 	0.5,
 	// }
