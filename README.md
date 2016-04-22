@@ -18,6 +18,8 @@ We'd like to add a Hall of Fame approach or addition to new generations.
 
 We could add a way to evaluate fitness based on a random group of test inputs, instead of always evaluating all fitnesses by all test inputs.
 
+While running a neural network is entirely concurrent, it'd be great if we could modify selection and crossover to also be concurrent-- crossover being concurrent is probably going to be simple once we have dedicated methods for parent pairing (generate a list of pairs, then split a goroutine off for each pair, and collect the results).
+
 Once the above is done, we'd like to add Genetic Programs and Genetic Algorithms.
 
 Then, a conversion to the JVM (Probably Scala).
