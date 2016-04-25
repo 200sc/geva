@@ -1,3 +1,5 @@
+// Package neural provides structure for creating and
+// modifying neural networks.
 package neural
 
 import (
@@ -5,24 +7,6 @@ import (
 	"math"
 	"math/rand"
 )
-
-type NetworkOutput struct {
-	value float64
-	index int
-}
-
-// An activator function just maps float values to other
-// float values. The function can be as simplistic or complicated
-// as desired-- eventually a set of common activators will be
-// collected.
-type ActivatorFunc func(float64) float64
-
-type Body [][]Neuron
-
-type Network struct {
-	Activator ActivatorFunc
-	Body      Body
-}
 
 func (modNet_p *Network) Copy() Network {
 	newBody := modNet_p.Body.Copy()
@@ -111,7 +95,7 @@ func (modNet_p *Network) Run(Inputs []float64) []float64 {
 	act := modNet.Activator
 	nn := modNet.Body
 
-	doneCh := make(chan NetworkOutput)
+	doneCh := make(chan networkOutput)
 
 	channels := make([][]chan float64, len(nn))
 	for x, col := range nn {
@@ -129,7 +113,7 @@ func (modNet_p *Network) Run(Inputs []float64) []float64 {
 				l = len(channels[x-1])
 			}
 			if x == len(nn)-1 {
-				go func(inputChannel chan float64, doneCh chan NetworkOutput,
+				go func(inputChannel chan float64, doneCh chan networkOutput,
 					inputLength int, y int, fn ActivatorFunc) {
 
 					out := 0.0
@@ -141,7 +125,7 @@ func (modNet_p *Network) Run(Inputs []float64) []float64 {
 
 					out = fn(out)
 
-					doneCh <- NetworkOutput{out, y}
+					doneCh <- networkOutput{out, y}
 
 				}(channels[x][y], doneCh, l, y, act)
 			} else {

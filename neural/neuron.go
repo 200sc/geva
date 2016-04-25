@@ -5,8 +5,6 @@ import (
 	"strconv"
 )
 
-type Neuron []float64
-
 func (n Neuron) String() string {
 	var buffer bytes.Buffer
 

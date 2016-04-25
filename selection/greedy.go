@@ -24,34 +24,33 @@ func (gs GreedySelection) GetParentProportion() int {
 func (gs GreedySelection) Select(p_p *population.Population) []neural.Network {
 	p := *p_p
 
-	fitnessChannels := p_p.Fitness()
-
-	fitnesses := make(map[int][]int)
+	fitMap := make(map[int][]int)
 	members := make([]neural.Network, p.Size)
 
 	// Send off goroutines to process tournament battles
 	for i := 0; i < p.Size; i++ {
-		f := <-fitnessChannels[i]
-		if v, ok := fitnesses[f]; ok {
-			fitnesses[f] = append(v, i)
+		f := p.Fitnesses[i]
+		if v, ok := fitMap[f]; ok {
+			fitMap[f] = append(v, i)
 		} else {
-			fitnesses[f] = []int{i}
+			fitMap[f] = []int{i}
 		}
-		close(fitnessChannels[i])
 	}
 
-	keys := KeySet_Int_SlInt(fitnesses)
+	keys := KeySet_Int_SlInt(fitMap)
 	sort.Ints(keys)
 	i := 0
 	j := 0
 	for i < p.Size/gs.ParentProportion {
-		for k := 0; k < len(fitnesses[keys[j]]); k++ {
-			members[i] = p.Members[fitnesses[keys[j]][k]]
+		for k := 0; k < len(fitMap[keys[j]]); k++ {
+			if i >= p.Size/gs.ParentProportion {
+				return members
+			}
+			members[i] = p.Members[fitMap[keys[j]][k]]
 			i++
 		}
 		j++
 	}
-
 	return members
 }
 

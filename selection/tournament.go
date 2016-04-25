@@ -24,13 +24,6 @@ func (ts TournamentSelection) GetParentProportion() int {
 func (ts TournamentSelection) Select(p_p *population.Population) []neural.Network {
 	p := *p_p
 
-	// Send off goroutines to calculate the population members' fitnesses
-	fitnessChannels := p_p.Fitness()
-
-	// We move as much initialization down here as we can,
-	// because we expect the above goroutines to be the
-	// most expensive time sink in this function.
-	fitnesses := make([]int, p.Size)
 	members := make([]neural.Network, p.Size)
 	// We have an arbitrary buffer here.
 	// It should just effect how many goroutines can
@@ -48,14 +41,7 @@ func (ts TournamentSelection) Select(p_p *population.Population) []neural.Networ
 		// Process fitness channels and map
 		// fitnesses to indexes.
 		for _, j := range fighters {
-			// The slice will be initialized to zero
-			// and we return 1 as optimal fitness,
-			// so this is a check for initialization.
-			if fitnesses[j] == 0 {
-				fitnesses[j] = <-fitnessChannels[j]
-				close(fitnessChannels[j])
-			}
-			fitMap[fitnesses[j]] = j
+			fitMap[p.Fitnesses[j]] = j
 		}
 
 		// The goroutine which will pick a winner

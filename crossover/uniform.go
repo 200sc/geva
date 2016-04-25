@@ -32,7 +32,7 @@ func (pc_p UniformCrossover) Crossover(nn []neural.Network, populated int, pairs
 		for i := 0; i < len(n1); i++ {
 			for k := 0; k < len(n1[i]); k++ {
 				if rand.Float64() < pc_p.ChosenProportion {
-					// This assumes our value is copied.
+					// This assumes our value is copied and is not just a pointer.
 					newBody[i][k] = n1[i][k]
 				} else {
 					newBody[i][k] = n2[i][k]

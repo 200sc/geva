@@ -4,38 +4,6 @@ import (
 	"math/rand"
 )
 
-type NetworkMutationOptions struct {
-	WeightOptions *FloatMutationOptions
-	ColumnOptions *ColumnGenerationOptions
-	// per column
-	NeuronReplacementChance float64
-	NeuronAdditionChance    float64
-	WeightSwapChance        float64
-	// per network
-	ColumnRemovalChance  float64
-	ColumnAdditionChance float64
-	NeuronMutationChance float64
-}
-type NetworkGenerationOptions struct {
-	NetworkMutationOptions
-	MinColumns    int
-	MaxColumns    int
-	Inputs        int
-	Outputs       int
-	BaseMutations int
-	Activator     ActivatorFunc
-}
-type ColumnGenerationOptions struct {
-	MinSize           int
-	MaxSize           int
-	DefaultAxonWeight float64
-}
-type FloatMutationOptions struct {
-	MutChance    float64
-	MutMagnitude float64
-	MutRange     int
-}
-
 func (genOpt NetworkGenerationOptions) Generate() Network {
 	return *GenerateNetwork(&genOpt)
 }
@@ -51,6 +19,9 @@ func (genOpt NetworkGenerationOptions) Mutate(n Network) *Network {
 func mutateFloat(toMutate float64, opt FloatMutationOptions) float64 {
 	if rand.Float64() >= opt.MutChance {
 		return toMutate
+	}
+	if rand.Float64() <= opt.ZeroOutChance {
+		return 0.0
 	}
 
 	out := (opt.MutMagnitude * float64(rand.Intn((opt.MutRange*2)+1))) + toMutate

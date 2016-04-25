@@ -20,6 +20,7 @@ func TestPopulationRun(t *testing.T) {
 		0.20,
 		0.05,
 		20,
+		0.01,
 	}
 
 	cgOpt := neural.ColumnGenerationOptions{
@@ -46,18 +47,11 @@ func TestPopulationRun(t *testing.T) {
 		3,
 		1,
 		25,
-		// Perceptron example
-		// func(x float64) float64 {
-		// 	if x > 0.5 {
-		// 		return 1
-		// 	}
-		// 	return 0.0
-		// },
 		neural.Rectifier,
 	}
 
 	popSize := 100
-	numGens := 1000
+	numGens := 200
 
 	members := make([]neural.Network, popSize)
 	for i := 0; i < popSize; i++ {
@@ -93,14 +87,16 @@ func TestPopulationRun(t *testing.T) {
 
 	pair := pairing.RandomPairing{}
 
-	in := make([][]float64, 3)
+	in := make([][]float64, 4)
 	in[0] = []float64{3.0, 2.0, 0.0}
 	in[1] = []float64{10.0, 20.0, 10.0}
 	in[2] = []float64{2.0, 100.0, 1.0}
-	out := make([][]float64, 3)
+	in[3] = []float64{0.0, 0.0, 50.0}
+	out := make([][]float64, 4)
 	out[0] = []float64{15.0}
 	out[1] = []float64{120.0}
 	out[2] = []float64{309.0}
+	out[3] = []float64{150.0}
 
 	p := population.Population{
 		members,
@@ -111,6 +107,10 @@ func TestPopulationRun(t *testing.T) {
 		pair,
 		in,
 		out,
+		5,
+		make([]int, popSize),
+		0,
+		0,
 	}
 
 	for i := 0; i < numGens; i++ {
