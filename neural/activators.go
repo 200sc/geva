@@ -1,7 +1,12 @@
 package neural
 
 import (
+	"fmt"
 	"math"
+)
+
+var (
+	activatorTests = []float64{-2, -1.5, -1, -0.5, 0, .5, 1, 1.5, 2}
 )
 
 // This list egregiously copied from Wikipedia.
@@ -71,3 +76,11 @@ func Gaussian(x float64) float64 {
 
 // For TanH, ArcTan, Sin
 // just dump in math.Tanh / math.Arctan / math.Sin
+
+func PrintActivator(a ActivatorFunc) {
+	fmt.Print("Activator: [")
+	for _, v := range activatorTests {
+		fmt.Print(v, ":", a(v), ",")
+	}
+	fmt.Print("]")
+}

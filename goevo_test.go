@@ -46,7 +46,7 @@ func TestPopulationRun(t *testing.T) {
 		0.00,
 		0.00,
 		0.10,
-		0.00,
+		0.01,
 	}
 
 	nngOpt := neural.NetworkGenerationOptions{

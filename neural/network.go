@@ -92,6 +92,7 @@ func (nn Network) Print() {
 		}
 		fmt.Println("")
 	}
+	PrintActivator(nn.Activator)
 	fmt.Println("")
 }
 
