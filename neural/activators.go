@@ -6,7 +6,17 @@ import (
 )
 
 var (
-	activatorTests = []float64{-2, -1.5, -1, -0.5, 0, .5, 1, 1.5, 2}
+	activatorTests = []float64{
+		-4.0, -3.75, -3.5, -3.25,
+		-3.0, -2.75, -2.5, -2.25,
+		-2.0, -1.75, -1.5, -1.25,
+		-1.0, -0.75, -0.5, -0.25,
+		0.0, 0.75, 0.5, 0.25,
+		1.0, 1.75, 1.5, 1.25,
+		2.0, 2.75, 2.5, 2.25,
+		3.0, 3.25, 3.5, 3.75,
+		4.0,
+	}
 )
 
 // This list egregiously copied from Wikipedia.
@@ -83,4 +93,61 @@ func PrintActivator(a ActivatorFunc) {
 		fmt.Print(v, ":", a(v), ",")
 	}
 	fmt.Print("]")
+}
+
+func GraphPrintActivator(a ActivatorFunc) {
+	m := make(map[float64]float64)
+	for _, v := range activatorTests {
+		m[v] = a(v)
+	}
+	grid := make([][]bool, 33)
+	for i := 0; i < 33; i++ {
+		grid[i] = make([]bool, 33)
+	}
+	maxRow := 0
+	minRow := 16
+	for k, v := range m {
+		gridCol := int((k + 4) * 4)
+		gridRow := round((((v - 4) * 4) * -1))
+		if gridRow < 0 || gridRow > 32 {
+			continue
+		}
+		grid[gridRow][gridCol] = true
+		if gridRow > maxRow {
+			maxRow = gridRow
+		} else if gridRow < minRow {
+			minRow = gridRow
+		}
+	}
+	for y, row := range grid {
+		if y > maxRow {
+			continue
+		} else if y < minRow {
+			continue
+		}
+		for x, v := range row {
+			if v {
+				fmt.Print("X")
+			} else {
+				if x == 16 {
+					fmt.Print("|")
+				} else if y == 16 {
+					fmt.Print("-")
+				} else {
+					fmt.Print(" ")
+				}
+			}
+		}
+		fmt.Println()
+	}
+}
+
+func round(f float64) int {
+	if f < -0.5 {
+		return int(f - 0.5)
+	}
+	if f > 0.5 {
+		return int(f + 0.5)
+	}
+	return 0
 }

@@ -31,9 +31,6 @@ func TestPopulationRun(t *testing.T) {
 
 	actOpt := neural.ActivatorMutationOptions{
 		neural.Rectifier,
-		neural.Rectifier_Parametric(.05),
-		neural.Rectifier_Parametric(.15),
-		neural.Identity,
 	}
 
 	nnmOpt := neural.NetworkMutationOptions{
