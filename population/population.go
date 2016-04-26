@@ -1,7 +1,6 @@
 package population
 
 import (
-	"fmt"
 	"goevo/neural"
 	"math"
 	"sort"
@@ -81,7 +80,6 @@ func (p_p *Population) GenerateFitness() *Population {
 		p.Fitnesses[i] = v
 	}
 
-	fmt.Println("fitness generated")
 	return &p
 }
 

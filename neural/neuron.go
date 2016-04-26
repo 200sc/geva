@@ -1,10 +1,15 @@
 package neural
 
+// Store functions exclusive to neurons.
+
 import (
 	"bytes"
 	"strconv"
 )
 
+/**
+ * Obtain a string represenation of a neuron
+ **/
 func (n Neuron) String() string {
 	var buffer bytes.Buffer
 

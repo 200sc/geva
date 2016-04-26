@@ -42,9 +42,22 @@ func (n *Neuron) mutate(wOpt_p *FloatMutationOptions) Neuron {
 }
 
 func (modNet Network) Mutate(mOpt_p *NetworkMutationOptions) *Network {
+
 	newBody := modNet.Body.Mutate(mOpt_p)
 	modNet.Body = *newBody
+
+	if rand.Float64() < mOpt_p.ActivatorMutationChance {
+		modNet.Activator = MutateActivator(mOpt_p.ActivatorOptions)
+	}
+
 	return &modNet
+}
+
+// All activators are currently weighted the same
+// in this mutation.
+func MutateActivator(mOpt_p *ActivatorMutationOptions) ActivatorFunc {
+	mOpt := *mOpt_p
+	return mOpt[rand.Intn(len(mOpt))]
 }
 
 /**

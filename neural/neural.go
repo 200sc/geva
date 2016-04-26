@@ -48,9 +48,23 @@ type Network struct {
 	Body      Body
 }
 
+// A network output is returned by a network's output neurons.
+// It is equivalent to a normal neuron's output, but it preserves
+// the index of the output neuron.
 type networkOutput struct {
 	value float64
 	index int
+}
+
+// Mutation and generation options follow.
+
+type FloatMutationOptions struct {
+	MutChance    float64
+	MutMagnitude float64
+	MutRange     int
+	// Zeroing out a neuron is useful for making it easier
+	// to remove an unnecessary connection in the network.
+	ZeroOutChance float64
 }
 
 type ColumnGenerationOptions struct {
@@ -58,27 +72,26 @@ type ColumnGenerationOptions struct {
 	MaxSize           int
 	DefaultAxonWeight float64
 }
-type FloatMutationOptions struct {
-	MutChance     float64
-	MutMagnitude  float64
-	MutRange      int
-	ZeroOutChance float64
-}
+
+type ActivatorMutationOptions []ActivatorFunc
 
 type NetworkMutationOptions struct {
-	WeightOptions *FloatMutationOptions
-	ColumnOptions *ColumnGenerationOptions
-	// per column
+	WeightOptions    *FloatMutationOptions
+	ColumnOptions    *ColumnGenerationOptions
+	ActivatorOptions *ActivatorMutationOptions
+	// checked per column
 	NeuronReplacementChance float64
 	NeuronAdditionChance    float64
 	WeightSwapChance        float64
-	// per network
-	ColumnRemovalChance  float64
-	ColumnAdditionChance float64
-	NeuronMutationChance float64
+	// checked per network
+	ColumnRemovalChance     float64
+	ColumnAdditionChance    float64
+	NeuronMutationChance    float64
+	ActivatorMutationChance float64
 }
 
 type NetworkGenerationOptions struct {
+	// To generate a network, you must mutate it
 	NetworkMutationOptions
 	MinColumns    int
 	MaxColumns    int

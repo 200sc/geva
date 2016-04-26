@@ -1,6 +1,6 @@
-// Package neural provides structure for creating and
-// modifying neural networks.
 package neural
+
+// Store functions exclusive to networks.
 
 import (
 	"fmt"
@@ -8,6 +8,9 @@ import (
 	"math/rand"
 )
 
+/**
+ * Copy a network
+ */
 func (modNet_p *Network) Copy() Network {
 	newBody := modNet_p.Body.Copy()
 	return Network{
@@ -17,7 +20,7 @@ func (modNet_p *Network) Copy() Network {
 }
 
 /**
- * Take a network and duplicate it
+ * Copy a network body
  */
 func (nn_p *Body) Copy() Body {
 
@@ -33,6 +36,10 @@ func (nn_p *Body) Copy() Body {
 	return newNetwork
 }
 
+/**
+ * Convert generation options into
+ * a new neural network
+ */
 func GenerateNetwork(nOpt_p *NetworkGenerationOptions) *Network {
 
 	nnOpt := *nOpt_p
@@ -68,13 +75,16 @@ func GenerateNetwork(nOpt_p *NetworkGenerationOptions) *Network {
 
 	modNet := Network{
 		Body:      nn,
-		Activator: nnOpt.Activator,
+		Activator: MutateActivator(nnOpt.ActivatorOptions),
 	}
 
 	return &modNet
 }
 
 // Todo: Print Activator
+/**
+ * Print a network
+ */
 func (nn Network) Print() {
 	for _, col := range nn.Body {
 		for _, n := range col {
@@ -179,6 +189,11 @@ func (modNet_p *Network) Run(Inputs []float64) []float64 {
 	return output
 }
 
+/**
+ * Get a set of slices
+ * in the same shape as
+ * a network body's slices.
+ */
 func (b Body) CopyStructure() Body {
 	body := make(Body, len(b))
 	for i := 0; i < len(b); i++ {
@@ -187,11 +202,14 @@ func (b Body) CopyStructure() Body {
 	return body
 }
 
-// High fitness is bad, and vice versa.
-func (n Network) Fitness(Inputs, expected [][]float64) int {
+/**
+ * Evaluate the fitness of a network
+ * low fitness is good, high fitness is bad.
+ */
+func (n Network) Fitness(inputs, expected [][]float64) int {
 	fitness := 1.0
-	for i := range Inputs {
-		output := n.Run(Inputs[i])
+	for i := range inputs {
+		output := n.Run(inputs[i])
 		for j := range output {
 			fitness += math.Abs(output[j] - expected[i][j])
 		}

@@ -29,15 +29,24 @@ func TestPopulationRun(t *testing.T) {
 		0.5,
 	}
 
+	actOpt := neural.ActivatorMutationOptions{
+		neural.Rectifier,
+		neural.Rectifier_Parametric(.05),
+		neural.Rectifier_Parametric(.15),
+		neural.Identity,
+	}
+
 	nnmOpt := neural.NetworkMutationOptions{
 		&wOpt,
 		&cgOpt,
+		&actOpt,
 		0.05,
 		0.00,
 		0.05,
 		0.00,
 		0.00,
 		0.10,
+		0.00,
 	}
 
 	nngOpt := neural.NetworkGenerationOptions{
@@ -46,12 +55,12 @@ func TestPopulationRun(t *testing.T) {
 		2,
 		3,
 		1,
-		25,
+		20,
 		neural.Rectifier,
 	}
 
-	popSize := 100
-	numGens := 200
+	popSize := 200
+	numGens := 100
 
 	members := make([]neural.Network, popSize)
 	for i := 0; i < popSize; i++ {
@@ -75,15 +84,15 @@ func TestPopulationRun(t *testing.T) {
 	// 	2,
 	// }
 
-	// c := crossover.AverageCrossover{
+	c := crossover.AverageCrossover{
+		2,
+	}
+	// c := crossover.PointCrossover{
 	// 	1,
 	// }
-	//c := crossover.PointCrossover{
-	//	1,
-	//}
-	c := crossover.UniformCrossover{
-		0.75,
-	}
+	// c := crossover.UniformCrossover{
+	// 	0.75,
+	// }
 
 	pair := pairing.RandomPairing{}
 
@@ -126,7 +135,7 @@ func TestPopulationRun(t *testing.T) {
 				maxIndex = i
 			}
 		}
-		fmt.Println(p.Members[maxIndex].Fitness(p.TestInputs, p.TestExpected))
+		fmt.Println(p.Fitnesses)
 		p.Members[maxIndex].Print()
 	}
 }
