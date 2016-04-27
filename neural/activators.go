@@ -17,6 +17,7 @@ var (
 		3.0, 3.25, 3.5, 3.75,
 		4.0,
 	}
+	testSize = 33
 )
 
 // This list egregiously copied from Wikipedia.
@@ -80,36 +81,34 @@ func Sinc(x float64) float64 {
 	return math.Sin(x) / x
 }
 
-func Gaussian(x float64) float64 {
-	return math.Pow(math.E, math.Pow(-1*x, 2))
-}
+// Bug(patrick)
+// This currently results in negative fitnesses, which shouldn't be possible
+// func Gaussian(x float64) float64 {
+// 	return math.Pow(math.E, math.Pow(-1*x, 2))
+// }
 
 // For TanH, ArcTan, Sin
 // just dump in math.Tanh / math.Arctan / math.Sin
 
-func PrintActivator(a ActivatorFunc) {
-	fmt.Print("Activator: [")
-	for _, v := range activatorTests {
-		fmt.Print(v, ":", a(v), ",")
-	}
-	fmt.Print("]")
-}
-
+/**
+ * Print the activator function as an ASCII graph
+ * Uses a staticly defined range
+ */
 func GraphPrintActivator(a ActivatorFunc) {
 	m := make(map[float64]float64)
 	for _, v := range activatorTests {
 		m[v] = a(v)
 	}
-	grid := make([][]bool, 33)
-	for i := 0; i < 33; i++ {
-		grid[i] = make([]bool, 33)
+	grid := make([][]bool, testSize)
+	for i := 0; i < testSize; i++ {
+		grid[i] = make([]bool, testSize)
 	}
 	maxRow := 0
 	minRow := 16
 	for k, v := range m {
 		gridCol := int((k + 4) * 4)
 		gridRow := round((((v - 4) * 4) * -1))
-		if gridRow < 0 || gridRow > 32 {
+		if gridRow < 0 || gridRow > testSize-1 {
 			continue
 		}
 		grid[gridRow][gridCol] = true
@@ -127,7 +126,9 @@ func GraphPrintActivator(a ActivatorFunc) {
 		}
 		for x, v := range row {
 			if v {
-				fmt.Print("X")
+				// this might not actually be ascii
+				// which might make this whole function a lie
+				fmt.Print("■")
 			} else {
 				if x == 16 {
 					fmt.Print("|")

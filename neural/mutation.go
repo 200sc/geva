@@ -41,6 +41,9 @@ func (n *Neuron) mutate(wOpt_p *FloatMutationOptions) Neuron {
 	return newNeuron
 }
 
+/**
+ * Mutate this network
+ */
 func (modNet Network) Mutate(mOpt_p *NetworkMutationOptions) *Network {
 
 	newBody := modNet.Body.Mutate(mOpt_p)
@@ -54,14 +57,21 @@ func (modNet Network) Mutate(mOpt_p *NetworkMutationOptions) *Network {
 }
 
 // All activators are currently weighted the same
-// in this mutation.
+// in this mutation. A future implementation could
+// also take in how highly each activator should be
+// weighed, and could avoid mutating into the current
+// activator (although this only has the effect of
+// slightly reducing real mutation chance)
+/**
+ * Mutate an activator function.
+ */
 func MutateActivator(mOpt_p *ActivatorMutationOptions) ActivatorFunc {
 	mOpt := *mOpt_p
 	return mOpt[rand.Intn(len(mOpt))]
 }
 
 /**
- * Mutate this network.
+ * Mutate this network body.
  */
 func (nn Body) Mutate(mOpt_p *NetworkMutationOptions) *Body {
 
