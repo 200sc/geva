@@ -1,8 +1,6 @@
 package selection
 
 import (
-	//"fmt"
-	"goevo/neural"
 	"goevo/population"
 	"sort"
 )
@@ -21,11 +19,11 @@ func (gs GreedySelection) GetParentProportion() int {
 // I'm assuming here that it means picking the top x members of the
 // population where x is the proportion of members who are parents
 // in the new generation.
-func (gs GreedySelection) Select(p_p *population.Population) []neural.Network {
+func (gs GreedySelection) Select(p_p *population.Population) []population.Individual {
 	p := *p_p
 
 	fitMap := make(map[int][]int)
-	members := make([]neural.Network, p.Size)
+	members := make([]population.Individual, p.Size)
 
 	// Send off goroutines to process tournament battles
 	for i := 0; i < p.Size; i++ {

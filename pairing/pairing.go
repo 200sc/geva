@@ -1,17 +1,17 @@
 package pairing
 
 import (
-	"goevo/neural"
+	"goevo/population"
 	"math/rand"
 )
 
 type RandomPairing struct{}
 
-func (rp RandomPairing) Pair(nn []neural.Network, populated int) [][]int {
+func (rp RandomPairing) Pair(inds []population.Individual, populated int) [][]int {
 
-	out := make([][]int, len(nn)-populated)
+	out := make([][]int, len(inds)-populated)
 
-	for i := 0; i < len(nn)-populated; i++ {
+	for i := 0; i < len(inds)-populated; i++ {
 
 		index1 := rand.Intn(populated)
 		index2 := rand.Intn(populated)

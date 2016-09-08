@@ -1,17 +1,14 @@
 package population
 
 import (
-	"goevo/neural"
 	"math"
 	"sort"
 )
 
 type Population struct {
-	Members      []neural.Network
-	Mutation     *neural.NetworkGenerationOptions
+	Members      []Individual
 	Size         int
 	Selection    SelectionMethod
-	Crossover    CrossoverMethod
 	Pairing      PairingMethod
 	TestInputs   [][]float64
 	TestExpected [][]float64
@@ -24,7 +21,7 @@ type Population struct {
 // This will change as more things take place
 // in a generation. Selection, Crossover, and Mutation
 // are granted.
-func (p_p *Population) NextGeneration() *Population {
+func (p_p *Population) NextGeneration() {
 	p := *p_p
 	// The number of parents in the next generation
 	parentSize := p.Size / p.Selection.GetParentProportion()
@@ -41,16 +38,29 @@ func (p_p *Population) NextGeneration() *Population {
 	}
 	parentSize += p.Elites
 
-	// Determine our pairing method and then
-	// crossover pairs for children in the next generation.
+	// Determine our pairing method
 	pairs := p.Pairing.Pair(nextGen, parentSize)
-	p.Members = p.Crossover.Crossover(nextGen, parentSize, pairs)
 
-	// The elites are not subject to mutation.
-	for i := p.Elites; i < len(p.Members); i++ {
-		p.Members[i] = *p.Mutation.Mutate(p.Members[i])
+	// i does not start at 0,
+	// but pairs, sensibly, does.
+	pairIndex := 0
+
+	p.Members = nextGen
+	// crossover pairs for children in the next generation.
+	for i := parentSize; i < len(nextGen); i++ {
+		n1 := p.Members[pairs[pairIndex][0]]
+		n2 := p.Members[pairs[pairIndex][1]]
+		v := n1.Crossover(n2)
+		p.Members[i] = v
+		pairIndex++
 	}
-	return &p
+
+	// Mutate. The elites are not subject to mutation.
+	for i := p.Elites; i < len(p.Members); i++ {
+		p.Members[i].Mutate()
+	}
+
+	*p_p = p
 }
 
 func (p_p *Population) GenerateFitness() *Population {
@@ -61,9 +71,9 @@ func (p_p *Population) GenerateFitness() *Population {
 	for i := 0; i < p.Size; i++ {
 		channels[i] = make(chan int)
 
-		go func(n *neural.Network, ch chan int, inputs [][]float64, expected [][]float64) {
-			ch <- (*n).Fitness(inputs, expected)
-		}(&(p.Members[i]), channels[i], p.TestInputs, p.TestExpected)
+		go func(n Individual, ch chan int, inputs [][]float64, expected [][]float64) {
+			ch <- n.Fitness(inputs, expected)
+		}((p.Members[i]), channels[i], p.TestInputs, p.TestExpected)
 	}
 
 	p.LowFitness = math.MaxInt32
@@ -83,11 +93,11 @@ func (p_p *Population) GenerateFitness() *Population {
 	return &p
 }
 
-func (p_p *Population) GetElites() []neural.Network {
+func (p_p *Population) GetElites() []Individual {
 	p := *p_p
 
 	fitMap := make(map[int][]int)
-	elites := make([]neural.Network, p.Elites)
+	elites := make([]Individual, p.Elites)
 
 	for i := 0; i < p.Size; i++ {
 		f := p.Fitnesses[i]
@@ -161,14 +171,10 @@ func (p_p *Population) Print() {
 // Used as Generic-esque helpers for populations
 
 type SelectionMethod interface {
-	Select(p_p *Population) []neural.Network
+	Select(p_p *Population) []Individual
 	GetParentProportion() int
 }
 
-type CrossoverMethod interface {
-	Crossover(nn []neural.Network, populated int, pairs [][]int) []neural.Network
-}
-
 type PairingMethod interface {
-	Pair(nn []neural.Network, populated int) [][]int
+	Pair(nn []Individual, populated int) [][]int
 }

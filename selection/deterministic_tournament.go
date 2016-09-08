@@ -1,7 +1,6 @@
 package selection
 
 import (
-	"goevo/neural"
 	"goevo/population"
 	"math"
 )
@@ -11,14 +10,14 @@ type DeterministicTournamentSelection struct {
 	ParentProportion int
 }
 
-func (dts_p *DeterministicTournamentSelection) Select(p_p *population.Population) []neural.Network {
+func (dts_p *DeterministicTournamentSelection) Select(p_p *population.Population) []population.Individual {
 	p := *p_p
 
 	// We move as much initialization down here as we can,
 	// because we expect the above goroutines to be the
 	// most expensive time sink in this function.
 	ts := *dts_p
-	members := make([]neural.Network, p.Size)
+	members := make([]population.Individual, p.Size)
 
 	// Send off goroutines to process tournament battles
 	for i := 0; i < p.Size/ts.ParentProportion; i++ {

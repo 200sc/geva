@@ -2,7 +2,6 @@ package goevo
 
 import (
 	"fmt"
-	"goevo/crossover"
 	"goevo/neural"
 	"goevo/pairing"
 	"goevo/population"
@@ -67,7 +66,7 @@ func TestPopulationRun(t *testing.T) {
 	popSize := 200
 	numGens := 100
 
-	members := make([]neural.Network, popSize)
+	members := make([]population.Individual, popSize)
 	for i := 0; i < popSize; i++ {
 		members[i] = nngOpt.Generate()
 	}
@@ -89,47 +88,37 @@ func TestPopulationRun(t *testing.T) {
 	// 	2,
 	// }
 
-	c := crossover.AverageCrossover{
-		2,
-	}
-	// c := crossover.PointCrossover{
-	// 	1,
-	// }
-	// c := crossover.UniformCrossover{
-	// 	0.75,
-	// }
-
 	pair := pairing.RandomPairing{}
 
-	in := make([][]float64, 4)
+	in := make([][]float64, 5)
 	in[0] = []float64{3.0, 2.0, 0.0}
 	in[1] = []float64{10.0, 20.0, 10.0}
 	in[2] = []float64{2.0, 100.0, 1.0}
 	in[3] = []float64{0.0, 0.0, 50.0}
-	out := make([][]float64, 4)
+	in[4] = []float64{10.0, 1.0, 1.0}
+	out := make([][]float64, 5)
 	out[0] = []float64{15.0}
 	out[1] = []float64{120.0}
 	out[2] = []float64{309.0}
 	out[3] = []float64{150.0}
+	out[4] = []float64{36.0}
 
 	p := population.Population{
-		members,
-		&nngOpt,
-		popSize,
-		s,
-		c,
-		pair,
-		in,
-		out,
-		5,
-		make([]int, popSize),
-		0,
-		0,
+		Members:      members,
+		Size:         popSize,
+		Selection:    s,
+		Pairing:      pair,
+		TestInputs:   in,
+		TestExpected: out,
+		Elites:       5,
+		Fitnesses:    make([]int, popSize),
 	}
+
+	neural.Init(nngOpt, neural.AverageCrossover{2})
 
 	for i := 0; i < numGens; i++ {
 		fmt.Println("Gen", i)
-		p = *(p.NextGeneration())
+		p.NextGeneration()
 		w, _ := p.Weights(1.0)
 		fmt.Println(w)
 		maxWeight := 0.0

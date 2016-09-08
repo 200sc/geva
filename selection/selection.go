@@ -28,3 +28,15 @@ func Sample(k, max int) (sampled []int) {
 	}
 	return
 }
+
+func KeySet_IntInt(m map[int]int) []int {
+	keys := make([]int, len(m))
+
+	i := 0
+	for k := range m {
+		keys[i] = k
+		i++
+	}
+
+	return keys
+}

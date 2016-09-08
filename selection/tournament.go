@@ -1,8 +1,6 @@
 package selection
 
 import (
-	//"fmt"
-	"goevo/neural"
 	"goevo/population"
 	"math/rand"
 	"sort"
@@ -21,10 +19,10 @@ func (ts TournamentSelection) GetParentProportion() int {
 	return ts.ParentProportion
 }
 
-func (ts TournamentSelection) Select(p_p *population.Population) []neural.Network {
+func (ts TournamentSelection) Select(p_p *population.Population) []population.Individual {
 	p := *p_p
 
-	members := make([]neural.Network, p.Size)
+	members := make([]population.Individual, p.Size)
 	// We have an arbitrary buffer here.
 	// It should just effect how many goroutines can
 	// simultaneously end (or all end prior to a
@@ -82,16 +80,4 @@ func (ts TournamentSelection) Select(p_p *population.Population) []neural.Networ
 	close(selectionCh)
 
 	return members
-}
-
-func KeySet_IntInt(m map[int]int) []int {
-	keys := make([]int, len(m))
-
-	i := 0
-	for k := range m {
-		keys[i] = k
-		i++
-	}
-
-	return keys
 }

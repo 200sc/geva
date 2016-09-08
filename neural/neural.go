@@ -91,7 +91,7 @@ type NetworkMutationOptions struct {
 }
 
 type NetworkGenerationOptions struct {
-	// To generate a network, you must mutate it
+	// To generate a network, you must be able to mutate it
 	NetworkMutationOptions
 	MinColumns    int
 	MaxColumns    int
@@ -99,4 +99,18 @@ type NetworkGenerationOptions struct {
 	Outputs       int
 	BaseMutations int
 	Activator     ActivatorFunc
+}
+
+type NeuralCrossover interface {
+	Crossover(a, b *Network) *Network
+}
+
+var (
+	ngo       NetworkGenerationOptions
+	crossover NeuralCrossover
+)
+
+func Init(newNgo NetworkGenerationOptions, newCrossover NeuralCrossover) {
+	ngo = newNgo
+	crossover = newCrossover
 }

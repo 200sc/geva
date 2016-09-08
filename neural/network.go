@@ -4,18 +4,30 @@ package neural
 
 import (
 	"fmt"
+	"goevo/population"
 	"math"
 	"math/rand"
 )
 
+func (nn *Network) Crossover(other population.Individual) population.Individual {
+	// Assert that other is a Network
+	nn2 := other.(*Network)
+	// Perform a crossover method as defined by global settings
+	return crossover.Crossover(nn, nn2)
+}
+
+func (nn *Network) CanCrossover(other population.Individual) bool {
+	return true
+}
+
 /**
  * Copy a network
  */
-func (modNet_p *Network) Copy() Network {
-	newBody := modNet_p.Body.Copy()
+func (nn *Network) Copy() Network {
+	newBody := nn.Body.Copy()
 	return Network{
 		Body:      newBody,
-		Activator: modNet_p.Activator,
+		Activator: nn.Activator,
 	}
 }
 
@@ -34,6 +46,10 @@ func (nn_p *Body) Copy() Body {
 	}
 
 	return newNetwork
+}
+
+func (genOpt NetworkGenerationOptions) Generate() *Network {
+	return GenerateNetwork(&genOpt)
 }
 
 /**
@@ -66,22 +82,19 @@ func GenerateNetwork(nOpt_p *NetworkGenerationOptions) *Network {
 	columnCount := rand.Intn(nnOpt.MaxColumns-nnOpt.MinColumns) + nnOpt.MinColumns
 
 	for i := 0; i < columnCount; i++ {
-		nn = *(nn.addColumn(&cOpt))
+		nn.addColumn(&cOpt)
 	}
 
 	for i := 0; i < nnOpt.BaseMutations; i++ {
-		nn = *(nn.Mutate(&nnOpt.NetworkMutationOptions))
+		nn.Mutate(&nnOpt.NetworkMutationOptions)
 	}
 
-	modNet := Network{
+	return &Network{
 		Body:      nn,
 		Activator: MutateActivator(nnOpt.ActivatorOptions),
 	}
-
-	return &modNet
 }
 
-// Todo: Print Activator
 /**
  * Print a network
  */

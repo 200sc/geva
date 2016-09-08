@@ -1,7 +1,6 @@
 package selection
 
 import (
-	"goevo/neural"
 	"goevo/population"
 )
 
@@ -19,14 +18,14 @@ func (sus StochasticUniversalSelection) GetParentProportion() int {
 	return sus.ParentProportion
 }
 
-func (sus StochasticUniversalSelection) Select(p_p *population.Population) []neural.Network {
+func (sus StochasticUniversalSelection) Select(p_p *population.Population) []population.Individual {
 	p := *p_p
 
 	_, cumulativeWeights := p.Weights(sus.Power)
 
 	inc := cumulativeWeights[len(cumulativeWeights)-1] / float64(p.Size/sus.ParentProportion)
 
-	outNet := make([]neural.Network, p.Size)
+	outNet := make([]population.Individual, p.Size)
 
 	i := 0
 	j := 0

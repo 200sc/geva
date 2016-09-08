@@ -126,8 +126,6 @@ func GraphPrintActivator(a ActivatorFunc) {
 		}
 		for x, v := range row {
 			if v {
-				// this might not actually be ascii
-				// which might make this whole function a lie
 				fmt.Print("■")
 			} else {
 				if x == 16 {
