@@ -12,8 +12,6 @@ We currently choose pairs out of our parents for crossover randomly, as our only
 
 Our way of judging fitness, 1 being the best and high being bad, makes converting fitnesses into weights for probabilistic selection a chore. It should also be allowed for the user to choose between high or low being good or bad, depending on the problem.
 
-We'd like to add Demetic Grouping.
-
 We'd like to add a Hall of Fame approach or addition to new generations.
 
 We could add a way to evaluate fitness based on a random group of test inputs, instead of always evaluating all fitnesses by all test inputs.
