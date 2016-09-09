@@ -4,11 +4,15 @@ This can build and evolve neural networks.
 
 Usage: see test files, helper functions for usage don't exist yet really.
 
+Crossover Methods: 3
+
+Selection Methods: 5
+
+Pairing Methods: 1
+
 # Next Steps #
 
-We currently have three Crossover Methods and five Selection Methods. We want more of both. A considerable problem facing us is that we don't have a reliable crossover method (coded or conceptualized) for combining two disparately sized neural networks. 
-
-We currently choose pairs out of our parents for crossover randomly, as our only pairing method. Adding more pairing methods would be good.
+ A considerable problem facing us is that we don't have a reliable crossover method (coded or conceptualized) for combining two disparately sized neural networks. 
 
 Our way of judging fitness, 1 being the best and high being bad, makes converting fitnesses into weights for probabilistic selection a chore. It should also be allowed for the user to choose between high or low being good or bad, depending on the problem.
 
