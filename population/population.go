@@ -26,7 +26,7 @@ func (p_p *Population) NextGeneration() {
 	// The number of parents in the next generation
 	parentSize := p.Size / p.Selection.GetParentProportion()
 
-	p = *(p.GenerateFitness())
+	p.GenerateFitness()
 	elites := p.GetElites()
 	nextGen := p.Selection.Select(&p)
 
@@ -50,8 +50,7 @@ func (p_p *Population) NextGeneration() {
 	for i := parentSize; i < len(nextGen); i++ {
 		n1 := p.Members[pairs[pairIndex][0]]
 		n2 := p.Members[pairs[pairIndex][1]]
-		v := n1.Crossover(n2)
-		p.Members[i] = v
+		p.Members[i] = n1.Crossover(n2)
 		pairIndex++
 	}
 
@@ -63,34 +62,30 @@ func (p_p *Population) NextGeneration() {
 	*p_p = p
 }
 
-func (p_p *Population) GenerateFitness() *Population {
-	p := *p_p
+func (p_p *Population) GenerateFitness() {
+	channels := make([]chan int, p_p.Size)
 
-	channels := make([]chan int, p.Size)
-
-	for i := 0; i < p.Size; i++ {
+	for i := 0; i < p_p.Size; i++ {
 		channels[i] = make(chan int)
 
 		go func(n Individual, ch chan int, inputs [][]float64, expected [][]float64) {
 			ch <- n.Fitness(inputs, expected)
-		}((p.Members[i]), channels[i], p.TestInputs, p.TestExpected)
+		}((p_p.Members[i]), channels[i], p_p.TestInputs, p_p.TestExpected)
 	}
 
-	p.LowFitness = math.MaxInt32
-	p.MaxFitness = 0
+	p_p.LowFitness = math.MaxInt32
+	p_p.MaxFitness = 0
 
-	for i := 0; i < p.Size; i++ {
+	for i := 0; i < p_p.Size; i++ {
 		v := <-channels[i]
 		close(channels[i])
-		if v < p.LowFitness {
-			p.LowFitness = v
-		} else if v > p.MaxFitness {
-			p.MaxFitness = v
+		if v < p_p.LowFitness {
+			p_p.LowFitness = v
+		} else if v > p_p.MaxFitness {
+			p_p.MaxFitness = v
 		}
-		p.Fitnesses[i] = v
+		p_p.Fitnesses[i] = v
 	}
-
-	return &p
 }
 
 func (p_p *Population) GetElites() []Individual {

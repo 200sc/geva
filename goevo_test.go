@@ -64,11 +64,15 @@ func TestPopulationRun(t *testing.T) {
 	}
 
 	popSize := 200
+	demeCount := 10
 	numGens := 100
 
-	members := make([]population.Individual, popSize)
-	for i := 0; i < popSize; i++ {
-		members[i] = nngOpt.Generate()
+	members := make([][]population.Individual, demeCount)
+	for j := 0; j < demeCount; j++ {
+		members[j] = make([]population.Individual, popSize/demeCount)
+		for i := 0; i < popSize/demeCount; i++ {
+			members[j][i] = nngOpt.Generate()
+		}
 	}
 	s := selection.ProbabilisticSelection{
 		3,
@@ -103,33 +107,44 @@ func TestPopulationRun(t *testing.T) {
 	out[3] = []float64{150.0}
 	out[4] = []float64{36.0}
 
-	p := population.Population{
-		Members:      members,
-		Size:         popSize,
-		Selection:    s,
-		Pairing:      pair,
-		TestInputs:   in,
-		TestExpected: out,
-		Elites:       5,
-		Fitnesses:    make([]int, popSize),
+	demes := make([]population.Population, demeCount)
+	for i := 0; i < demeCount; i++ {
+		demes[i] = population.Population{
+			Members:      members[i],
+			Size:         popSize / demeCount,
+			Selection:    s,
+			Pairing:      pair,
+			TestInputs:   in,
+			TestExpected: out,
+			Elites:       2,
+			Fitnesses:    make([]int, popSize/demeCount),
+		}
+	}
+	dg := population.DemeGroup{
+		Demes:           demes,
+		MigrationChance: 0.1,
 	}
 
 	neural.Init(nngOpt, neural.AverageCrossover{2})
 
 	for i := 0; i < numGens; i++ {
 		fmt.Println("Gen", i)
-		p.NextGeneration()
-		w, _ := p.Weights(1.0)
-		fmt.Println(w)
-		maxWeight := 0.0
-		maxIndex := 0
-		for i, v := range w {
-			if v > maxWeight {
-				maxWeight = v
-				maxIndex = i
+		dg.NextGeneration()
+		if i == numGens-1 {
+			for _, p := range dg.Demes {
+				w, _ := p.Weights(1.0)
+				fmt.Println(w)
+				maxWeight := 0.0
+				maxIndex := 0
+				for i, v := range w {
+					if v > maxWeight {
+						maxWeight = v
+						maxIndex = i
+					}
+				}
+				fmt.Println(p.Fitnesses)
+				p.Members[maxIndex].Print()
 			}
 		}
-		fmt.Println(p.Fitnesses)
-		p.Members[maxIndex].Print()
 	}
 }
