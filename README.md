@@ -16,7 +16,7 @@ Pairing Methods: 1
 
 Our way of judging fitness, 1 being the best and high being bad, makes converting fitnesses into weights for probabilistic selection a chore. It should also be allowed for the user to choose between high or low being good or bad, depending on the problem.
 
-We'd like to add a Hall of Fame approach or addition to new generations.
+We'd like to add a Hall of Fame approach or addition to new generations, but doing so requires a problem where the fitness function is a flexible competition.
 
 We could add a way to evaluate fitness based on a random group of test inputs, instead of always evaluating all fitnesses by all test inputs.
 
