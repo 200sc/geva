@@ -22,4 +22,8 @@ We could add a way to evaluate fitness based on a random group of test inputs, i
 
 While running a neural network is entirely concurrent, it'd be great if we could modify selection and crossover to also be concurrent-- crossover being concurrent is probably going to be simple once we have dedicated methods for parent pairing (generate a list of pairs, then split a goroutine off for each pair, and collect the results).
 
+It's then worth reviewing and running performance tests on anything that is or could be concurrent to decide if it actually allows for increased speed. The concurrent neural network model might actually be slower than iteration, based on other work I've done in Go with concurrent event handling and 2d drawing. 
+
+As a part of these reviews, looking into what can be passed to graphics cards for work instead of to the processor would be very worthwhile (Go doesn't support vectorized CPU instructions as of 1.7, so we would need to go to the graphics card to do these).
+
 Once the above is done, we'd like to add Genetic Programs and Genetic Algorithms.
