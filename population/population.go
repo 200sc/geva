@@ -2,6 +2,7 @@ package population
 
 import (
 	"math"
+	"math/rand"
 	"sort"
 )
 
@@ -10,6 +11,7 @@ type Population struct {
 	Size         int
 	Selection    SelectionMethod
 	Pairing      PairingMethod
+	FitnessTests int
 	TestInputs   [][]float64
 	TestExpected [][]float64
 	Elites       int
@@ -68,9 +70,20 @@ func (p_p *Population) GenerateFitness() {
 	for i := 0; i < p_p.Size; i++ {
 		channels[i] = make(chan int)
 
-		go func(n Individual, ch chan int, inputs [][]float64, expected [][]float64) {
-			ch <- n.Fitness(inputs, expected)
-		}((p_p.Members[i]), channels[i], p_p.TestInputs, p_p.TestExpected)
+		go func(n Individual, ch chan int, inputs [][]float64, expected [][]float64, tests int) {
+			if len(inputs) == tests {
+				ch <- n.Fitness(inputs, expected)
+				return
+			}
+			in := make([][]float64, tests)
+			out := make([][]float64, tests)
+			for i := 0; i < tests; i++ {
+				j := rand.Intn(len(inputs))
+				in[i] = inputs[j]
+				out[i] = expected[j]
+			}
+			ch <- n.Fitness(in, out)
+		}((p_p.Members[i]), channels[i], p_p.TestInputs, p_p.TestExpected, p_p.FitnessTests)
 	}
 
 	p_p.LowFitness = math.MaxInt32

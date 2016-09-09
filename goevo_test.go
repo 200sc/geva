@@ -64,8 +64,8 @@ func TestPopulationRun(t *testing.T) {
 	}
 
 	popSize := 200
-	demeCount := 10
-	numGens := 100
+	demeCount := 4
+	numGens := 500
 
 	members := make([][]population.Individual, demeCount)
 	for j := 0; j < demeCount; j++ {
@@ -114,6 +114,7 @@ func TestPopulationRun(t *testing.T) {
 			Size:         popSize / demeCount,
 			Selection:    s,
 			Pairing:      pair,
+			FitnessTests: 5,
 			TestInputs:   in,
 			TestExpected: out,
 			Elites:       2,

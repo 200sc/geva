@@ -18,8 +18,6 @@ Our way of judging fitness, 1 being the best and high being bad, makes convertin
 
 We'd like to add a Hall of Fame approach or addition to new generations, but doing so requires a problem where the fitness function is a flexible competition.
 
-We could add a way to evaluate fitness based on a random group of test inputs, instead of always evaluating all fitnesses by all test inputs.
-
 While running a neural network is entirely concurrent, it'd be great if we could modify selection and crossover to also be concurrent-- crossover being concurrent is probably going to be simple once we have dedicated methods for parent pairing (generate a list of pairs, then split a goroutine off for each pair, and collect the results).
 
 It's then worth reviewing and running performance tests on anything that is or could be concurrent to decide if it actually allows for increased speed. The concurrent neural network model might actually be slower than iteration, based on other work I've done in Go with concurrent event handling and 2d drawing. 
