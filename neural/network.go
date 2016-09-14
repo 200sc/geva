@@ -17,7 +17,12 @@ func (nn *Network) Crossover(other population.Individual) population.Individual 
 }
 
 func (nn *Network) CanCrossover(other population.Individual) bool {
-	return true
+	switch other.(type) {
+	default:
+		return false
+	case *Network:
+		return true
+	}
 }
 
 /**

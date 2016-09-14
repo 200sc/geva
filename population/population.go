@@ -176,7 +176,7 @@ func (p_p *Population) Print() {
 	}
 }
 
-// Used as Generic-esque helpers for populations
+// Used as Generic helpers for populations
 
 type SelectionMethod interface {
 	Select(p_p *Population) []Individual
