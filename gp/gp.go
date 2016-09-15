@@ -1,8 +1,13 @@
 package gp
 
+import (
+	"goevo/population"
+	"math/rand"
+)
+
 // The principal Individual implementation for the gp package
 type GP struct {
-	first Node
+	first *Node
 	env   *Environment
 	nodes int
 }
@@ -12,11 +17,11 @@ var (
 	crossover   GPCrossover
 	environment Environment
 	actions     Actions
-	fitness     func(n Node, inputs, outputs [][]float64) int
+	fitness     FitnessFunc
 )
 
 func Init(genOpt GPOptions, env Environment, cross GPCrossover,
-	act Actions, f func(n Node, inputs, outputs [][]float64) int) {
+	act Actions, f FitnessFunc) {
 
 	environment = env
 	actions = act
@@ -33,8 +38,8 @@ func GenerateGP(genOpt GPOptions) *GP {
 	gp := new(GP)
 	gp.env = &environment
 	a, children := getNonZeroAction()
-	gp.first = Node{
-		make([]Node, children),
+	gp.first = &Node{
+		make([]*Node, children),
 		a,
 		gp,
 	}
@@ -60,18 +65,17 @@ func (gp *GP) CanCrossover(other population.Individual) bool {
 }
 
 func (gp *GP) Crossover(other population.Individual) population.Individual {
-	// I'm relatively confident the most obvious way to crossover
-	// gp trees is to use point crossover.
-	gp2 := other.(*GP)
-	return crossover.Crossover(gp, gp2)
+	return crossover.Crossover(gp, other.(*GP))
 }
 
 func (gp *GP) Fitness(input, expected [][]float64) int {
-	return fitness(gp.first, input, expected)
+	return fitness(gp, input, expected)
 }
 
 func (gp *GP) Mutate() {
-	// We refer to our mutation chances here, and run
-	// through the tree with those chances. We probably
-	// want to start at the leaves.
+	if rand.Float64() < gpOptions.SwapMutationChance {
+		gp.SwapMutate()
+	} else if rand.Float64() < gpOptions.ShrinkMutationChance {
+		gp.ShrinkMutate()
+	}
 }

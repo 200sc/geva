@@ -1,5 +1,9 @@
 package gp
 
+import (
+	"math/rand"
+)
+
 func (gp *GP) ShrinkMutate() {
 
 	n := gp.first
@@ -16,7 +20,7 @@ func (gp *GP) ShrinkMutate() {
 	// Avoid replacing gp.first with a terminal
 	tries := 0
 	for {
-		i := rand.IntN(len(n.args))
+		i := rand.Intn(len(n.args))
 		if len(n.args[i].args) != 0 {
 			n = n.args[i]
 			break
@@ -32,7 +36,7 @@ func (gp *GP) ShrinkMutate() {
 
 		// Continually traverse down
 		// to a random child
-		i := rand.IntN(len(n.args))
+		i := rand.Intn(len(n.args))
 
 		// If the child has no children,
 		// it is now our shrink target
@@ -49,8 +53,9 @@ func (gp *GP) ShrinkMutate() {
 
 func (gp *GP) SwapMutate() {
 	nodes := gp.first.GetAllNodes()
-	children := len(nodes[rand.IntN(nodes)].args)
-	nodes[i].eval = actions[children][rand.IntN(actions[children])]
+	i := rand.Intn(len(nodes))
+	children := len(nodes[i].args)
+	nodes[i].eval = actions[children][rand.Intn(len(actions[children]))]
 }
 
 func (n *Node) GetAllNodes() []*Node {

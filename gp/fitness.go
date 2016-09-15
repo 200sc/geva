@@ -4,6 +4,8 @@ import (
 	"math"
 )
 
+type FitnessFunc func(gp *GP, inputs, outputs [][]float64) int
+
 // An example fitness function which treats
 // the output as a environment to compare
 // a modified environment by the GP to.
@@ -22,10 +24,10 @@ func EnvFitness(g *GP, inputs, outputs [][]float64) int {
 // against the single expected output
 func OutputFitness(g *GP, inputs, outputs [][]float64) int {
 	fitness := 1
-	for i, env := range inputs {
+	for i, envDiff := range inputs {
 		g.env = environment.New(envDiff)
 		out := Eval(g.first)
-		fitness += math.Abs(out - int(output[i][0]))
+		fitness += int(math.Abs(float64(out - int(outputs[i][0]))))
 	}
 	return fitness
 }

@@ -17,28 +17,3 @@ type GPOptions struct {
 	// its parent with it.
 	ShrinkMutationChance float64
 }
-
-func (gpo *GPOptions) MaxNodeCount(mnc int) *GPOptions {
-	gpo.MaxNodeCount = nc
-	return gpo
-}
-
-func (gpo *GPOptions) MaxStartDepth(msd int) *GPOptions {
-	gpo.MaxStartDepth = msd
-	return gpo
-}
-
-func (gpo *GPOptions) MaxDepth(md int) *GPOptions {
-	gpo.MaxDepth = md
-	return gpo
-}
-
-func (gpo *GPOptions) SwapMutationChance(smc float64) *GPOptions {
-	gpo.SwapMutationChance = smc
-	return gpo
-}
-
-func (gpo *GPOptions) ShrinkMutationChance(smc float64) *GPOptions {
-	gpo.ShrinkMutationChance = smc
-	return gpo
-}

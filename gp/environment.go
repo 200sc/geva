@@ -17,9 +17,10 @@ type Environment []*int
 func (env Environment) New(envDiff []float64) *Environment {
 	newEnv := make(Environment, len(env))
 	for i, f := range envDiff {
-		newEnv[i] = math.Ceil(float64(env[i]) + f)
+		newEnv[i] = new(int)
+		*newEnv[i] = int(math.Ceil(float64(*env[i]) + f))
 	}
-	return newEnv
+	return &newEnv
 }
 
 // Returns the absolute difference between the given environment
@@ -28,7 +29,7 @@ func (env Environment) New(envDiff []float64) *Environment {
 func (env Environment) Diff(envDiff []float64) (diff int) {
 	for i, f := range envDiff {
 		if f != 0.0 {
-			diff += math.Ceil(float64(env[i]) - f)
+			diff += int(math.Ceil(float64(*env[i]) - f))
 		}
 	}
 	return

@@ -2,6 +2,7 @@ package goevo
 
 import (
 	"fmt"
+	"goevo/gp"
 	"goevo/neural"
 	"goevo/pairing"
 	"goevo/population"
@@ -11,7 +12,102 @@ import (
 	"time"
 )
 
-func TestPopulationRun(t *testing.T) {
+func TestGPRun(t *testing.T) {
+
+	rand.Seed(time.Now().UTC().UnixNano())
+
+	// Experimenting with this syntax.
+	// It doesn't look very much like go right now.
+	gpOpt := gp.GPOptions{
+		MaxNodeCount:         10,
+		MaxStartDepth:        5,
+		MaxDepth:             10,
+		SwapMutationChance:   0.05,
+		ShrinkMutationChance: 0.05,
+	}
+
+	actions := gp.BaseActions
+
+	val := 0
+	env := gp.Environment{&val}
+
+	in := make([][]float64, 5)
+	in[0] = []float64{3.0}
+	in[1] = []float64{10.0}
+	in[2] = []float64{2.0}
+	in[3] = []float64{0.0}
+	in[4] = []float64{10.0}
+	out := make([][]float64, 5)
+	out[0] = []float64{9.0}
+	out[1] = []float64{30.0}
+	out[2] = []float64{6.0}
+	out[3] = []float64{0.0}
+	out[4] = []float64{30.0}
+
+	gp.Init(gpOpt, env, gp.PointCrossover{}, actions, gp.OutputFitness)
+	gp.AddEnvironmentAccess()
+
+	popSize := 200
+	demeCount := 1
+	numGens := 500
+
+	members := make([][]population.Individual, demeCount)
+	for j := 0; j < demeCount; j++ {
+		members[j] = make([]population.Individual, popSize/demeCount)
+		for i := 0; i < popSize/demeCount; i++ {
+			members[j][i] = gp.GenerateGP(gpOpt)
+		}
+	}
+	s := selection.ProbabilisticSelection{
+		3,
+		1.7,
+	}
+
+	pair := pairing.RandomPairing{}
+
+	demes := make([]population.Population, demeCount)
+	for i := 0; i < demeCount; i++ {
+		demes[i] = population.Population{
+			Members:      members[i],
+			Size:         popSize / demeCount,
+			Selection:    s,
+			Pairing:      pair,
+			FitnessTests: 5,
+			TestInputs:   in,
+			TestExpected: out,
+			Elites:       2,
+			Fitnesses:    make([]int, popSize/demeCount),
+		}
+	}
+	dg := population.DemeGroup{
+		Demes:           demes,
+		MigrationChance: 0.05,
+	}
+
+	for i := 0; i < numGens; i++ {
+		fmt.Println("Gen", i)
+		dg.NextGeneration()
+		if i == numGens-1 {
+			for _, p := range dg.Demes {
+				w, _ := p.Weights(1.0)
+				fmt.Println(w)
+				maxWeight := 0.0
+				maxIndex := 0
+				for i, v := range w {
+					if v > maxWeight {
+						maxWeight = v
+						maxIndex = i
+					}
+				}
+				fmt.Println(p.Fitnesses)
+				p.Members[maxIndex].Print()
+			}
+		}
+	}
+
+}
+
+func TestNNRun(t *testing.T) {
 
 	rand.Seed(time.Now().UTC().UnixNano())
 
