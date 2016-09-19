@@ -10,20 +10,23 @@ type DeterministicTournamentSelection struct {
 	ParentProportion int
 }
 
-func (dts_p *DeterministicTournamentSelection) Select(p_p *population.Population) []population.Individual {
+func (dts DeterministicTournamentSelection) GetParentProportion() int {
+	return dts.ParentProportion
+}
+
+func (dts DeterministicTournamentSelection) Select(p_p *population.Population) []population.Individual {
 	p := *p_p
 
 	// We move as much initialization down here as we can,
 	// because we expect the above goroutines to be the
 	// most expensive time sink in this function.
-	ts := *dts_p
 	members := make([]population.Individual, p.Size)
 
 	// Send off goroutines to process tournament battles
-	for i := 0; i < p.Size/ts.ParentProportion; i++ {
+	for i := 0; i < p.Size/dts.ParentProportion; i++ {
 
 		// Get a random set of indexes
-		fighters := Sample(ts.TournamentSize, p.Size)
+		fighters := Sample(dts.TournamentSize, p.Size)
 		fitMap := make(map[int]int)
 
 		// Process fitness channels and map

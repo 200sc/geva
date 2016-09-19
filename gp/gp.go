@@ -75,7 +75,9 @@ func (gp *GP) Fitness(input, expected [][]float64) int {
 func (gp *GP) Mutate() {
 	if rand.Float64() < gpOptions.SwapMutationChance {
 		gp.SwapMutate()
-	} else if rand.Float64() < gpOptions.ShrinkMutationChance {
+	}
+	if rand.Float64() < gpOptions.ShrinkMutationChance {
 		gp.ShrinkMutate()
 	}
+	gp.nodes = gp.first.Size()
 }

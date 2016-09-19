@@ -19,11 +19,11 @@ func TestGPRun(t *testing.T) {
 	// Experimenting with this syntax.
 	// It doesn't look very much like go right now.
 	gpOpt := gp.GPOptions{
-		MaxNodeCount:         10,
+		MaxNodeCount:         20,
 		MaxStartDepth:        5,
 		MaxDepth:             10,
-		SwapMutationChance:   0.05,
-		ShrinkMutationChance: 0.05,
+		SwapMutationChance:   0.02,
+		ShrinkMutationChance: 0.02,
 	}
 
 	actions := gp.BaseActions
@@ -31,25 +31,22 @@ func TestGPRun(t *testing.T) {
 	val := 0
 	env := gp.Environment{&val}
 
-	in := make([][]float64, 5)
+	in := make([][]float64, 3)
 	in[0] = []float64{3.0}
-	in[1] = []float64{10.0}
-	in[2] = []float64{2.0}
-	in[3] = []float64{0.0}
-	in[4] = []float64{10.0}
-	out := make([][]float64, 5)
-	out[0] = []float64{9.0}
-	out[1] = []float64{30.0}
-	out[2] = []float64{6.0}
-	out[3] = []float64{0.0}
-	out[4] = []float64{30.0}
+	in[1] = []float64{2.0}
+	in[2] = []float64{4.0}
+	out := make([][]float64, 3)
+	out[0] = []float64{27.0}
+	out[1] = []float64{8.0}
+	out[2] = []float64{64.0}
 
+	//gp.Init(gpOpt, env, gp.PointCrossover{}, actions, gp.ComplexityFitness(gp.OutputFitness, 1.0))
 	gp.Init(gpOpt, env, gp.PointCrossover{}, actions, gp.OutputFitness)
 	gp.AddEnvironmentAccess()
 
-	popSize := 200
-	demeCount := 1
-	numGens := 500
+	popSize := 100
+	demeCount := 5
+	numGens := 200
 
 	members := make([][]population.Individual, demeCount)
 	for j := 0; j < demeCount; j++ {
@@ -58,9 +55,9 @@ func TestGPRun(t *testing.T) {
 			members[j][i] = gp.GenerateGP(gpOpt)
 		}
 	}
-	s := selection.ProbabilisticSelection{
+	s := selection.DeterministicTournamentSelection{
+		2,
 		3,
-		1.7,
 	}
 
 	pair := pairing.RandomPairing{}
@@ -72,7 +69,7 @@ func TestGPRun(t *testing.T) {
 			Size:         popSize / demeCount,
 			Selection:    s,
 			Pairing:      pair,
-			FitnessTests: 5,
+			FitnessTests: 3,
 			TestInputs:   in,
 			TestExpected: out,
 			Elites:       2,
@@ -100,6 +97,9 @@ func TestGPRun(t *testing.T) {
 					}
 				}
 				fmt.Println(p.Fitnesses)
+				p.Members[0].Print()
+				p.Members[1].Print()
+				p.Members[3].Print()
 				p.Members[maxIndex].Print()
 			}
 		}

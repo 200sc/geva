@@ -55,6 +55,19 @@ func (gp *GP) SwapMutate() {
 	nodes := gp.first.GetAllNodes()
 	i := rand.Intn(len(nodes))
 	children := len(nodes[i].args)
+	r := rand.Float64()
+	if r < 0.33 {
+		if children != 0 {
+			children--
+			nodes[i].args = nodes[i].args[:len(nodes[i].args)]
+		}
+	} else if r > 0.66 {
+		if children != len(actions)-1 {
+			children++
+			newAction, _ := getAction(0)
+			nodes[i].args = append(nodes[i].args, NewNode(newAction, 0, gp))
+		}
+	}
 	nodes[i].eval = actions[children][rand.Intn(len(actions[children]))]
 }
 

@@ -15,6 +15,14 @@ type Node struct {
 	gp *GP
 }
 
+func NewNode(a Action, children int, gp *GP) *Node {
+	return &Node{
+		make([]*Node, children),
+		a,
+		gp,
+	}
+}
+
 func (n *Node) GenerateTree(depth, nodeLimit int) int {
 
 	nodes := 1
@@ -23,19 +31,11 @@ func (n *Node) GenerateTree(depth, nodeLimit int) int {
 		// Get a terminal action if...
 		if depth == 0 || nodes >= nodeLimit || rand.Float64() < 0.5 {
 			a, _ := getAction(0)
-			n.args[i] = &Node{
-				make([]*Node, 0),
-				a,
-				n.gp,
-			}
+			n.args[i] = NewNode(a, 0, n.gp)
 			nodes++
 		} else {
 			a, children := getNonZeroAction()
-			n.args[i] = &Node{
-				make([]*Node, children),
-				a,
-				n.gp,
-			}
+			n.args[i] = NewNode(a, children, n.gp)
 			nodes += n.args[i].GenerateTree(depth-1, nodeLimit-nodes)
 		}
 	}

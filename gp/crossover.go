@@ -24,6 +24,7 @@ type PointCrossover struct{}
 // though.
 
 func (pc PointCrossover) Crossover(a, b *GP) *GP {
+
 	g1 := a.first
 	g2 := b.first
 
@@ -33,6 +34,10 @@ func (pc PointCrossover) Crossover(a, b *GP) *GP {
 	c := new(GP)
 
 	g3 := g1.Copy(c)
+
+	// if a.nodes > gpOptions.MaxNodeCount {
+	// 	return x
+	// }
 
 	node1, parent := g3.GetRandomNode()
 	node2, _ := g2.GetRandomNode()

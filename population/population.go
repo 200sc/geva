@@ -40,7 +40,6 @@ func (p_p *Population) NextGeneration() {
 	}
 	parentSize += p.Elites
 
-	// Determine our pairing method
 	pairs := p.Pairing.Pair(nextGen, parentSize)
 
 	// i does not start at 0,
