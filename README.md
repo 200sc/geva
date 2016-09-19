@@ -24,4 +24,4 @@ It's then worth reviewing and running performance tests on anything that is or c
 
 As a part of these reviews, looking into what can be passed to graphics cards for work instead of to the processor would be very worthwhile (Go doesn't support vectorized CPU instructions as of 1.7, so we would need to go to the graphics card to do these).
 
-Once the above is done, we'd like to add Genetic Programs and Genetic Algorithms.
+Once the above is done, we'd like to add Genetic Algorithms.
