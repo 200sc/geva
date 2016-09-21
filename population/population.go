@@ -18,18 +18,22 @@ type Population struct {
 	Fitnesses    []int
 	LowFitness   int
 	MaxFitness   int
+	GoalFitness  int
 }
 
 // This will change as more things take place
 // in a generation. Selection, Crossover, and Mutation
 // are granted.
-func (p_p *Population) NextGeneration() {
+func (p_p *Population) NextGeneration() bool {
 	p := *p_p
 	// The number of parents in the next generation
 	parentSize := p.Size / p.Selection.GetParentProportion()
 
 	p.GenerateFitness()
-	elites := p.GetElites()
+	elites, stopEarly := p.GetElites()
+	if stopEarly {
+		return true
+	}
 	nextGen := p.Selection.Select(&p)
 
 	// Ensure that the elites (the best members)
@@ -61,6 +65,7 @@ func (p_p *Population) NextGeneration() {
 	}
 
 	*p_p = p
+	return false
 }
 
 func (p_p *Population) GenerateFitness() {
@@ -100,7 +105,7 @@ func (p_p *Population) GenerateFitness() {
 	}
 }
 
-func (p_p *Population) GetElites() []Individual {
+func (p_p *Population) GetElites() ([]Individual, bool) {
 	p := *p_p
 
 	fitMap := make(map[int][]int)
@@ -108,6 +113,9 @@ func (p_p *Population) GetElites() []Individual {
 
 	for i := 0; i < p.Size; i++ {
 		f := p.Fitnesses[i]
+		if f <= p.GoalFitness {
+			return elites, true
+		}
 		if v, ok := fitMap[f]; ok {
 			fitMap[f] = append(v, i)
 		} else {
@@ -122,14 +130,14 @@ func (p_p *Population) GetElites() []Individual {
 	for i < p.Elites {
 		for k := 0; k < len(fitMap[keys[j]]); k++ {
 			if i >= p.Elites {
-				return elites
+				return elites, false
 			}
 			elites[i] = p.Members[fitMap[keys[j]][k]]
 			i++
 		}
 		j++
 	}
-	return elites
+	return elites, false
 }
 
 func KeySet_Int_SlInt(m map[int][]int) []int {

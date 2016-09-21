@@ -19,11 +19,11 @@ func TestGPRun(t *testing.T) {
 	// Experimenting with this syntax.
 	// It doesn't look very much like go right now.
 	gpOpt := gp.GPOptions{
-		MaxNodeCount:         20,
+		MaxNodeCount:         50,
 		MaxStartDepth:        5,
 		MaxDepth:             10,
-		SwapMutationChance:   0.02,
-		ShrinkMutationChance: 0.02,
+		SwapMutationChance:   0.10,
+		ShrinkMutationChance: 0.05,
 	}
 
 	actions := gp.BaseActions
@@ -45,7 +45,7 @@ func TestGPRun(t *testing.T) {
 	gp.AddEnvironmentAccess()
 
 	popSize := 100
-	demeCount := 5
+	demeCount := 2
 	numGens := 200
 
 	members := make([][]population.Individual, demeCount)
@@ -72,8 +72,9 @@ func TestGPRun(t *testing.T) {
 			FitnessTests: 3,
 			TestInputs:   in,
 			TestExpected: out,
-			Elites:       2,
+			Elites:       4,
 			Fitnesses:    make([]int, popSize/demeCount),
+			GoalFitness:  1,
 		}
 	}
 	dg := population.DemeGroup{
@@ -83,8 +84,8 @@ func TestGPRun(t *testing.T) {
 
 	for i := 0; i < numGens; i++ {
 		fmt.Println("Gen", i)
-		dg.NextGeneration()
-		if i == numGens-1 {
+		stopEarly := dg.NextGeneration()
+		if i == numGens-1 || stopEarly {
 			for _, p := range dg.Demes {
 				w, _ := p.Weights(1.0)
 				fmt.Println(w)
@@ -102,6 +103,7 @@ func TestGPRun(t *testing.T) {
 				p.Members[3].Print()
 				p.Members[maxIndex].Print()
 			}
+			break
 		}
 	}
 

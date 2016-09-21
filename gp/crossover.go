@@ -53,5 +53,9 @@ func (pc PointCrossover) Crossover(a, b *GP) *GP {
 	c.env = a.env
 	c.first = g3
 	c.nodes = c.first.Size()
+	for c.nodes > gpOptions.MaxNodeCount {
+		c.ShrinkMutate()
+		c.nodes--
+	}
 	return c
 }

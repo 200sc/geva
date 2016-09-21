@@ -21,7 +21,7 @@ type DemeGroup struct {
 	MigrationChance float64
 }
 
-func (dg *DemeGroup) NextGeneration() {
+func (dg *DemeGroup) NextGeneration() bool {
 	migrators := 0.0
 	if dg.MigrationChance >= 1.0 {
 		migrators = math.Floor(dg.MigrationChance)
@@ -60,7 +60,9 @@ func (dg *DemeGroup) NextGeneration() {
 			d1[m], d2[n] = d2[n], d1[m]
 		}
 	}
+	stopEarly := false
 	for i := range dg.Demes {
-		dg.Demes[i].NextGeneration()
+		stopEarly = dg.Demes[i].NextGeneration() || stopEarly
 	}
+	return stopEarly
 }
