@@ -11,7 +11,7 @@ GP Crossover Methods: 1
 
 Selection Methods: 5
 
-Pairing Methods: 1
+Pairing Methods: 2
 
 # Next Steps #
 
