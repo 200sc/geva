@@ -40,13 +40,13 @@ func TestGPRun(t *testing.T) {
 	out[1] = []float64{8.0}
 	out[2] = []float64{64.0}
 
-	//gp.Init(gpOpt, env, gp.PointCrossover{}, actions, gp.ComplexityFitness(gp.OutputFitness, 1.0))
-	gp.Init(gpOpt, env, gp.PointCrossover{}, actions, gp.OutputFitness)
+	gp.Init(gpOpt, env, gp.PointCrossover{}, actions, gp.ComplexityFitness(gp.OutputFitness, 0.1))
+	//gp.Init(gpOpt, env, gp.PointCrossover{}, actions, gp.OutputFitness)
 	gp.AddEnvironmentAccess()
 
-	popSize := 100
-	demeCount := 2
-	numGens := 200
+	popSize := 200
+	demeCount := 5
+	numGens := 10000
 
 	members := make([][]population.Individual, demeCount)
 	for j := 0; j < demeCount; j++ {
@@ -60,7 +60,7 @@ func TestGPRun(t *testing.T) {
 		3,
 	}
 
-	pair := pairing.RandomPairing{}
+	pair := pairing.AlphaPairing{2}
 
 	demes := make([]population.Population, demeCount)
 	for i := 0; i < demeCount; i++ {
@@ -72,7 +72,7 @@ func TestGPRun(t *testing.T) {
 			FitnessTests: 3,
 			TestInputs:   in,
 			TestExpected: out,
-			Elites:       4,
+			Elites:       1,
 			Fitnesses:    make([]int, popSize/demeCount),
 			GoalFitness:  1,
 		}
@@ -83,7 +83,7 @@ func TestGPRun(t *testing.T) {
 	}
 
 	for i := 0; i < numGens; i++ {
-		fmt.Println("Gen", i)
+		fmt.Println("Gen", i+1)
 		stopEarly := dg.NextGeneration()
 		if i == numGens-1 || stopEarly {
 			for _, p := range dg.Demes {
@@ -98,11 +98,9 @@ func TestGPRun(t *testing.T) {
 					}
 				}
 				fmt.Println(p.Fitnesses)
-				p.Members[0].Print()
-				p.Members[1].Print()
-				p.Members[3].Print()
 				p.Members[maxIndex].Print()
 			}
+			fmt.Println("Generations taken: ", i+1)
 			break
 		}
 	}

@@ -1,10 +1,13 @@
 # GoEvo #
+# Version 0.0.1#
 
 This can build and evolve neural networks.
 
 Usage: see test files, helper functions for usage don't exist yet really.
 
-Crossover Methods: 3
+Neural Crossover Methods: 3
+
+GP Crossover Methods: 1
 
 Selection Methods: 5
 
@@ -25,3 +28,7 @@ It's then worth reviewing and running performance tests on anything that is or c
 As a part of these reviews, looking into what can be passed to graphics cards for work instead of to the processor would be very worthwhile (Go doesn't support vectorized CPU instructions as of 1.7, so we would need to go to the graphics card to do these).
 
 Once the above is done, we'd like to add Genetic Algorithms.
+
+# Test Results 0.0.1#
+
+In goevo_2_test, TestGPRunAverageGenerations, with a loop count of 10000, was able to build a small GP to take a value and put it to the third power (almost always in the form: mult(env0,mult(env0,env0))) in an average of 12.4676 generations with the options in that test.

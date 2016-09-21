@@ -30,10 +30,10 @@ func (p_p *Population) NextGeneration() bool {
 	parentSize := p.Size / p.Selection.GetParentProportion()
 
 	p.GenerateFitness()
-	elites, stopEarly := p.GetElites()
-	if stopEarly {
+	if p.LowFitness <= p.GoalFitness {
 		return true
 	}
+	elites := p.GetElites()
 	nextGen := p.Selection.Select(&p)
 
 	// Ensure that the elites (the best members)
@@ -44,13 +44,13 @@ func (p_p *Population) NextGeneration() bool {
 	}
 	parentSize += p.Elites
 
-	pairs := p.Pairing.Pair(nextGen, parentSize)
+	p.Members = nextGen
+	pairs := p.Pairing.Pair(&p, parentSize)
 
 	// i does not start at 0,
 	// but pairs, sensibly, does.
 	pairIndex := 0
 
-	p.Members = nextGen
 	// crossover pairs for children in the next generation.
 	for i := parentSize; i < len(nextGen); i++ {
 		n1 := p.Members[pairs[pairIndex][0]]
@@ -105,7 +105,7 @@ func (p_p *Population) GenerateFitness() {
 	}
 }
 
-func (p_p *Population) GetElites() ([]Individual, bool) {
+func (p_p *Population) GetElites() []Individual {
 	p := *p_p
 
 	fitMap := make(map[int][]int)
@@ -113,9 +113,6 @@ func (p_p *Population) GetElites() ([]Individual, bool) {
 
 	for i := 0; i < p.Size; i++ {
 		f := p.Fitnesses[i]
-		if f <= p.GoalFitness {
-			return elites, true
-		}
 		if v, ok := fitMap[f]; ok {
 			fitMap[f] = append(v, i)
 		} else {
@@ -130,14 +127,14 @@ func (p_p *Population) GetElites() ([]Individual, bool) {
 	for i < p.Elites {
 		for k := 0; k < len(fitMap[keys[j]]); k++ {
 			if i >= p.Elites {
-				return elites, false
+				return elites
 			}
 			elites[i] = p.Members[fitMap[keys[j]][k]]
 			i++
 		}
 		j++
 	}
-	return elites, false
+	return elites
 }
 
 func KeySet_Int_SlInt(m map[int][]int) []int {
@@ -186,10 +183,10 @@ func (p_p *Population) Print() {
 // Used as Generic helpers for populations
 
 type SelectionMethod interface {
-	Select(p_p *Population) []Individual
+	Select(p *Population) []Individual
 	GetParentProportion() int
 }
 
 type PairingMethod interface {
-	Pair(nn []Individual, populated int) [][]int
+	Pair(p *Population, populated int) [][]int
 }
