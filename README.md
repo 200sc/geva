@@ -31,4 +31,8 @@ Once the above is done, we'd like to add Genetic Algorithms.
 
 # Test Results 0.0.1#
 
-In goevo_2_test, TestGPRunAverageGenerations, with a loop count of 10000, was able to build a small GP to take a value and put it to the third power (almost always in the form: mult(env0,mult(env0,env0))) in an average of 12.4676 generations with the options in that test.
+```
+Test name         | 0.0.1 Time 
+---
+TestGPAveragePow3 | 6.073
+```

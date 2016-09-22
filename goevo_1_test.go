@@ -40,9 +40,10 @@ func TestGPRun(t *testing.T) {
 	out[1] = []float64{8.0}
 	out[2] = []float64{64.0}
 
-	gp.Init(gpOpt, env, gp.PointCrossover{}, actions, gp.ComplexityFitness(gp.OutputFitness, 0.1))
+	gp.Init(gpOpt, env, gp.PointCrossover{},
+		actions, 1.0, gp.ComplexityFitness(gp.OutputFitness, 0.1))
 	//gp.Init(gpOpt, env, gp.PointCrossover{}, actions, gp.OutputFitness)
-	gp.AddEnvironmentAccess()
+	gp.AddEnvironmentAccess(1.0)
 
 	popSize := 200
 	demeCount := 5

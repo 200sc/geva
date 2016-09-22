@@ -30,7 +30,7 @@ func (n *Node) GenerateTree(depth, nodeLimit int) int {
 	for i := 0; i < len(n.args); i++ {
 		// Get a terminal action if...
 		if depth == 0 || nodes >= nodeLimit || rand.Float64() < 0.5 {
-			a, _ := getAction(0)
+			a := getZeroAction()
 			n.args[i] = NewNode(a, 0, n.gp)
 			nodes++
 		} else {

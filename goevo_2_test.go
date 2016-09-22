@@ -11,9 +11,9 @@ import (
 	"time"
 )
 
-func TestGPAverageGenerations(t *testing.T) {
+func TestGPAveragePow3(t *testing.T) {
 	totalGenerations := 0
-	loops := 200
+	loops := 2000
 	rand.Seed(time.Now().UTC().UnixNano())
 	for i := 0; i < loops; i++ {
 
@@ -41,9 +41,10 @@ func TestGPAverageGenerations(t *testing.T) {
 		out[1] = []float64{8.0}
 		out[2] = []float64{64.0}
 
-		gp.Init(gpOpt, env, gp.PointCrossover{}, actions, gp.ComplexityFitness(gp.OutputFitness, 0.1))
+		gp.Init(gpOpt, env, gp.PointCrossover{}, actions, 1.0,
+			gp.ComplexityFitness(gp.OutputFitness, 0.1))
 		//gp.Init(gpOpt, env, gp.PointCrossover{}, actions, gp.OutputFitness)
-		gp.AddEnvironmentAccess()
+		gp.AddEnvironmentAccess(1.0)
 
 		popSize := 200
 		demeCount := 5
@@ -61,7 +62,9 @@ func TestGPAverageGenerations(t *testing.T) {
 			3,
 		}
 
-		pair := pairing.AlphaPairing{2}
+		pair := pairing.RandomPairing{}
+		// Alpha pairing{2} doubles the expected generations to reach 1 fitness
+		//pair := pairing.AlphaPairing{2}
 
 		demes := make([]population.Population, demeCount)
 		for i := 0; i < demeCount; i++ {
@@ -73,7 +76,7 @@ func TestGPAverageGenerations(t *testing.T) {
 				FitnessTests: 3,
 				TestInputs:   in,
 				TestExpected: out,
-				Elites:       1,
+				Elites:       2,
 				Fitnesses:    make([]int, popSize/demeCount),
 				GoalFitness:  1,
 			}

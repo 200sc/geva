@@ -64,11 +64,11 @@ func (gp *GP) SwapMutate() {
 	} else if r > 0.66 {
 		if children != len(actions)-1 {
 			children++
-			newAction, _ := getAction(0)
+			newAction := getZeroAction()
 			nodes[i].args = append(nodes[i].args, NewNode(newAction, 0, gp))
 		}
 	}
-	nodes[i].eval = actions[children][rand.Intn(len(actions[children]))]
+	nodes[i].eval, _ = getAction(children)
 }
 
 func (n *Node) GetAllNodes() []*Node {

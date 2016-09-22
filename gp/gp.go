@@ -13,18 +13,30 @@ type GP struct {
 }
 
 var (
-	gpOptions   GPOptions
-	crossover   GPCrossover
-	environment Environment
-	actions     Actions
-	fitness     FitnessFunc
+	gpOptions            GPOptions
+	crossover            GPCrossover
+	environment          Environment
+	actions              Actions
+	actionWeights        [][]float64
+	cumActionWeights     []float64
+	cumZeroActionWeights []float64
+	fitness              FitnessFunc
 )
 
 func Init(genOpt GPOptions, env Environment, cross GPCrossover,
-	act Actions, f FitnessFunc) {
+	act [][]Action, baseActionWeight float64, f FitnessFunc) {
 
 	environment = env
 	actions = act
+	actionWeights = make([][]float64, len(actions))
+	for i, tier := range actions {
+		actionWeights[i] = make([]float64, len(tier))
+		for j := range tier {
+			actionWeights[i][j] = baseActionWeight
+		}
+	}
+	cumZeroActionWeights = CalculateCumulativeActionWeights(0)
+	cumActionWeights = CalculateCumulativeActionWeights(1, 2, 3)
 	fitness = f
 	gpOptions = genOpt
 	crossover = cross

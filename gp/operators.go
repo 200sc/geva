@@ -4,10 +4,7 @@ import (
 	"math/rand"
 )
 
-type Action struct {
-	op   Operator
-	name string
-}
+type Operator func(*GP, ...*Node) int
 
 func neg(gp *GP, x ...*Node) int {
 	return Eval(x[0]) * -1
