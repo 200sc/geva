@@ -34,5 +34,5 @@ Once the above is done, we'd like to add Genetic Algorithms.
 ```
 Test name         | 0.0.1 Time 
 ---
-TestGPAveragePow3 | 6.073
+TestGPAveragePow3 | 6.073 s
 ```
