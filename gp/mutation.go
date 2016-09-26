@@ -6,7 +6,7 @@ import (
 
 func (gp *GP) ShrinkMutate() {
 
-	n := gp.first
+	n := gp.First
 
 	// We have some special cases for gp.first
 	// We don't want to replace gp.first with
@@ -52,7 +52,7 @@ func (gp *GP) ShrinkMutate() {
 }
 
 func (gp *GP) SwapMutate() {
-	nodes := gp.first.GetAllNodes()
+	nodes := gp.First.GetAllNodes()
 	i := rand.Intn(len(nodes))
 	children := len(nodes[i].args)
 	r := rand.Float64()

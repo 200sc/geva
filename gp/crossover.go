@@ -25,8 +25,8 @@ type PointCrossover struct{}
 
 func (pc PointCrossover) Crossover(a, b *GP) *GP {
 
-	g1 := a.first
-	g2 := b.first
+	g1 := a.First
+	g2 := b.First
 
 	// Find a random point in both networks.
 	// Replace what exists at g1point with g2point.
@@ -50,12 +50,13 @@ func (pc PointCrossover) Crossover(a, b *GP) *GP {
 		parent.args[i] = node2.Copy(c)
 	}
 
-	c.env = a.env
-	c.first = g3
-	c.nodes = c.first.Size()
-	for c.nodes > gpOptions.MaxNodeCount {
+	c.Env = a.Env
+	c.Mem = a.Mem.Copy()
+	c.First = g3
+	c.Nodes = c.First.Size()
+	for c.Nodes > gpOptions.MaxNodeCount {
 		c.ShrinkMutate()
-		c.nodes--
+		c.Nodes--
 	}
 	return c
 }

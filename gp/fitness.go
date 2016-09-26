@@ -13,9 +13,9 @@ type FitnessFunc func(gp *GP, inputs, outputs [][]float64) int
 func EnvFitness(g *GP, inputs, outputs [][]float64) int {
 	fitness := 1
 	for i, envDiff := range inputs {
-		g.env = environment.New(envDiff)
-		Eval(g.first)
-		fitness += g.env.Diff(outputs[i])
+		g.Env = environment.New(envDiff)
+		Eval(g.First)
+		fitness += g.Env.Diff(outputs[i])
 	}
 	return fitness
 }
@@ -26,8 +26,8 @@ func EnvFitness(g *GP, inputs, outputs [][]float64) int {
 func OutputFitness(g *GP, inputs, outputs [][]float64) int {
 	fitness := 1
 	for i, envDiff := range inputs {
-		g.env = environment.New(envDiff)
-		out := Eval(g.first)
+		g.Env = environment.New(envDiff)
+		out := Eval(g.First)
 		fitness += int(math.Abs(float64(out - int(outputs[i][0]))))
 	}
 	if fitness < 0 {
@@ -39,7 +39,7 @@ func OutputFitness(g *GP, inputs, outputs [][]float64) int {
 func ComplexityFitness(f FitnessFunc, mod float64) FitnessFunc {
 	return func(g *GP, inputs, outputs [][]float64) int {
 		i := f(g, inputs, outputs)
-		i += int(math.Floor(mod * float64(g.nodes)))
+		i += int(math.Floor(mod * float64(g.Nodes)))
 		if i < 0 {
 			i = math.MaxInt32
 		}

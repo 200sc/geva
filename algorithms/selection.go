@@ -4,6 +4,10 @@ import (
 	"math/rand"
 )
 
+// AKA Single-Instance Roulette Search
+// Given a set of cumulative weights, pick an index
+// evenly distributed as according to said weights.
+// Tl;dr Binary search but with ranges of values
 func CumWeightedChooseOne(remainingWeights []float64) int {
 	totalWeight := remainingWeights[len(remainingWeights)-1]
 	choice := rand.Float64() * totalWeight

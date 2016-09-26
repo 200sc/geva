@@ -7,15 +7,17 @@ import (
 
 // The principal Individual implementation for the gp package
 type GP struct {
-	first *Node
-	env   *Environment
-	nodes int
+	First *Node
+	Env   *Environment
+	Mem   *Environment
+	Nodes int
 }
 
 var (
 	gpOptions            GPOptions
 	crossover            GPCrossover
 	environment          Environment
+	memory               Environment
 	actions              Actions
 	actionWeights        [][]float64
 	cumActionWeights     []float64
@@ -48,14 +50,15 @@ func GenerateGP(genOpt GPOptions) *GP {
 	// with creation types here
 
 	gp := new(GP)
-	gp.env = &environment
+	gp.Env = &environment
+	gp.Mem = memory.Copy()
 	a, children := getNonZeroAction()
-	gp.first = &Node{
+	gp.First = &Node{
 		make([]*Node, children),
 		a,
 		gp,
 	}
-	gp.nodes = gp.first.GenerateTree(genOpt.MaxStartDepth, genOpt.MaxNodeCount)
+	gp.Nodes = gp.First.GenerateTree(genOpt.MaxStartDepth, genOpt.MaxNodeCount)
 	return gp
 }
 
@@ -64,7 +67,7 @@ func (gp *GP) Print() {
 	// because GPs are usually going to be printed
 	// in large sets, and because environments are
 	// usually going to be constant between GPs.
-	gp.first.Print("", true)
+	gp.First.Print("", true)
 }
 
 func (gp *GP) CanCrossover(other population.Individual) bool {
@@ -91,5 +94,5 @@ func (gp *GP) Mutate() {
 	if rand.Float64() < gpOptions.ShrinkMutationChance {
 		gp.ShrinkMutate()
 	}
-	gp.nodes = gp.first.Size()
+	gp.Nodes = gp.First.Size()
 }

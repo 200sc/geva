@@ -12,6 +12,21 @@ import (
 // learn what, of these, is important.
 type Environment []*int
 
+func (env Environment) Copy() *Environment {
+	newEnv := make(Environment, len(env))
+	for i, f := range env {
+		var v int
+		if f == nil {
+			v = 0
+		} else {
+			v = *f
+		}
+		newEnv[i] = new(int)
+		*newEnv[i] = v
+	}
+	return &newEnv
+}
+
 // Creates a combined environment by the given envDiff inputs
 // and returns a new environment pointer
 func (env Environment) New(envDiff []float64) *Environment {
@@ -33,4 +48,13 @@ func (env Environment) Diff(envDiff []float64) (diff int) {
 		}
 	}
 	return
+}
+
+func NewEnvironment(size int, baseVal int) Environment {
+	env := make(Environment, size)
+	for i := 0; i < size; i++ {
+		env[i] = new(int)
+		*env[i] = baseVal
+	}
+	return env
 }

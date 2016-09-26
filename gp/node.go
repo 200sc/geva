@@ -45,7 +45,7 @@ func (n *Node) GenerateTree(depth, nodeLimit int) int {
 
 // This is more or less shorthand
 func Eval(n *Node) int {
-	return n.eval.op(n.gp, n.args...)
+	return n.eval.Op(n.gp, n.args...)
 }
 
 //http://stackoverflow.com/questions/4965335/how-to-print-binary-tree-diagram
@@ -61,7 +61,7 @@ func (n *Node) Print(prefix string, isTail bool) {
 		prefix += "│   "
 	}
 	// Add identifier here
-	s += n.eval.name
+	s += n.eval.Name
 	fmt.Println(s)
 	for i := 0; i < len(n.args)-1; i++ {
 		n.args[i].Print(prefix, false)
@@ -78,7 +78,7 @@ func (n *Node) GetRandomNode() (*Node, *Node) {
 	// using that we try to have a 50% chance to take a node
 	// at around halfway down the tree.
 
-	apxDepth := math.Floor(math.Log2(float64(n.gp.nodes)))
+	apxDepth := math.Floor(math.Log2(float64(n.gp.Nodes)))
 
 	curDepth := 1
 

@@ -21,6 +21,22 @@ type DemeGroup struct {
 	MigrationChance float64
 }
 
+func (dg *DemeGroup) BestMember() (Individual, int) {
+
+	bestFitness := math.MaxInt32
+	var bestInd Individual
+
+	for _, d := range dg.Demes {
+		ind, fit := d.BestMember()
+		if fit < bestFitness {
+			bestFitness = fit
+			bestInd = ind
+		}
+	}
+
+	return bestInd, bestFitness
+}
+
 func (dg *DemeGroup) NextGeneration() bool {
 	migrators := 0.0
 	if dg.MigrationChance >= 1.0 {

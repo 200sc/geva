@@ -1,6 +1,7 @@
 package gp
 
 import (
+	"math"
 	"math/rand"
 )
 
@@ -34,7 +35,15 @@ func divide(gp *GP, xs ...*Node) int {
 }
 
 func pow(gp *GP, xs ...*Node) int {
-	return Eval(xs[0]) ^ Eval(xs[1])
+	return int(math.Pow(float64(Eval(xs[0])), float64(Eval(xs[1]))))
+}
+
+func pow2(gp *GP, xs ...*Node) int {
+	return int(math.Pow(float64(Eval(xs[0])), 2.0))
+}
+
+func pow3(gp *GP, xs ...*Node) int {
+	return int(math.Pow(float64(Eval(xs[0])), 3.0))
 }
 
 func mod(gp *GP, xs ...*Node) int {

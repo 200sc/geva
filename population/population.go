@@ -174,6 +174,19 @@ func (p_p *Population) Weights(power float64) ([]float64, []float64) {
 	return weights, cumulativeWeights
 }
 
+func (p *Population) BestMember() (Individual, int) {
+	w, _ := p.Weights(1.0)
+	maxWeight := 0.0
+	maxIndex := 0
+	for i, v := range w {
+		if v > maxWeight {
+			maxWeight = v
+			maxIndex = i
+		}
+	}
+	return p.Members[maxIndex], p.Fitnesses[maxIndex]
+}
+
 func (p_p *Population) Print() {
 	for _, v := range p_p.Members {
 		v.Print()
