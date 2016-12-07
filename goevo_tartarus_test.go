@@ -2,6 +2,7 @@ package goevo
 
 import (
 	"fmt"
+	"goevo/env"
 	"goevo/gp"
 	"goevo/pairing"
 	"goevo/population"
@@ -91,7 +92,8 @@ func forward(g *gp.GP, nothing ...*gp.Node) int {
 
 func look(g *gp.GP, nothing ...*gp.Node) int {
 	// Increment the number of actions we've taken
-	*(*g.Env)[36] = *(*g.Env)[36] + 1
+	//*(*g.Env)[36] = *(*g.Env)[36] + 1
+
 	pos := *(*g.Env)[37]
 	// -1 represents outside the map
 	// 0 represents nothing
@@ -106,7 +108,7 @@ func look(g *gp.GP, nothing ...*gp.Node) int {
 func TartarusFitness(g *gp.GP, inputs, outputs [][]float64) int {
 	fitness := 0
 	for _, envDiff := range inputs {
-		g.Env = gp.NewEnvironment(39, 0).New(envDiff)
+		g.Env = env.NewI(39, 0).New(envDiff)
 		runs := 0
 		*(*g.Env)[36] = 0
 		for runs < 200 && *(*g.Env)[36] < 100 {
@@ -150,7 +152,7 @@ func RandomTartarusBoard() []float64 {
 	return out
 }
 
-func PrintBoard(board gp.Environment) {
+func PrintBoard(board env.I) {
 	if len(board) < 39 {
 		return
 	}
@@ -189,7 +191,7 @@ func TestGPTartarus(t *testing.T) {
 	actions := gp.BaseActions
 	actions[0] = append(actions[0], tartActions...)
 
-	env := gp.NewEnvironment(39, 0)
+	env := env.NewI(39, 0)
 
 	in := make([][]float64, 20)
 	out := make([][]float64, 20)

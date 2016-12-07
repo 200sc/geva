@@ -2,6 +2,7 @@ package goevo
 
 import (
 	"fmt"
+	"goevo/env"
 	"goevo/gp"
 	"goevo/pairing"
 	"goevo/population"
@@ -31,7 +32,7 @@ func TestGPSuite(t *testing.T) {
 	// Pow 1 and Pow 2 have an average
 	// gen count of 1, so they aren't
 	// included here.
-	for i := 3; i < 13; i++ {
+	for i := 8; i < 9; i++ {
 		out := [][]float64{
 			{math.Pow(1.0, float64(i))},
 			{math.Pow(2.0, float64(i))},
@@ -64,7 +65,7 @@ func TestGPSuite(t *testing.T) {
 	// 	})
 	// }
 
-	testGenerations := 20000
+	testGenerations := 100000
 	rand.Seed(time.Now().UTC().UnixNano())
 	for _, tc := range testCases {
 		totalGenerations := 0
@@ -84,18 +85,17 @@ func TestGPSuite(t *testing.T) {
 
 			actions := gp.BaseActions
 
-			val := 0
-			env := gp.Environment{&val}
+			env := env.NewI(1, 0)
 
 			gp.Init(gpOpt, env, gp.PointCrossover{}, actions, 1.0,
 				gp.ComplexityFitness(gp.OutputFitness, 0.05))
 			//gp.Init(gpOpt, env, gp.PointCrossover{}, actions, 1.0, gp.OutputFitness)
 			gp.AddEnvironmentAccess(1.0)
-			gp.AddStorage(1, 1.0)
+			//gp.AddStorage(1, 1.0)
 
 			popSize := 200
 			demeCount := 5
-			numGens := 10000
+			numGens := 5000
 
 			members := make([][]population.Individual, demeCount)
 			for j := 0; j < demeCount; j++ {
@@ -137,14 +137,16 @@ func TestGPSuite(t *testing.T) {
 				stopEarly := dg.NextGeneration()
 				if j == numGens-1 || stopEarly {
 					totalGenerations += j + 1
-					//if loops%200 == 0 {
-					//fmt.Println("Loop", loops, "Gens", totalGenerations)
-					//ind, _ := dg.BestMember()
-					//ind.Print()
-					// 	fmt.Println("Generations taken: ", j+1)
-					//}
+					if loops%20 == 0 {
+						fmt.Println("Loop", loops, "Gens", totalGenerations)
+						ind, _ := dg.BestMember()
+						ind.Print()
+						fmt.Println("Generations taken: ", j+1)
+					}
 					break
 				}
+				//ind, _ := dg.BestMember()
+				//ind.Print()
 			}
 			loops += 1
 		}

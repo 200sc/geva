@@ -2,6 +2,7 @@ package gp
 
 import (
 	"goevo/algorithms"
+	"goevo/env"
 	"strconv"
 )
 
@@ -29,7 +30,7 @@ var (
 	TwoArgActions = []Action{
 		{add, "add"},
 		//{subtract, "sub"},
-		//{multiply, "mult"},
+		{multiply, "mult"},
 		//{divide, "div"},
 		//{pow, "pow"},
 		//{mod, "mod"},
@@ -105,9 +106,9 @@ func getNonZeroAction() (action Action, children int) {
 }
 
 func AddEnvironmentAccess(baseWeight float64) {
-	envActions := make([]Action, len(environment))
-	envWeights := make([]float64, len(environment))
-	for i := range environment {
+	envActions := make([]Action, len(*environment))
+	envWeights := make([]float64, len(*environment))
+	for i := range *environment {
 		envActions[i] = Action{
 			func(gp *GP, nothing ...*Node) int {
 				return *(*gp.Env)[i]
@@ -157,7 +158,10 @@ func AddStorage(spaces int, baseWeight float64) {
 	actionWeights[0] = append(actionWeights[0], memWeights...)
 	cumZeroActionWeights = CalculateCumulativeActionWeights(0)
 
-	memory = make([]*int, spaces)
+	if memory == nil {
+		memory = new(env.I)
+	}
+	*memory = make([]*int, spaces)
 }
 
 // If we like the above pattern, we can

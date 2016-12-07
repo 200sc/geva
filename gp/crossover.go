@@ -28,20 +28,21 @@ func (pc PointCrossover) Crossover(a, b *GP) *GP {
 	g1 := a.First
 	g2 := b.First
 
-	// Find a random point in both networks.
-	// Replace what exists at g1point with g2point.
-
 	c := new(GP)
 
 	g3 := g1.Copy(c)
 
-	// if a.nodes > gpOptions.MaxNodeCount {
-	// 	return x
-	// }
-
+	// Find a random point in both networks.
+	// Replace what exists at g1point with g2point.
 	node1, parent := g3.GetRandomNode()
 	node2, _ := g2.GetRandomNode()
 
+	// If the node chosen has no arguments,
+	// we put this branch somewhere in the
+	// node's parents.
+	//
+	// This assumes that GPs are never just one
+	// no-argument instruction.
 	if len(node1.args) > 0 {
 		i := rand.Intn(len(node1.args))
 		node1.args[i] = node2.Copy(c)

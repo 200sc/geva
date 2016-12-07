@@ -1,6 +1,7 @@
 package gp
 
 import (
+	"goevo/env"
 	"goevo/population"
 	"math/rand"
 )
@@ -8,16 +9,16 @@ import (
 // The principal Individual implementation for the gp package
 type GP struct {
 	First *Node
-	Env   *Environment
-	Mem   *Environment
+	Env   *env.I
+	Mem   *env.I
 	Nodes int
 }
 
 var (
 	gpOptions            GPOptions
 	crossover            GPCrossover
-	environment          Environment
-	memory               Environment
+	environment          *env.I
+	memory               *env.I
 	actions              Actions
 	actionWeights        [][]float64
 	cumActionWeights     []float64
@@ -25,10 +26,10 @@ var (
 	fitness              FitnessFunc
 )
 
-func Init(genOpt GPOptions, env Environment, cross GPCrossover,
+func Init(genOpt GPOptions, e *env.I, cross GPCrossover,
 	act [][]Action, baseActionWeight float64, f FitnessFunc) {
 
-	environment = env
+	environment = e
 	actions = act
 	actionWeights = make([][]float64, len(actions))
 	for i, tier := range actions {
@@ -50,7 +51,7 @@ func GenerateGP(genOpt GPOptions) *GP {
 	// with creation types here
 
 	gp := new(GP)
-	gp.Env = &environment
+	gp.Env = environment.Copy()
 	gp.Mem = memory.Copy()
 	a, children := getNonZeroAction()
 	gp.First = &Node{

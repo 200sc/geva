@@ -2,6 +2,7 @@ package goevo
 
 import (
 	"fmt"
+	"goevo/env"
 	"goevo/gp"
 	"goevo/neural"
 	"goevo/pairing"
@@ -28,8 +29,7 @@ func TestGPRun(t *testing.T) {
 
 	actions := gp.BaseActions
 
-	val := 0
-	env := gp.Environment{&val}
+	env := env.NewI(1, 0)
 
 	in := make([][]float64, 3)
 	in[0] = []float64{3.0}
