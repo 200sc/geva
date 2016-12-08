@@ -15,17 +15,23 @@ func (gp *LGP) SwapMutate() {
 }
 
 func (gp *LGP) ShrinkMutate() {
+	if len(gp.Instructions) < 2 {
+		return
+	}
 	// Get rid of a random action
 	i := rand.Intn(len(gp.Instructions))
 	gp.Instructions = append(gp.Instructions[:i], gp.Instructions[i+1:]...)
 }
 
 func (gp *LGP) ExpandMutate() {
+	if len(gp.Instructions) > gpOptions.MaxActionCount {
+		return
+	}
 	// Add an action at a random spot
 	inst := gp.GetInstruction()
 	i := rand.Intn(len(gp.Instructions))
 	half := append(gp.Instructions[:i], inst)
-	gp.Instructions = append(half, gp.Instructions[i:])
+	gp.Instructions = append(half, gp.Instructions[i:]...)
 }
 
 func (gp *LGP) ValueMutate() {
@@ -33,11 +39,11 @@ func (gp *LGP) ValueMutate() {
 	i := rand.Intn(len(gp.Instructions))
 	inst := gp.Instructions[i]
 
-	gp.Instructions[i].Args = getArgs(inst.Act.Args, len(gp.Mem)+SPECIAL_REGISTERS)
+	gp.Instructions[i].Args = getArgs(inst.Act.Args, len(*gp.Mem)+SPECIAL_REGISTERS)
 
 }
 func (gp *LGP) MemMutate() {
 	// Mutate a value in memory's start value
-	i := rand.Intn(len(gp.Mem))
-	*gp.Mem[i] = rand.Intn(10+SPECIAL_REGISTERS) - SPECIAL_REGISTERS
+	i := rand.Intn(len(*gp.Mem))
+	*(*gp.Mem)[i] = rand.Intn(10+SPECIAL_REGISTERS) - SPECIAL_REGISTERS
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"goevo/env"
 	"goevo/population"
+	"math/rand"
 )
 
 // A linear genetic program
@@ -11,6 +12,10 @@ type LGP struct {
 	Instructions []Instruction
 	Mem          *env.I
 	Env          *env.I
+	// The last register is the last register
+	// that the LGP has written to. When using
+	// the special value LAST_WRITTEN, this register's
+	// value is accessed by the LGP.
 	lastRegister int
 	pc           int
 }
@@ -19,13 +24,17 @@ const (
 	SPECIAL_REGISTERS = 1
 )
 
+const (
+	LAST_WRITTEN = -1
+)
+
 var (
 	gpOptions        LGPOptions
 	crossover        LGPCrossover
 	environment      *env.I
 	memory           *env.I
 	actions          []Action
-	actionWeights    [][]float64
+	actionWeights    []float64
 	cumActionWeights []float64
 	fitness          FitnessFunc
 )
@@ -50,7 +59,7 @@ func Init(genOpt LGPOptions, e, m *env.I, cross LGPCrossover,
 
 func GenerateLGP(genOpt LGPOptions) *LGP {
 
-	gp = new(LGP)
+	gp := new(LGP)
 
 	gp.Env = environment.Copy()
 	gp.Mem = memory.Copy()
@@ -59,15 +68,43 @@ func GenerateLGP(genOpt LGPOptions) *LGP {
 
 	gp.Instructions = make([]Instruction, l)
 	for i := range gp.Instructions {
-		gp.Instructions[i] = gp.getInstruction()
+		gp.Instructions[i] = gp.GetInstruction()
 	}
 
 	return gp
 }
 
+func (gp *LGP) Run() {
+	quit_early := 300
+	i := 0
+	gp.lastRegister = 0
+	gp.pc = 0
+	id := rand.Intn(1000000)
+	defer func(i int) {
+		if r := recover(); r != nil {
+			fmt.Println("Recovered panicking id", i)
+			panic("Resuming Panic")
+		}
+	}(id)
+	nextPC := gp.pc
+	for i < quit_early && nextPC < len(gp.Instructions) {
+		if gp.pc < 0 {
+			// uh
+			gp.pc = 0
+			nextPC = 0
+		}
+		//fmt.Println(id, nextPC, len(gp.Instructions))
+		inst := gp.Instructions[nextPC]
+		gp.pc++
+		inst.Act.Op(gp, inst.Args...)
+		i++
+		nextPC = gp.pc
+	}
+}
+
 func (gp *LGP) Print() {
-	fmt.Println("A LGP")
 	// Todo
+	fmt.Println("A LGP")
 }
 
 func (gp *LGP) CanCrossover(other population.Individual) bool {
@@ -110,8 +147,16 @@ func (gp *LGP) Mutate() {
 	case v3 < gpOptions.ExpandMutationChance:
 		gp.ExpandMutate()
 	case v4 < gpOptions.ValueMutationChance:
-		gp.ValueMUtate()
-	case v5 < gpOptions.EnvMutationChance:
-		gp.EnvMutate()
+		gp.ValueMutate()
+	case v5 < gpOptions.MemMutationChance:
+		gp.MemMutate()
 	}
+}
+
+func (gp *LGP) Copy() *LGP {
+	gp2 := new(LGP)
+	gp2.Instructions = gp.Instructions
+	gp2.Mem = gp.Mem.Copy()
+	gp2.Env = gp.Env.Copy()
+	return gp2
 }

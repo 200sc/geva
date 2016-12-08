@@ -1,4 +1,9 @@
-package gp
+package lgp
+
+import (
+	"math"
+	"math/rand"
+)
 
 type Operator func(*LGP, ...int)
 
@@ -27,16 +32,18 @@ func divide(gp *LGP, xs ...int) {
 }
 
 func pow(gp *LGP, xs ...int) {
-	v := int(math.Pow(float64(gp.getVal(xs[1])), float64(gp.getVal(xs[2]))))
+	v := int(math.Pow(float64(gp.regVal(xs[1])), float64(gp.regVal(xs[2]))))
 	gp.setReg(xs[0], v)
 }
 
 func pow2(gp *LGP, xs ...int) {
-	return int(math.Pow(float64(Eval(xs[0])), 2.0))
+	v := int(math.Pow(float64(gp.regVal(xs[1])), 2))
+	gp.setReg(xs[0], v)
 }
 
 func pow3(gp *LGP, xs ...int) {
-	return int(math.Pow(float64(Eval(xs[0])), 3.0))
+	v := int(math.Pow(float64(gp.regVal(xs[1])), 3))
+	gp.setReg(xs[0], v)
 }
 
 func mod(gp *LGP, xs ...int) {
@@ -109,13 +116,13 @@ func nine(gp *LGP, xs ...int) {
 }
 
 func (gp *LGP) regVal(r1 int) int {
-	return gp.Mem[gp.getReg(r1)]
+	return *(*gp.Mem)[gp.getReg(r1)]
 }
 
 func (gp *LGP) getReg(r1 int) (r2 int) {
 	r2 = r1
 	// Special coded pointers evaluated here
-	if r2 == -1 {
+	if r2 == LAST_WRITTEN {
 		r2 = gp.lastRegister
 	}
 	return
@@ -123,5 +130,5 @@ func (gp *LGP) getReg(r1 int) (r2 int) {
 
 func (gp *LGP) setReg(r1, v int) {
 	gp.lastRegister = gp.getReg(r1)
-	gp.Mem[gp.lastRegister] = v
+	*(*gp.Mem)[gp.lastRegister] = v
 }

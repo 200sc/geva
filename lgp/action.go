@@ -2,8 +2,8 @@ package lgp
 
 import (
 	"goevo/algorithms"
-	"goevo/env"
 	"math/rand"
+	"strconv"
 )
 
 type Instruction struct {
@@ -53,7 +53,7 @@ func (gp *LGP) GetInstruction() Instruction {
 	act := getAction()
 	return Instruction{
 		act,
-		getArgs(act.Args, len(gp.Mem)+SPECIAL_REGISTERS),
+		getArgs(act.Args, len(*gp.Mem)+SPECIAL_REGISTERS),
 	}
 }
 
@@ -75,8 +75,8 @@ func AddEnvironmentAccess(baseWeight float64) {
 	envWeights := make([]float64, len(*environment))
 	for i := range *environment {
 		envActions[i] = Action{
-			func(gp *LGP, xs ...int) int {
-				gp.setReg(xs[0], *gp.Env[i])
+			func(gp *LGP, xs ...int) {
+				gp.setReg(xs[0], *(*gp.Env)[i])
 			},
 			"env" + strconv.Itoa(i),
 			1,
@@ -87,6 +87,7 @@ func AddEnvironmentAccess(baseWeight float64) {
 
 	actions = append(actions, envActions...)
 	actionWeights = append(actionWeights, envWeights...)
+	cumActionWeights = append(cumActionWeights, envWeights...)
 
 	for i := oldl; i < len(actionWeights); i++ {
 		cumActionWeights[i] = cumActionWeights[i-1] + actionWeights[i]
