@@ -109,7 +109,7 @@ func nine(gp *LGP, xs ...int) {
 }
 
 func (gp *LGP) regVal(r1 int) int {
-	return gp.Env[gp.getReg(r1)]
+	return gp.Mem[gp.getReg(r1)]
 }
 
 func (gp *LGP) getReg(r1 int) (r2 int) {
@@ -123,5 +123,5 @@ func (gp *LGP) getReg(r1 int) (r2 int) {
 
 func (gp *LGP) setReg(r1, v int) {
 	gp.lastRegister = gp.getReg(r1)
-	gp.Env[gp.lastRegister] = v
+	gp.Mem[gp.lastRegister] = v
 }

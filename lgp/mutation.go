@@ -1,7 +1,43 @@
 package lgp
 
-func (gp *LGP) SwapMutate()   {}
-func (gp *LGP) ShrinkMutate() {}
-func (gp *LGP) ExpandMutate() {}
-func (gp *LGP) ValueMUtate()  {}
-func (gp *LGP) EnvMutate()    {}
+import (
+	"math/rand"
+)
+
+func (gp *LGP) SwapMutate() {
+	// Find two actions and swap them
+	i := rand.Intn(len(gp.Instructions))
+	j := rand.Intn(len(gp.Instructions))
+	if j == i {
+		j = (j + 1) % len(gp.Instructions)
+	}
+	gp.Instructions[i], gp.Instructions[j] = gp.Instructions[j], gp.Instructions[i]
+}
+
+func (gp *LGP) ShrinkMutate() {
+	// Get rid of a random action
+	i := rand.Intn(len(gp.Instructions))
+	gp.Instructions = append(gp.Instructions[:i], gp.Instructions[i+1:]...)
+}
+
+func (gp *LGP) ExpandMutate() {
+	// Add an action at a random spot
+	inst := gp.GetInstruction()
+	i := rand.Intn(len(gp.Instructions))
+	half := append(gp.Instructions[:i], inst)
+	gp.Instructions = append(half, gp.Instructions[i:])
+}
+
+func (gp *LGP) ValueMutate() {
+	// Mutate an argument set
+	i := rand.Intn(len(gp.Instructions))
+	inst := gp.Instructions[i]
+
+	gp.Instructions[i].Args = getArgs(inst.Act.Args, len(gp.Mem)+SPECIAL_REGISTERS)
+
+}
+func (gp *LGP) MemMutate() {
+	// Mutate a value in memory's start value
+	i := rand.Intn(len(gp.Mem))
+	*gp.Mem[i] = rand.Intn(10+SPECIAL_REGISTERS) - SPECIAL_REGISTERS
+}

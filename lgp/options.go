@@ -3,6 +3,7 @@ package lgp
 type LGPOptions struct {
 	MaxActionCount  int
 	MaxStartActions int
+	MinStartActions int
 
 	SwapMutationChance   float64
 	ValueMutationChance  float64

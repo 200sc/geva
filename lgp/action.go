@@ -3,8 +3,13 @@ package lgp
 import (
 	"goevo/algorithms"
 	"goevo/env"
-	"strconv"
+	"math/rand"
 )
+
+type Instruction struct {
+	Act  Action
+	Args []int
+}
 
 // The effect of a given action is internally defined
 // by the action, and GPs need to learn what actions
@@ -44,6 +49,54 @@ var (
 	}
 )
 
+func (gp *LGP) GetInstruction() Instruction {
+	act := getAction()
+	return Instruction{
+		act,
+		getArgs(act.Args, len(gp.Mem)+SPECIAL_REGISTERS),
+	}
+}
+
 func getAction() Action {
 	return actions[algorithms.CumWeightedChooseOne(cumActionWeights)]
+}
+
+func getArgs(argCount int, limit int) []int {
+	args := make([]int, argCount)
+	for i := range args {
+		// Todo: distribute these numbers non-linearly
+		args[i] = rand.Intn(limit) - SPECIAL_REGISTERS
+	}
+	return args
+}
+
+func AddEnvironmentAccess(baseWeight float64) {
+	envActions := make([]Action, len(*environment))
+	envWeights := make([]float64, len(*environment))
+	for i := range *environment {
+		envActions[i] = Action{
+			func(gp *LGP, xs ...int) int {
+				gp.setReg(xs[0], *gp.Env[i])
+			},
+			"env" + strconv.Itoa(i),
+			1,
+		}
+		envWeights[i] = baseWeight
+	}
+	oldl := len(actions)
+
+	actions = append(actions, envActions...)
+	actionWeights = append(actionWeights, envWeights...)
+
+	for i := oldl; i < len(actionWeights); i++ {
+		cumActionWeights[i] = cumActionWeights[i-1] + actionWeights[i]
+	}
+}
+
+func ResetCumActionWeights() {
+	cumActionWeights = make([]float64, len(actions))
+	cumActionWeights[0] = actionWeights[0]
+	for i := 1; i < len(actionWeights); i++ {
+		cumActionWeights[i] = cumActionWeights[i-1] + actionWeights[i]
+	}
 }

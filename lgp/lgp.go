@@ -8,38 +8,41 @@ import (
 
 // A linear genetic program
 type LGP struct {
-	Actions      []Action
+	Instructions []Instruction
+	Mem          *env.I
 	Env          *env.I
 	lastRegister int
 	pc           int
 }
 
+const (
+	SPECIAL_REGISTERS = 1
+)
+
 var (
 	gpOptions        LGPOptions
 	crossover        LGPCrossover
 	environment      *env.I
+	memory           *env.I
 	actions          []Action
 	actionWeights    [][]float64
 	cumActionWeights []float64
 	fitness          FitnessFunc
 )
 
-func Init(genOpt LGPOptions, e *env.I, cross LGPCrossover,
+func Init(genOpt LGPOptions, e, m *env.I, cross LGPCrossover,
 	act []Action, baseActionWeight float64, f FitnessFunc) {
 
 	actions = act
 
 	actionWeights = make([]float64, len(actions))
-	cumActionWeights = make([]float64, len(actions))
 	for i := range actions {
 		actionWeights[i] = baseActionWeight
 	}
-	cumActionWeights[0] = actionWeights[0]
-	for i := 1; i < len(actions); i++ {
-		cumActionWeights[i] = actionWeights[i] + cumActionWeights[i-1]
-	}
+	ResetCumActionWeights()
 
 	environment = e
+	memory = m
 	fitness = f
 	gpOptions = genOpt
 	crossover = cross
@@ -48,6 +51,16 @@ func Init(genOpt LGPOptions, e *env.I, cross LGPCrossover,
 func GenerateLGP(genOpt LGPOptions) *LGP {
 
 	gp = new(LGP)
+
+	gp.Env = environment.Copy()
+	gp.Mem = memory.Copy()
+
+	l := rand.Intn(genOpt.MaxStartActions-genOpt.MinStartActions) + genOpt.MinStartActions
+
+	gp.Instructions = make([]Instruction, l)
+	for i := range gp.Instructions {
+		gp.Instructions[i] = gp.getInstruction()
+	}
 
 	return gp
 }
