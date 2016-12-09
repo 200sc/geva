@@ -34,12 +34,18 @@ var (
 		//{divide, "div"},
 		//{pow, "pow"},
 		//{mod, "mod"},
-		{ifRand, "rand?"},
+		//{ifRand, "rand?"},
+		{do2, "do2"},
+		// Tree based GPs NEED something like this
+		// to compete with LGPs, but this method does
+		// not achieve the desired results.
+		//{whilePositive, "while+"},
 	}
 	ThreeArgActions = []Action{
 		{neZero, "!0?"},
 		{isPositive, "+?"},
-		{ifRand, "rand?"},
+		//{ifRand, "rand?"},
+		//{do3, "do3"},
 	}
 	ZeroArgActions = []Action{
 		{randv, "rand"},

@@ -36,6 +36,22 @@ func OutputFitness(g *GP, inputs, outputs [][]float64) int {
 	return fitness
 }
 
+func Mem0Fitness(g *GP, inputs, outputs [][]float64) int {
+	if g.Mem == nil {
+		panic("Mem0Fitness used on GPs without memory")
+	}
+	fitness := 1
+	for i, envDiff := range inputs {
+		g.Env = environment.New(envDiff)
+		Eval(g.First)
+		fitness += int(math.Abs(float64(*(*g.Mem)[0]) - outputs[i][0]))
+	}
+	if fitness < 0 {
+		fitness = math.MaxInt32
+	}
+	return fitness
+}
+
 func ComplexityFitness(f FitnessFunc, mod float64) FitnessFunc {
 	return func(g *GP, inputs, outputs [][]float64) int {
 		i := f(g, inputs, outputs)

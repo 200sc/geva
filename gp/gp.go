@@ -45,6 +45,15 @@ func Init(genOpt GPOptions, e *env.I, cross GPCrossover,
 	crossover = cross
 }
 
+func GeneratePopulation(opt interface{}, popSize int) []population.Individual {
+	gpOpt := opt.(GPOptions)
+	members := make([]population.Individual, popSize)
+	for j := 0; j < popSize; j++ {
+		members[j] = GenerateGP(gpOpt)
+	}
+	return members
+}
+
 func GenerateGP(genOpt GPOptions) *GP {
 
 	// Eventually we'll do something

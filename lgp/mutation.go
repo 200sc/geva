@@ -15,7 +15,7 @@ func (gp *LGP) SwapMutate() {
 }
 
 func (gp *LGP) ShrinkMutate() {
-	if len(gp.Instructions) < 2 {
+	if len(gp.Instructions) <= gpOptions.MinActionCount {
 		return
 	}
 	// Get rid of a random action
@@ -44,6 +44,6 @@ func (gp *LGP) ValueMutate() {
 }
 func (gp *LGP) MemMutate() {
 	// Mutate a value in memory's start value
-	i := rand.Intn(len(*gp.Mem))
-	*(*gp.Mem)[i] = rand.Intn(10+SPECIAL_REGISTERS) - SPECIAL_REGISTERS
+	i := rand.Intn(len(*gp.MemStart))
+	*(*gp.MemStart)[i] = rand.Intn(10+SPECIAL_REGISTERS) - SPECIAL_REGISTERS
 }

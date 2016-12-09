@@ -11,6 +11,7 @@ import (
 type LGP struct {
 	Instructions []Instruction
 	Mem          *env.I
+	MemStart     *env.I
 	Env          *env.I
 	// The last register is the last register
 	// that the LGP has written to. When using
@@ -22,10 +23,7 @@ type LGP struct {
 
 const (
 	SPECIAL_REGISTERS = 1
-)
-
-const (
-	LAST_WRITTEN = -1
+	LAST_WRITTEN      = -1
 )
 
 var (
@@ -57,12 +55,22 @@ func Init(genOpt LGPOptions, e, m *env.I, cross LGPCrossover,
 	crossover = cross
 }
 
+func GeneratePopulation(opt interface{}, popSize int) []population.Individual {
+	gpOpt := opt.(LGPOptions)
+	members := make([]population.Individual, popSize)
+	for j := 0; j < popSize; j++ {
+		members[j] = GenerateLGP(gpOpt)
+	}
+	return members
+}
+
 func GenerateLGP(genOpt LGPOptions) *LGP {
 
 	gp := new(LGP)
 
 	gp.Env = environment.Copy()
 	gp.Mem = memory.Copy()
+	gp.MemStart = memory.Copy()
 
 	l := rand.Intn(genOpt.MaxStartActions-genOpt.MinStartActions) + genOpt.MinStartActions
 
@@ -77,20 +85,13 @@ func GenerateLGP(genOpt LGPOptions) *LGP {
 func (gp *LGP) Run() {
 	quit_early := 300
 	i := 0
+
 	gp.lastRegister = 0
 	gp.pc = 0
-	// This is just to figure out who is crashing
-	id := rand.Intn(1000000)
-	defer func(i int) {
-		if r := recover(); r != nil {
-			fmt.Println("Recovered panicking id", i)
-			gp.Print()
-			panic("Resuming Panic")
-		}
-	}(id)
+	gp.Mem = gp.MemStart.Copy()
+
 	nextPC := gp.pc
 	for i < quit_early && nextPC < len(gp.Instructions) {
-		//fmt.Println(id, nextPC, len(gp.Instructions))
 		inst := gp.Instructions[nextPC]
 		gp.pc++
 		inst.Act.Op(gp, inst.Args...)
@@ -103,11 +104,11 @@ func (gp *LGP) Print() {
 	// Todo
 	fmt.Println("Instructions:")
 	for _, i := range gp.Instructions {
-		fmt.Println("---", i.String())
+		fmt.Println("───", i.String())
 	}
 	fmt.Println("MEM:")
 	for i, m := range *gp.Mem {
-		fmt.Println("---", i, ":", *m)
+		fmt.Println("───", i, ":", *m)
 	}
 	fmt.Println("LR", gp.lastRegister)
 	fmt.Println("PC", gp.pc)
@@ -164,6 +165,7 @@ func (gp *LGP) Copy() *LGP {
 	gp2 := new(LGP)
 	gp2.Instructions = gp.Instructions
 	gp2.Mem = gp.Mem.Copy()
+	gp2.MemStart = gp.MemStart.Copy()
 	gp2.Env = gp.Env.Copy()
 	return gp2
 }

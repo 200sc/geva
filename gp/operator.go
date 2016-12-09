@@ -34,6 +34,17 @@ func divide(gp *GP, xs ...*Node) int {
 	return 0
 }
 
+func do2(gp *GP, xs ...*Node) int {
+	Eval(xs[0])
+	return Eval(xs[1])
+}
+
+func do3(gp *GP, xs ...*Node) int {
+	Eval(xs[0])
+	Eval(xs[1])
+	return Eval(xs[2])
+}
+
 func pow(gp *GP, xs ...*Node) int {
 	return int(math.Pow(float64(Eval(xs[0])), float64(Eval(xs[1]))))
 }
@@ -53,6 +64,16 @@ func mod(gp *GP, xs ...*Node) int {
 		return a % b
 	}
 	return 0
+}
+
+func whilePositive(gp *GP, xs ...*Node) int {
+	loops := 0
+	var out int
+	for Eval(xs[0]) > 0 && loops < 10 {
+		out = Eval(xs[1])
+		loops++
+	}
+	return out
 }
 
 func neZero(gp *GP, xs ...*Node) int {
