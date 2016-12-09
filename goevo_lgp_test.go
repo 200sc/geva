@@ -33,7 +33,7 @@ func TestLGPRun(t *testing.T) {
 	actions := lgp.BaseActions
 
 	e := env.NewI(1, 0)
-	mem := env.NewI(4, 0)
+	mem := env.NewI(2, 0)
 
 	in := make([][]float64, 3)
 	in[0] = []float64{3.0}

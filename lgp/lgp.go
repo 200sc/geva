@@ -79,20 +79,17 @@ func (gp *LGP) Run() {
 	i := 0
 	gp.lastRegister = 0
 	gp.pc = 0
+	// This is just to figure out who is crashing
 	id := rand.Intn(1000000)
 	defer func(i int) {
 		if r := recover(); r != nil {
 			fmt.Println("Recovered panicking id", i)
+			gp.Print()
 			panic("Resuming Panic")
 		}
 	}(id)
 	nextPC := gp.pc
 	for i < quit_early && nextPC < len(gp.Instructions) {
-		if gp.pc < 0 {
-			// uh
-			gp.pc = 0
-			nextPC = 0
-		}
 		//fmt.Println(id, nextPC, len(gp.Instructions))
 		inst := gp.Instructions[nextPC]
 		gp.pc++
@@ -104,7 +101,17 @@ func (gp *LGP) Run() {
 
 func (gp *LGP) Print() {
 	// Todo
-	fmt.Println("A LGP")
+	fmt.Println("Instructions:")
+	for _, i := range gp.Instructions {
+		fmt.Println("---", i.String())
+	}
+	fmt.Println("MEM:")
+	for i, m := range *gp.Mem {
+		fmt.Println("---", i, ":", *m)
+	}
+	fmt.Println("LR", gp.lastRegister)
+	fmt.Println("PC", gp.pc)
+	fmt.Println("")
 }
 
 func (gp *LGP) CanCrossover(other population.Individual) bool {

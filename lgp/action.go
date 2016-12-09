@@ -11,6 +11,15 @@ type Instruction struct {
 	Args []int
 }
 
+func (i *Instruction) String() string {
+	s := i.Act.Name
+	s += ":"
+	for _, a := range i.Args {
+		s += strconv.Itoa(a) + " "
+	}
+	return s
+}
+
 // The effect of a given action is internally defined
 // by the action, and GPs need to learn what actions
 // are useful, when.

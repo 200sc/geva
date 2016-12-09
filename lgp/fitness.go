@@ -25,7 +25,8 @@ func Mem0Fitness(g *LGP, inputs, outputs [][]float64) int {
 	for i, envDiff := range inputs {
 		g.Env = environment.New(envDiff)
 		g.Run()
-		fitness += int(math.Abs(float64(*(*g.Mem)[0]) - outputs[i][0]))
+		v := int(math.Abs(float64(*(*g.Mem)[0]) - outputs[i][0]))
+		fitness += v
 	}
 	if fitness < 0 {
 		fitness = math.MaxInt32

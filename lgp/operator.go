@@ -68,7 +68,14 @@ func bgz(gp *LGP, xs ...int) {
 }
 
 func jmp(gp *LGP, xs ...int) {
-	gp.pc = gp.regVal(xs[0])
+	pc := gp.regVal(xs[0])
+	if pc >= len(gp.Instructions) {
+		pc = len(gp.Instructions) - 1
+	}
+	if pc < 0 {
+		pc = 0
+	}
+	gp.pc = pc
 }
 
 func randv(gp *LGP, xs ...int) {
