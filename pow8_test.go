@@ -57,30 +57,31 @@ func TestVSMSuite(t *testing.T) {
 	Seed()
 
 	testCases := make([]GPTestCase, 0)
-	testCases = append(testCases, Pow8TestCase())
+	testCases = append(testCases, ReverseListTestCase())
 
 	gpOpt := lgp.LGPOptions{
 		MinActionCount:  2,
-		MaxActionCount:  20,
-		MaxStartActions: 10,
-		MinStartActions: 3,
+		MaxActionCount:  40,
+		MaxStartActions: 40,
+		MinStartActions: 10,
 
 		SwapMutationChance:   0.05,
 		ValueMutationChance:  0.05,
 		ShrinkMutationChance: 0.05,
-		ExpandMutationChance: 0.05,
-		MemMutationChance:    0.05,
+		ExpandMutationChance: 0.10,
+		MemMutationChance:    0.10,
 	}
 
 	lgp.Init(gpOpt,
-		env.NewI(1, 0),
-		env.NewI(2, 0),
+		env.NewI(5, 0),
+		env.NewI(5, 0),
 		lgp.PointCrossover{2},
-		lgp.BaseActions,
-		1.0,
-		lgp.ComplexityFitness(lgp.Mem0Fitness, 0.1))
+		lgp.MinActions,
+		0.0,
+		lgp.MatchEnvFitness)
 
 	lgp.AddEnvironmentAccess(1.0)
+	lgp.AddEnvironmentChanging(1.0)
 
 	RunSuite(
 		testCases,
@@ -89,7 +90,7 @@ func TestVSMSuite(t *testing.T) {
 		100000,
 		gpOpt,
 		lgp.GeneratePopulation,
-		selection.DeterministicTournamentSelection{2, 3},
+		selection.ProbabilisticSelection{3, 3},
 		pairing.RandomPairing{},
 		5,
 		1,

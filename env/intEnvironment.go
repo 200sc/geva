@@ -33,6 +33,9 @@ func (env *I) Copy() *I {
 // Creates a combined environment by the given envDiff inputs
 // and returns a new environment pointer
 func (env *I) New(envDiff []float64) *I {
+	if len(envDiff) != len(*env) {
+		panic("Differing length environments given to New Environment call")
+	}
 	newEnv := make(I, len(*env))
 	for i, f := range envDiff {
 		newEnv[i] = new(int)
@@ -48,6 +51,15 @@ func (env *I) Diff(envDiff []float64) (diff int) {
 	for i, f := range envDiff {
 		if f != 0.0 {
 			diff += int(math.Ceil(float64(*(*env)[i]) - f))
+		}
+	}
+	return
+}
+
+func (env *I) MatchDiff(envDiff []float64) (diff int) {
+	for i, f := range envDiff {
+		if int(f) != *(*env)[i] {
+			diff++
 		}
 	}
 	return

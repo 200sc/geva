@@ -34,6 +34,23 @@ func Pow8TestCase() GPTestCase {
 	}
 }
 
+func ReverseListTestCase() GPTestCase {
+	title := "ReverseList"
+	in := [][]float64{
+		{1.0, 2.0, 3.0, 4.0, 5.0},
+	}
+
+	out := [][]float64{
+		{5.0, 4.0, 3.0, 2.0, 1.0},
+	}
+
+	return GPTestCase{
+		in,
+		out,
+		title,
+	}
+}
+
 type SuiteFunc func(interface{}, int) []population.Individual
 
 func RunSuite(testCases []GPTestCase, demeCount, popSize, testGenerations int, options interface{},

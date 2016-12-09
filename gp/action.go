@@ -127,6 +127,24 @@ func AddEnvironmentAccess(baseWeight float64) {
 	cumZeroActionWeights = CalculateCumulativeActionWeights(0)
 }
 
+func AddEnvironmentChanging(baseWeight float64) {
+	envActions := make([]Action, len(*environment))
+	envWeights := make([]float64, len(*environment))
+	for i := range *environment {
+		envActions[i] = Action{
+			func(gp *GP, xs ...*Node) int {
+				v := Eval(xs[0])
+				*(*gp.Env)[i] = v
+				return v
+			},
+			"setEnv" + strconv.Itoa(i)}
+		envWeights[i] = baseWeight
+	}
+	actions[1] = append(actions[1], envActions...)
+	actionWeights[1] = append(actionWeights[1], envWeights...)
+	cumActionWeights = CalculateCumulativeActionWeights(1, 2, 3)
+}
+
 func AddStorage(spaces int, baseWeight float64) {
 	storageActions := make([]Action, spaces)
 	storageWeights := make([]float64, spaces)
@@ -169,10 +187,6 @@ func AddStorage(spaces int, baseWeight float64) {
 	}
 	*memory = make([]*int, spaces)
 }
-
-// If we like the above pattern, we can
-// also add a similar AddEnvironmentChanging
-// function.
 
 func CalculateCumulativeActionWeights(args ...int) []float64 {
 	weightCount := 0

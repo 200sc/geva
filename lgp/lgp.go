@@ -110,6 +110,10 @@ func (gp *LGP) Print() {
 	for i, m := range *gp.Mem {
 		fmt.Println("───", i, ":", *m)
 	}
+	fmt.Println("ENV:")
+	for i, e := range *gp.Env {
+		fmt.Println("───", i, ":", *e)
+	}
 	fmt.Println("LR", gp.lastRegister)
 	fmt.Println("PC", gp.pc)
 	fmt.Println("")

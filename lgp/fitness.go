@@ -1,6 +1,7 @@
 package lgp
 
 import (
+	//"fmt"
 	"math"
 	"time"
 )
@@ -15,7 +16,19 @@ func EnvFitness(g *LGP, inputs, outputs [][]float64) int {
 	for i, envDiff := range inputs {
 		g.Env = environment.New(envDiff)
 		g.Run()
-		fitness += g.Env.Diff(outputs[i])
+		v := int(math.Abs(float64(g.Env.Diff(outputs[i]))))
+		//fmt.Println("EnvDiff:", v)
+		fitness += v
+	}
+	return fitness
+}
+
+func MatchEnvFitness(g *LGP, inputs, outputs [][]float64) int {
+	fitness := 1
+	for i, envDiff := range inputs {
+		g.Env = environment.New(envDiff)
+		g.Run()
+		fitness += g.Env.MatchDiff(outputs[i])
 	}
 	return fitness
 }

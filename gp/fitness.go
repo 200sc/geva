@@ -20,6 +20,16 @@ func EnvFitness(g *GP, inputs, outputs [][]float64) int {
 	return fitness
 }
 
+func MatchEnvFitness(g *GP, inputs, outputs [][]float64) int {
+	fitness := 1
+	for i, envDiff := range inputs {
+		g.Env = environment.New(envDiff)
+		Eval(g.First)
+		fitness += g.Env.MatchDiff(outputs[i])
+	}
+	return fitness
+}
+
 // An example fitness which treats the
 // output of the GP as a value to compare
 // against the single expected output

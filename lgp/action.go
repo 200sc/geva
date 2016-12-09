@@ -56,6 +56,11 @@ var (
 		//{eight, "8", 1},
 		//{nine, "9", 1},
 	}
+	MinActions = []Action{
+		{bnez, "bnez", 1},
+		{bgz, "bgz", 1},
+		{jmp, "jmp", 1},
+	}
 )
 
 func (gp *LGP) GetInstruction() Instruction {
@@ -84,9 +89,7 @@ func AddEnvironmentAccess(baseWeight float64) {
 	envWeights := make([]float64, len(*environment))
 	for i := range *environment {
 		envActions[i] = Action{
-			func(gp *LGP, xs ...int) {
-				gp.setReg(xs[0], *(*gp.Env)[i])
-			},
+			genAccessFunc(i),
 			"env" + strconv.Itoa(i),
 			1,
 		}
@@ -100,6 +103,40 @@ func AddEnvironmentAccess(baseWeight float64) {
 
 	for i := oldl; i < len(actionWeights); i++ {
 		cumActionWeights[i] = cumActionWeights[i-1] + actionWeights[i]
+	}
+}
+
+func genAccessFunc(i int) Operator {
+	return func(gp *LGP, xs ...int) {
+		gp.setReg(xs[0], *(*gp.Env)[i])
+	}
+}
+
+func AddEnvironmentChanging(baseWeight float64) {
+	envActions := make([]Action, len(*environment))
+	envWeights := make([]float64, len(*environment))
+	for i := range *environment {
+		envActions[i] = Action{
+			genChangingFunc(i),
+			"setEnv" + strconv.Itoa(i),
+			1,
+		}
+		envWeights[i] = baseWeight
+	}
+	oldl := len(actions)
+
+	actions = append(actions, envActions...)
+	actionWeights = append(actionWeights, envWeights...)
+	cumActionWeights = append(cumActionWeights, envWeights...)
+
+	for i := oldl; i < len(actionWeights); i++ {
+		cumActionWeights[i] = cumActionWeights[i-1] + actionWeights[i]
+	}
+}
+
+func genChangingFunc(j int) Operator {
+	return func(gp *LGP, xs ...int) {
+		*(*gp.Env)[j] = gp.regVal(xs[0])
 	}
 }
 

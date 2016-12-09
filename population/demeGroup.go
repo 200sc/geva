@@ -23,11 +23,10 @@ type DemeGroup struct {
 
 func (dg *DemeGroup) BestMember() (Individual, int) {
 
-	bestFitness := math.MaxInt32
-	var bestInd Individual
+	bestInd, bestFitness := dg.Demes[0].BestMember()
 
-	for _, d := range dg.Demes {
-		ind, fit := d.BestMember()
+	for i := 1; i < len(dg.Demes); i++ {
+		ind, fit := dg.Demes[i].BestMember()
 		if fit < bestFitness {
 			bestFitness = fit
 			bestInd = ind
