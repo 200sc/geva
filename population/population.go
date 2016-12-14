@@ -193,8 +193,6 @@ func (p_p *Population) Print() {
 	}
 }
 
-// Used as Generic helpers for populations
-
 type SelectionMethod interface {
 	Select(p *Population) []Individual
 	GetParentProportion() int

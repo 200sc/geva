@@ -67,6 +67,25 @@ var (
 		TwoArgActions,
 		ThreeArgActions,
 	}
+	TartarusActions = [][]Action{
+		{
+			{randv, "rand"},
+			{zero, "0"},
+			{one, "1"},
+			{two, "2"}},
+		{
+			{neg, "neg"}},
+		{
+			{add, "add"},
+			{subtract, "sub"},
+			{multiply, "multiply"},
+			{do2, "do2"}},
+		{
+			{isPositive, "+?"},
+			{ifRand, "rand?"},
+			{do3, "do3"},
+			{neZero, "!0?"}},
+	}
 )
 
 func getAction(args ...int) (action Action, children int) {

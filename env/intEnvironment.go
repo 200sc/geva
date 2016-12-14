@@ -5,14 +5,10 @@ import (
 	"math"
 )
 
-// The index of each environment element is insignificant.
-// Programss are expected to learn which indexes are useful for
-// each operation.
-// The int that each element refers to means something
-// particular for each problem. Programs are also expected to
-// learn what, of these, is important.
+// I represents an integer-valued environment
 type I []*int
 
+// Copy copies an integer environment
 func (env *I) Copy() *I {
 	if env == nil {
 		return nil
@@ -31,7 +27,7 @@ func (env *I) Copy() *I {
 	return &newEnv
 }
 
-// Creates a combined environment by the given envDiff inputs
+// New Creates a combined environment by the given envDiff inputs
 // and returns a new environment pointer
 func (env *I) New(envDiff []float64) *I {
 	newEnv := make(I, len(envDiff))
@@ -51,9 +47,9 @@ func (env *I) New(envDiff []float64) *I {
 	return &newEnv
 }
 
-// Returns the absolute difference between the given environment
+// Diff returns the absolute difference between the given environment
 // and the passed in expectations. 0 in envDiff is treated as
-// insinificant.
+// insignificant.
 func (env *I) Diff(envDiff []float64) (diff int) {
 	for i, f := range envDiff {
 		if f != 0.0 {
@@ -63,6 +59,8 @@ func (env *I) Diff(envDiff []float64) (diff int) {
 	return
 }
 
+// MatchDiff compares each element in envDiff and env and
+// retuns the number of elements which are not the same.
 func (env *I) MatchDiff(envDiff []float64) (diff int) {
 	//fmt.Println("Env diff length:", len(*env), len(envDiff))
 	for i, f := range envDiff {
@@ -75,6 +73,7 @@ func (env *I) MatchDiff(envDiff []float64) (diff int) {
 	return
 }
 
+// NewI constructs an I with a baseValue at each space
 func NewI(size int, baseVal int) *I {
 	env := make(I, size)
 	for i := 0; i < size; i++ {

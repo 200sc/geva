@@ -1,24 +1,20 @@
 package goevo
 
 import (
-	"fmt"
+	"goevo/alg"
 	"goevo/env"
 	"goevo/gp"
 	"goevo/neural"
 	"goevo/pairing"
 	"goevo/population"
 	"goevo/selection"
-	"math/rand"
 	"testing"
-	"time"
 )
 
 func TestGPRun(t *testing.T) {
 
-	rand.Seed(time.Now().UTC().UnixNano())
+	Seed()
 
-	// Experimenting with this syntax.
-	// It doesn't look very much like go right now.
 	gpOpt := gp.GPOptions{
 		MaxNodeCount:         50,
 		MaxStartDepth:        5,
@@ -43,204 +39,105 @@ func TestGPRun(t *testing.T) {
 	gp.Init(gpOpt, env, gp.PointCrossover{},
 		actions, 1.0, gp.ComplexityFitness(gp.OutputFitness, 0.1))
 
-	popSize := 200
-	demeCount := 5
-	numGens := 10000
-
-	members := make([][]population.Individual, demeCount)
-	for j := 0; j < demeCount; j++ {
-		members[j] = make([]population.Individual, popSize/demeCount)
-		for i := 0; i < popSize/demeCount; i++ {
-			members[j][i] = gp.GenerateGP(gpOpt)
-		}
-	}
-	s := selection.DeterministicTournament{
-		2,
-		3,
+	members := make([]population.Individual, 200)
+	for j := 0; j < 200; j++ {
+		members[j] = gp.GenerateGP(gpOpt)
 	}
 
-	pair := pairing.Alpha{2}
-
-	demes := make([]population.Population, demeCount)
-	for i := 0; i < demeCount; i++ {
-		demes[i] = population.Population{
-			Members:      members[i],
-			Size:         popSize / demeCount,
-			Selection:    s,
-			Pairing:      pair,
-			FitnessTests: 3,
-			TestInputs:   in,
-			TestExpected: out,
-			Elites:       1,
-			Fitnesses:    make([]int, popSize/demeCount),
-			GoalFitness:  1,
-		}
-	}
-	dg := population.DemeGroup{
-		Demes:           demes,
-		MigrationChance: 0.05,
-	}
-
-	for i := 0; i < numGens; i++ {
-		fmt.Println("Gen", i+1)
-		stopEarly := dg.NextGeneration()
-		if i == numGens-1 || stopEarly {
-			for _, p := range dg.Demes {
-				w, _ := p.Weights(1.0)
-				fmt.Println(w)
-				maxWeight := 0.0
-				maxIndex := 0
-				for i, v := range w {
-					if v > maxWeight {
-						maxWeight = v
-						maxIndex = i
-					}
-				}
-				fmt.Println(p.Fitnesses)
-				p.Members[maxIndex].Print()
-			}
-			fmt.Println("Generations taken: ", i+1)
-			break
-		}
-	}
-
+	RunDemeGroup(
+		MakeDemes(
+			5,
+			members,
+			[]population.SelectionMethod{selection.DeterministicTournament{2, 3}},
+			[]population.PairingMethod{pairing.Alpha{2}},
+			in,
+			out,
+			len(in),
+			1,
+			alg.LinearIntRange{1, 2},
+			0.05,
+		),
+		10000)
 }
 
 func TestNNRun(t *testing.T) {
 
-	rand.Seed(time.Now().UTC().UnixNano())
-
-	wOpt := neural.FloatMutationOptions{
-		0.20,
-		0.05,
-		20,
-		0.01,
-	}
-
-	cgOpt := neural.ColumnGenerationOptions{
-		3,
-		4,
-		0.5,
-	}
-
-	actOpt := neural.ActivatorMutationOptions{
-		neural.Rectifier,
-		neural.Identity,
-		neural.BentIdentity,
-		neural.Softplus,
-		neural.Softstep,
-		neural.Softsign,
-		neural.Sinc,
-		neural.Perceptron_Threshold(0.5),
-		neural.Rectifier_Exponential(1.5),
-	}
-
-	nnmOpt := neural.NetworkMutationOptions{
-		&wOpt,
-		&cgOpt,
-		&actOpt,
-		0.05,
-		0.00,
-		0.05,
-		0.00,
-		0.00,
-		0.10,
-		0.01,
-	}
+	Seed()
 
 	nngOpt := neural.NetworkGenerationOptions{
-		nnmOpt,
-		1,
-		2,
-		3,
-		1,
-		20,
-		neural.Rectifier,
+		NetworkMutationOptions: neural.NetworkMutationOptions{
+			WeightOptions: &neural.FloatMutationOptions{
+				MutChance:     0.20,
+				MutMagnitude:  0.05,
+				MutRange:      20,
+				ZeroOutChance: 0.01,
+			},
+			ColumnOptions: &neural.ColumnGenerationOptions{
+				MinSize:           3,
+				MaxSize:           4,
+				DefaultAxonWeight: 0.5,
+			},
+			ActivatorOptions: &neural.ActivatorMutationOptions{
+				neural.Rectifier,
+				neural.Identity,
+				neural.BentIdentity,
+				neural.Softplus,
+				neural.Softstep,
+				neural.Softsign,
+				neural.Sinc,
+				neural.Perceptron_Threshold(0.5),
+				neural.Rectifier_Exponential(1.5),
+			},
+			NeuronReplacementChance: 0.05,
+			NeuronAdditionChance:    0.00,
+			WeightSwapChance:        0.05,
+			ColumnRemovalChance:     0.00,
+			ColumnAdditionChance:    0.00,
+			NeuronMutationChance:    0.10,
+			ActivatorMutationChance: 0.01,
+		},
+		MinColumns:    1,
+		MaxColumns:    2,
+		Inputs:        3,
+		Outputs:       1,
+		BaseMutations: 20,
+		Activator:     neural.Rectifier,
 	}
 
-	popSize := 200
-	demeCount := 4
-	numGens := 500
-
-	members := make([][]population.Individual, demeCount)
-	for j := 0; j < demeCount; j++ {
-		members[j] = make([]population.Individual, popSize/demeCount)
-		for i := 0; i < popSize/demeCount; i++ {
-			members[j][i] = nngOpt.Generate()
-		}
+	members := make([]population.Individual, 200)
+	for j := range members {
+		members[j] = nngOpt.Generate()
 	}
-	s := selection.Probabilistic{
-		3,
-		1.7,
+
+	in := [][]float64{
+		{3.0, 2.0, 0.0},
+		{10.0, 20.0, 10.0},
+		{2.0, 100.0, 1.0},
+		{0.0, 0.0, 50.0},
+		{10.0, 1.0, 1.0},
 	}
-	// s := selection.StochasticUniversal{
-	// 	2,
-	// 	false,
-	// 	1.0,
-	// }
-	// s := selection.Tournament{
-	// 	2,
-	// 	2,
-	// 	1.0,
-	// }
-	// s := selection.Greedy{
-	// 	2,
-	// }
-
-	pair := pairing.Random{}
-
-	in := make([][]float64, 5)
-	in[0] = []float64{3.0, 2.0, 0.0}
-	in[1] = []float64{10.0, 20.0, 10.0}
-	in[2] = []float64{2.0, 100.0, 1.0}
-	in[3] = []float64{0.0, 0.0, 50.0}
-	in[4] = []float64{10.0, 1.0, 1.0}
-	out := make([][]float64, 5)
-	out[0] = []float64{15.0}
-	out[1] = []float64{120.0}
-	out[2] = []float64{309.0}
-	out[3] = []float64{150.0}
-	out[4] = []float64{36.0}
-
-	demes := make([]population.Population, demeCount)
-	for i := 0; i < demeCount; i++ {
-		demes[i] = population.Population{
-			Members:      members[i],
-			Size:         popSize / demeCount,
-			Selection:    s,
-			Pairing:      pair,
-			FitnessTests: 5,
-			TestInputs:   in,
-			TestExpected: out,
-			Elites:       2,
-			Fitnesses:    make([]int, popSize/demeCount),
-		}
-	}
-	dg := population.DemeGroup{
-		Demes:           demes,
-		MigrationChance: 0.1,
+	out := [][]float64{
+		{15.0},
+		{120.0},
+		{309.0},
+		{150.0},
+		{36.0},
 	}
 
 	neural.Init(nngOpt, neural.AverageCrossover{2})
 
-	for i := 0; i < numGens; i++ {
-		fmt.Println("Gen", i)
-		dg.NextGeneration()
-		if i == numGens-1 {
-			for _, p := range dg.Demes {
-				w, _ := p.Weights(1.0)
-				fmt.Println(w)
-				maxWeight := 0.0
-				maxIndex := 0
-				for i, v := range w {
-					if v > maxWeight {
-						maxWeight = v
-						maxIndex = i
-					}
-				}
-				fmt.Println(p.Fitnesses)
-				p.Members[maxIndex].Print()
-			}
-		}
-	}
+	RunDemeGroup(
+		MakeDemes(
+			4,
+			members,
+			[]population.SelectionMethod{selection.Probabilistic{3, 1.7}},
+			[]population.PairingMethod{pairing.Random{}},
+			in,
+			out,
+			len(in),
+			2.0,
+			alg.LinearIntRange{2, 3},
+			0.1,
+		),
+		500)
 }

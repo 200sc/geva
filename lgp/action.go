@@ -67,6 +67,15 @@ var (
 		//{setEnv, "setEnv", 2},
 		{envLen, "envLen", 1},
 	}
+	PowSumActions = []Action{
+		{getEnv, "env", 2},
+		{add, "add", 3},
+		{multiply, "mult", 3},
+		{divide, "div", 3},
+		{zero, "0", 1},
+		{one, "1", 1},
+		{two, "2", 1},
+	}
 )
 
 func (gp *LGP) GetInstruction() Instruction {

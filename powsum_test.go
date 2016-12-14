@@ -1,6 +1,7 @@
 package goevo
 
 import (
+	"fmt"
 	"goevo/alg"
 	"goevo/env"
 	"goevo/gp"
@@ -11,12 +12,13 @@ import (
 	"testing"
 )
 
-func TestGPPow8(t *testing.T) {
+func TestGPPowSum(t *testing.T) {
 
 	Seed()
 
 	testCases := make([]TestCase, 0)
-	testCases = append(testCases, Pow8TestCase())
+	testCases = append(testCases, PowSumTestCase())
+	fmt.Println(testCases)
 
 	gpOpt := gp.GPOptions{
 		MaxNodeCount:         50,
@@ -28,11 +30,11 @@ func TestGPPow8(t *testing.T) {
 
 	gp.Init(
 		gpOpt,
-		env.NewI(1, 0),
+		env.NewI(2, 0),
 		gp.PointCrossover{},
 		gp.BaseActions,
 		1.0,
-		gp.ComplexityFitness(gp.OutputFitness, 0.05))
+		gp.OutputFitness)
 
 	RunSuite(
 		testCases,
@@ -44,39 +46,35 @@ func TestGPPow8(t *testing.T) {
 		[]population.SelectionMethod{selection.DeterministicTournament{2, 3}},
 		[]population.PairingMethod{pairing.Random{}},
 		1,
-		alg.LinearIntRange{4, 6},
+		alg.LinearIntRange{1, 10},
 		0.05)
 }
 
-// VSM (virtual state machine) used instead of LGP
-// for regex simplicity to select GPSuite by itself
-func TestVSMPow8(t *testing.T) {
+func TestVSMPowSum(t *testing.T) {
 
 	Seed()
 
 	testCases := make([]TestCase, 0)
-	testCases = append(testCases, Pow8TestCase())
+	testCases = append(testCases, PowSumTestCase())
 
 	gpOpt := lgp.LGPOptions{
 		MinActionCount:  2,
 		MaxActionCount:  20,
 		MaxStartActions: 10,
-		MinStartActions: 5,
+		MinStartActions: 3,
 
-		SwapMutationChance:   0.10,
-		ValueMutationChance:  0.10,
-		ShrinkMutationChance: 0.10,
-		ExpandMutationChance: 0.10,
-		MemMutationChance:    0.10,
+		SwapMutationChance:   0.20,
+		ValueMutationChance:  0.20,
+		ShrinkMutationChance: 0.20,
+		ExpandMutationChance: 0.20,
+		MemMutationChance:    0.20,
 	}
 
-	actions := lgp.BaseActions
-	actions = append(actions, lgp.EnvActions...)
+	actions := lgp.PowSumActions
 
 	lgp.Init(gpOpt,
 		env.NewI(1, 0),
-		env.NewI(2, 0),
-		//lgp.UniformCrossover{0.5},
+		env.NewI(8, 0),
 		lgp.PointCrossover{2},
 		actions,
 		1.0,
@@ -93,6 +91,6 @@ func TestVSMPow8(t *testing.T) {
 		[]population.SelectionMethod{selection.DeterministicTournament{2, 3}},
 		[]population.PairingMethod{pairing.Random{}},
 		1,
-		alg.LinearIntRange{4, 6},
+		alg.LinearIntRange{1, 2},
 		0.05)
 }

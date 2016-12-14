@@ -65,3 +65,7 @@ func (ap Alpha) Pair(p *population.Population, populated int) [][]int {
 
 	return out
 }
+
+type Method interface {
+	Pair(p *population.Population, populated int) [][]int
+}

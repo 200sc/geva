@@ -4,7 +4,7 @@ import (
 	"math/rand"
 )
 
-// AKA Single-Instance Roulette Search
+// CumWeightedChooseOne AKA Single-Instance Roulette Search
 // Given a set of cumulative weights, pick an index
 // evenly distributed as according to said weights.
 // Tl;dr Binary search but with ranges of values

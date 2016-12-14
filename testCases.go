@@ -1,19 +1,16 @@
 package goevo
 
 import (
-	"fmt"
-	"goevo/alg"
-	"goevo/population"
 	"math"
 )
 
-type GPTestCase struct {
+type TestCase struct {
 	inputs  [][]float64
 	outputs [][]float64
 	title   string
 }
 
-func Pow8TestCase() GPTestCase {
+func Pow8TestCase() TestCase {
 	in := [][]float64{
 		{1.0},
 		{2.0},
@@ -26,14 +23,14 @@ func Pow8TestCase() GPTestCase {
 		out[i] = []float64{math.Pow(f[0], 8.0)}
 	}
 
-	return GPTestCase{
+	return TestCase{
 		in,
 		out,
 		"Pow8",
 	}
 }
 
-func PowSumTestCase() GPTestCase {
+func PowSumTestCase() TestCase {
 	in := [][]float64{
 		{10, 1},
 		//{10, 2},
@@ -48,7 +45,7 @@ func PowSumTestCase() GPTestCase {
 		out[i] = []float64{PowSum(f[0], f[1])}
 	}
 
-	return GPTestCase{
+	return TestCase{
 		in,
 		out,
 		"PowSum",
@@ -63,7 +60,7 @@ func PowSum(max, pow float64) float64 {
 	return out
 }
 
-func ReverseListTestCase() GPTestCase {
+func ReverseListTestCase() TestCase {
 	in := [][]float64{
 		{1.0, 2.0, 3.0, 4.0, 5.0},
 		{7.0, 8.0, 9.0, 10.0, 11.0, 12.0},
@@ -75,7 +72,7 @@ func ReverseListTestCase() GPTestCase {
 		out[i] = ReverseList(f)
 	}
 
-	return GPTestCase{
+	return TestCase{
 		in,
 		out,
 		"ReverseList",
@@ -91,63 +88,17 @@ func ReverseList(lst []float64) []float64 {
 	return outList
 }
 
-type SuiteFunc func(interface{}, int) []population.Individual
+func TransposeMatrixTestCase() TestCase {
+	in := [][]float64{
+		{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0},
+	}
 
-func RunSuite(testCases []GPTestCase, demeCount, popSize, testGenerations int, options interface{},
-	suiteFunc SuiteFunc, selection []population.SelectionMethod, pairing []population.PairingMethod,
-	goal int, elites alg.IntRange, migration float64) {
-
-	for _, tc := range testCases {
-		totalGenerations := 0
-		fmt.Println(tc.title)
-		loops := 1
-		mean := 0.0
-		nextPrint := 5000
-		results := []float64{}
-		for totalGenerations < testGenerations {
-
-			dg := MakeDemes(
-				demeCount,
-				suiteFunc(options, popSize),
-				selection,
-				pairing,
-				tc.inputs,
-				tc.outputs,
-				len(tc.inputs),
-				goal,
-				elites,
-				migration)
-
-			numGens := 5000
-
-			for j := 0; j < numGens; j++ {
-				stopEarly := dg.NextGeneration()
-				if j == numGens-1 || stopEarly {
-					totalGenerations += j + 1
-
-					if loops%20 == 1 || totalGenerations > nextPrint {
-						fmt.Println("Loop", loops, "Gens", totalGenerations)
-						ind, _ := dg.BestMember()
-						ind.Print()
-						mean = float64(totalGenerations) / float64(loops)
-						results = append(results, float64(j+1))
-						fmt.Println("Generations taken: ", j+1)
-						fmt.Println("Average Generations: ", mean)
-						nextPrint = totalGenerations + 5000
-					}
-					break
-				}
-			}
-			loops += 1
-		}
-		mean = float64(totalGenerations) / float64(loops)
-		stdDevTotal := 0.0
-		for _, f := range results {
-			stdDevTotal += math.Pow((f - mean), 2)
-		}
-		stdDevTotal /= float64(len(results))
-		stdDev := math.Sqrt(stdDevTotal)
-		fmt.Println("End Average Generations: ", mean)
-		fmt.Println("End Standard Deviation: ", stdDev)
+	out := [][]float64{
+		{1.0, 4.0, 7.0, 2.0, 5.0, 8.0, 3.0, 6.0, 9.0},
+	}
+	return TestCase{
+		in,
+		out,
+		"TransposeMatrix",
 	}
 }
