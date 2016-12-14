@@ -5,19 +5,19 @@ import (
 	"math/rand"
 )
 
-type ProbabilisticSelection struct {
+type Probabilistic struct {
 	ParentProportion int
 	Power            float64
 }
 
-func (ps ProbabilisticSelection) GetParentProportion() int {
+func (ps Probabilistic) GetParentProportion() int {
 	return ps.ParentProportion
 }
 
 // This specific algorithm is based on the algorithm described by
 // Adam Liposki and Dorota Lipowska in "Roulette-wheel selection
 // via stochastic acceptance" http://arxiv.org/pdf/1109.3627v2.pdf
-func (ps ProbabilisticSelection) Select(p_p *population.Population) []population.Individual {
+func (ps Probabilistic) Select(p_p *population.Population) []population.Individual {
 	p := *p_p
 
 	weights, _ := p.Weights(ps.Power)

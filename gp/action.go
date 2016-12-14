@@ -1,7 +1,7 @@
 package gp
 
 import (
-	"goevo/algorithms"
+	"goevo/alg"
 	"goevo/env"
 	"strconv"
 )
@@ -23,7 +23,8 @@ type Action struct {
 // being picked!
 var (
 	OneArgActions = []Action{
-		{neg, "neg"},
+		{getEnv, "env"},
+		//{neg, "neg"},
 		//{pow2, "pow2"},
 		//{pow3, "pow3"},
 	}
@@ -31,11 +32,11 @@ var (
 		{add, "add"},
 		//{subtract, "sub"},
 		{multiply, "mult"},
-		//{divide, "div"},
+		{divide, "div"},
 		//{pow, "pow"},
 		//{mod, "mod"},
 		//{ifRand, "rand?"},
-		{do2, "do2"},
+		//{do2, "do2"},
 		// Tree based GPs NEED something like this
 		// to compete with LGPs, but this method does
 		// not achieve the desired results.
@@ -43,14 +44,15 @@ var (
 	}
 	ThreeArgActions = []Action{
 		{neZero, "!0?"},
-		{isPositive, "+?"},
+		//{isPositive, "+?"},
 		//{ifRand, "rand?"},
 		//{do3, "do3"},
 	}
 	ZeroArgActions = []Action{
-		{randv, "rand"},
-		//{one, "1"},
-		//{two, "2"},
+		//{randv, "rand"},
+		{zero, "0"},
+		{one, "1"},
+		{two, "2"},
 		//{three, "3"},
 		//{four, "4"},
 		//{five, "5"},
@@ -72,7 +74,7 @@ func getAction(args ...int) (action Action, children int) {
 	// and treat that choice as an index
 	// as if the available arrays were attached end-on-end
 
-	choice := algorithms.CumWeightedChooseOne(CalculateCumulativeActionWeights(args...))
+	choice := alg.CumWeightedChooseOne(CalculateCumulativeActionWeights(args...))
 
 	for i := 0; i < len(args); i++ {
 		if len(actions[args[i]]) > choice {
@@ -89,7 +91,7 @@ func getZeroAction() (action Action) {
 	// Make a choice out of the options
 	// and treat that choice as an index
 	// as if the available arrays were attached end-on-end
-	choice := algorithms.CumWeightedChooseOne(cumZeroActionWeights)
+	choice := alg.CumWeightedChooseOne(cumZeroActionWeights)
 	action = actions[0][choice]
 	return
 }
@@ -98,7 +100,7 @@ func getNonZeroAction() (action Action, children int) {
 	// Make a choice out of the options
 	// and treat that choice as an index
 	// as if the available arrays were attached end-on-end
-	choice := algorithms.CumWeightedChooseOne(cumActionWeights)
+	choice := alg.CumWeightedChooseOne(cumActionWeights)
 
 	for i := 1; i < len(actions); i++ {
 		if len(actions[i]) > choice {
@@ -111,38 +113,28 @@ func getNonZeroAction() (action Action, children int) {
 	return
 }
 
-func AddEnvironmentAccess(baseWeight float64) {
-	envActions := make([]Action, len(*environment))
-	envWeights := make([]float64, len(*environment))
-	for i := range *environment {
-		envActions[i] = Action{
-			func(gp *GP, nothing ...*Node) int {
-				return *(*gp.Env)[i]
-			},
-			"env" + strconv.Itoa(i)}
-		envWeights[i] = baseWeight
+func getEnv(gp *GP, xs ...*Node) int {
+	index := Eval(xs[0])
+	if index >= len(*gp.Env) {
+		index = len(*gp.Env) - 1
 	}
-	actions[0] = append(actions[0], envActions...)
-	actionWeights[0] = append(actionWeights[0], envWeights...)
-	cumZeroActionWeights = CalculateCumulativeActionWeights(0)
+	if index < 0 {
+		index = 0
+	}
+	return *(*gp.Env)[index]
 }
 
-func AddEnvironmentChanging(baseWeight float64) {
-	envActions := make([]Action, len(*environment))
-	envWeights := make([]float64, len(*environment))
-	for i := range *environment {
-		envActions[i] = Action{
-			func(gp *GP, xs ...*Node) int {
-				v := Eval(xs[0])
-				*(*gp.Env)[i] = v
-				return v
-			},
-			"setEnv" + strconv.Itoa(i)}
-		envWeights[i] = baseWeight
+func setEnv(gp *GP, xs ...*Node) int {
+	index := Eval(xs[1])
+	if index >= len(*gp.Env) {
+		index = len(*gp.Env) - 1
 	}
-	actions[1] = append(actions[1], envActions...)
-	actionWeights[1] = append(actionWeights[1], envWeights...)
-	cumActionWeights = CalculateCumulativeActionWeights(1, 2, 3)
+	if index < 0 {
+		index = 0
+	}
+	v := Eval(xs[0])
+	*(*gp.Env)[index] = v
+	return v
 }
 
 func AddStorage(spaces int, baseWeight float64) {

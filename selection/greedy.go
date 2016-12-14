@@ -5,11 +5,11 @@ import (
 	"sort"
 )
 
-type GreedySelection struct {
+type Greedy struct {
 	ParentProportion int
 }
 
-func (gs GreedySelection) GetParentProportion() int {
+func (gs Greedy) GetParentProportion() int {
 	return gs.ParentProportion
 }
 
@@ -19,7 +19,7 @@ func (gs GreedySelection) GetParentProportion() int {
 // I'm assuming here that it means picking the top x members of the
 // population where x is the proportion of members who are parents
 // in the new generation, so that's what this is.
-func (gs GreedySelection) Select(p_p *population.Population) []population.Individual {
+func (gs Greedy) Select(p_p *population.Population) []population.Individual {
 	p := *p_p
 
 	fitMap := make(map[int][]int)

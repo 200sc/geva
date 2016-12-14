@@ -2,6 +2,7 @@ package goevo
 
 import (
 	"fmt"
+	"goevo/alg"
 	"goevo/population"
 	"math"
 )
@@ -20,51 +21,89 @@ func Pow8TestCase() GPTestCase {
 		{4.0},
 	}
 
-	out := [][]float64{
-		{math.Pow(1.0, 8.0)},
-		{math.Pow(2.0, 8.0)},
-		{math.Pow(3.0, 8.0)},
-		{math.Pow(4.0, 8.0)},
+	out := make([][]float64, len(in))
+	for i, f := range in {
+		out[i] = []float64{math.Pow(f[0], 8.0)}
 	}
-	title := "Pow8"
+
 	return GPTestCase{
 		in,
 		out,
-		title,
+		"Pow8",
 	}
 }
 
-func ReverseListTestCase() GPTestCase {
-	title := "ReverseList"
+func PowSumTestCase() GPTestCase {
 	in := [][]float64{
-		{1.0, 2.0, 3.0, 4.0, 5.0},
+		{10, 1},
+		//{10, 2},
+		{20, 1},
+		//{20, 2},
+		{30, 1},
+		//{30, 2},
 	}
 
-	out := [][]float64{
-		{5.0, 4.0, 3.0, 2.0, 1.0},
+	out := make([][]float64, len(in))
+	for i, f := range in {
+		out[i] = []float64{PowSum(f[0], f[1])}
 	}
 
 	return GPTestCase{
 		in,
 		out,
-		title,
+		"PowSum",
 	}
+}
+
+func PowSum(max, pow float64) float64 {
+	out := 0.0
+	for i := 0.0; i <= max; i++ {
+		out += math.Pow(i, pow)
+	}
+	return out
+}
+
+func ReverseListTestCase() GPTestCase {
+	in := [][]float64{
+		{1.0, 2.0, 3.0, 4.0, 5.0},
+		{7.0, 8.0, 9.0, 10.0, 11.0, 12.0},
+		{15.0, 14.0, 13.0},
+	}
+
+	out := make([][]float64, len(in))
+	for i, f := range in {
+		out[i] = ReverseList(f)
+	}
+
+	return GPTestCase{
+		in,
+		out,
+		"ReverseList",
+	}
+}
+
+func ReverseList(lst []float64) []float64 {
+	outList := make([]float64, len(lst))
+	halflen := (len(lst) / 2) + 1
+	for i := 0; i < halflen; i++ {
+		outList[i] = lst[len(lst)-(i+1)]
+	}
+	return outList
 }
 
 type SuiteFunc func(interface{}, int) []population.Individual
 
 func RunSuite(testCases []GPTestCase, demeCount, popSize, testGenerations int, options interface{},
-	suiteFunc SuiteFunc, selection population.SelectionMethod, pairing population.PairingMethod,
-	elites, goal int, migration float64) {
+	suiteFunc SuiteFunc, selection []population.SelectionMethod, pairing []population.PairingMethod,
+	goal int, elites alg.IntRange, migration float64) {
 
 	for _, tc := range testCases {
 		totalGenerations := 0
 		fmt.Println(tc.title)
-		loops := 0
-		variance := 0.0
-		oldMean := 0.0
+		loops := 1
 		mean := 0.0
-		stdDev := 0.0
+		nextPrint := 5000
+		results := []float64{}
 		for totalGenerations < testGenerations {
 
 			dg := MakeDemes(
@@ -75,8 +114,8 @@ func RunSuite(testCases []GPTestCase, demeCount, popSize, testGenerations int, o
 				tc.inputs,
 				tc.outputs,
 				len(tc.inputs),
-				elites,
 				goal,
+				elites,
 				migration)
 
 			numGens := 5000
@@ -86,25 +125,28 @@ func RunSuite(testCases []GPTestCase, demeCount, popSize, testGenerations int, o
 				if j == numGens-1 || stopEarly {
 					totalGenerations += j + 1
 
-					if loops%20 == 1 {
+					if loops%20 == 1 || totalGenerations > nextPrint {
 						fmt.Println("Loop", loops, "Gens", totalGenerations)
 						ind, _ := dg.BestMember()
 						ind.Print()
-						oldMean = mean
 						mean = float64(totalGenerations) / float64(loops)
-						variance = variance + (float64(j+1)-oldMean)*(float64(j+1)-mean)
-						stdDev = math.Sqrt(variance / float64(totalGenerations-1))
+						results = append(results, float64(j+1))
 						fmt.Println("Generations taken: ", j+1)
 						fmt.Println("Average Generations: ", mean)
-						fmt.Println("Standard Deviation: ", stdDev)
+						nextPrint = totalGenerations + 5000
 					}
 					break
 				}
 			}
 			loops += 1
 		}
-		oldMean = mean
 		mean = float64(totalGenerations) / float64(loops)
+		stdDevTotal := 0.0
+		for _, f := range results {
+			stdDevTotal += math.Pow((f - mean), 2)
+		}
+		stdDevTotal /= float64(len(results))
+		stdDev := math.Sqrt(stdDevTotal)
 		fmt.Println("End Average Generations: ", mean)
 		fmt.Println("End Standard Deviation: ", stdDev)
 	}

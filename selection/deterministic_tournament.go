@@ -5,16 +5,16 @@ import (
 	"math"
 )
 
-type DeterministicTournamentSelection struct {
+type DeterministicTournament struct {
 	TournamentSize   int
 	ParentProportion int
 }
 
-func (dts DeterministicTournamentSelection) GetParentProportion() int {
+func (dts DeterministicTournament) GetParentProportion() int {
 	return dts.ParentProportion
 }
 
-func (dts DeterministicTournamentSelection) Select(p *population.Population) []population.Individual {
+func (dts DeterministicTournament) Select(p *population.Population) []population.Individual {
 	// We move as much initialization down here as we can,
 	// because we expect the above goroutines to be the
 	// most expensive time sink in this function.

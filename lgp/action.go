@@ -1,7 +1,7 @@
 package lgp
 
 import (
-	"goevo/algorithms"
+	"goevo/alg"
 	"math/rand"
 	"strconv"
 )
@@ -37,7 +37,7 @@ var (
 		//{pow2, "pow2", 2},
 		//{pow3, "pow3", 2},
 		{add, "add", 3},
-		//{subtract, "sub", 3},
+		{subtract, "sub", 3},
 		{multiply, "mult", 3},
 		//{divide, "div", 3},
 		//{pow, "pow", 3},
@@ -46,7 +46,8 @@ var (
 		{bgz, "bgz", 1},
 		{jmp, "jmp", 1},
 		{randv, "rand", 1},
-		//{one, "1", 1},
+		{zero, "0", 1},
+		{one, "1", 1},
 		//{two, "2", 1},
 		//{three, "3", 1},
 		//{four, "4", 1},
@@ -61,6 +62,11 @@ var (
 		{bgz, "bgz", 1},
 		{jmp, "jmp", 1},
 	}
+	EnvActions = []Action{
+		{getEnv, "env", 2},
+		//{setEnv, "setEnv", 2},
+		{envLen, "envLen", 1},
+	}
 )
 
 func (gp *LGP) GetInstruction() Instruction {
@@ -72,7 +78,7 @@ func (gp *LGP) GetInstruction() Instruction {
 }
 
 func getAction() Action {
-	return actions[algorithms.CumWeightedChooseOne(cumActionWeights)]
+	return actions[alg.CumWeightedChooseOne(cumActionWeights)]
 }
 
 func getArgs(argCount int, limit int) []int {
@@ -82,62 +88,6 @@ func getArgs(argCount int, limit int) []int {
 		args[i] = rand.Intn(limit) - SPECIAL_REGISTERS
 	}
 	return args
-}
-
-func AddEnvironmentAccess(baseWeight float64) {
-	envActions := make([]Action, len(*environment))
-	envWeights := make([]float64, len(*environment))
-	for i := range *environment {
-		envActions[i] = Action{
-			genAccessFunc(i),
-			"env" + strconv.Itoa(i),
-			1,
-		}
-		envWeights[i] = baseWeight
-	}
-	oldl := len(actions)
-
-	actions = append(actions, envActions...)
-	actionWeights = append(actionWeights, envWeights...)
-	cumActionWeights = append(cumActionWeights, envWeights...)
-
-	for i := oldl; i < len(actionWeights); i++ {
-		cumActionWeights[i] = cumActionWeights[i-1] + actionWeights[i]
-	}
-}
-
-func genAccessFunc(i int) Operator {
-	return func(gp *LGP, xs ...int) {
-		gp.setReg(xs[0], *(*gp.Env)[i])
-	}
-}
-
-func AddEnvironmentChanging(baseWeight float64) {
-	envActions := make([]Action, len(*environment))
-	envWeights := make([]float64, len(*environment))
-	for i := range *environment {
-		envActions[i] = Action{
-			genChangingFunc(i),
-			"setEnv" + strconv.Itoa(i),
-			1,
-		}
-		envWeights[i] = baseWeight
-	}
-	oldl := len(actions)
-
-	actions = append(actions, envActions...)
-	actionWeights = append(actionWeights, envWeights...)
-	cumActionWeights = append(cumActionWeights, envWeights...)
-
-	for i := oldl; i < len(actionWeights); i++ {
-		cumActionWeights[i] = cumActionWeights[i-1] + actionWeights[i]
-	}
-}
-
-func genChangingFunc(j int) Operator {
-	return func(gp *LGP, xs ...int) {
-		*(*gp.Env)[j] = gp.regVal(xs[0])
-	}
 }
 
 func ResetCumActionWeights() {

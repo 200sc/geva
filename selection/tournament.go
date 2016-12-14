@@ -6,7 +6,7 @@ import (
 	"sort"
 )
 
-type TournamentSelection struct {
+type Tournament struct {
 	TournamentSize int
 	// 2 for 1/2, 3 for 1/3, etc
 	// The remaining fraction will
@@ -15,11 +15,11 @@ type TournamentSelection struct {
 	ChanceToSelectBest float64
 }
 
-func (ts TournamentSelection) GetParentProportion() int {
+func (ts Tournament) GetParentProportion() int {
 	return ts.ParentProportion
 }
 
-func (ts TournamentSelection) Select(p_p *population.Population) []population.Individual {
+func (ts Tournament) Select(p_p *population.Population) []population.Individual {
 	p := *p_p
 
 	members := make([]population.Individual, p.Size)

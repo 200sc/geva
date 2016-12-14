@@ -122,6 +122,32 @@ func nine(gp *LGP, xs ...int) {
 	gp.setReg(xs[0], 9)
 }
 
+func getEnv(gp *LGP, xs ...int) {
+	index := gp.regVal(xs[1])
+	if index >= len(*gp.Env) {
+		index = len(*gp.Env) - 1
+	}
+	if index < 0 {
+		index = 0
+	}
+	gp.setReg(xs[0], *(*gp.Env)[index])
+}
+
+func setEnv(gp *LGP, xs ...int) {
+	index := gp.regVal(xs[1])
+	if index >= len(*gp.Env) {
+		index = len(*gp.Env) - 1
+	}
+	if index < 0 {
+		index = 0
+	}
+	*(*gp.Env)[index] = gp.regVal(xs[0])
+}
+
+func envLen(gp *LGP, xs ...int) {
+	gp.setReg(xs[0], len(*gp.Env))
+}
+
 func (gp *LGP) regVal(r1 int) int {
 	return *(*gp.Mem)[gp.getReg(r1)]
 }

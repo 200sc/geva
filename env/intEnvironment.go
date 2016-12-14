@@ -1,6 +1,7 @@
 package env
 
 import (
+	//"fmt"
 	"math"
 )
 
@@ -33,14 +34,20 @@ func (env *I) Copy() *I {
 // Creates a combined environment by the given envDiff inputs
 // and returns a new environment pointer
 func (env *I) New(envDiff []float64) *I {
-	if len(envDiff) != len(*env) {
-		panic("Differing length environments given to New Environment call")
-	}
-	newEnv := make(I, len(*env))
-	for i, f := range envDiff {
+	newEnv := make(I, len(envDiff))
+	for i := range newEnv {
 		newEnv[i] = new(int)
-		*newEnv[i] = int(math.Ceil(float64(*(*env)[i]) + f))
+		var e int
+		var f int
+		if i < len(*env) {
+			e = *(*env)[i]
+		}
+		if i < len(envDiff) {
+			f = int(math.Ceil(envDiff[i]))
+		}
+		*newEnv[i] = e + f
 	}
+	//fmt.Println("Env.New length:", len(newEnv))
 	return &newEnv
 }
 
@@ -57,8 +64,11 @@ func (env *I) Diff(envDiff []float64) (diff int) {
 }
 
 func (env *I) MatchDiff(envDiff []float64) (diff int) {
+	//fmt.Println("Env diff length:", len(*env), len(envDiff))
 	for i, f := range envDiff {
-		if int(f) != *(*env)[i] {
+		if i >= len(*env) {
+			diff++
+		} else if int(f) != *(*env)[i] {
 			diff++
 		}
 	}

@@ -42,8 +42,6 @@ func TestGPRun(t *testing.T) {
 
 	gp.Init(gpOpt, env, gp.PointCrossover{},
 		actions, 1.0, gp.ComplexityFitness(gp.OutputFitness, 0.1))
-	//gp.Init(gpOpt, env, gp.PointCrossover{}, actions, gp.OutputFitness)
-	gp.AddEnvironmentAccess(1.0)
 
 	popSize := 200
 	demeCount := 5
@@ -56,12 +54,12 @@ func TestGPRun(t *testing.T) {
 			members[j][i] = gp.GenerateGP(gpOpt)
 		}
 	}
-	s := selection.DeterministicTournamentSelection{
+	s := selection.DeterministicTournament{
 		2,
 		3,
 	}
 
-	pair := pairing.AlphaPairing{2}
+	pair := pairing.Alpha{2}
 
 	demes := make([]population.Population, demeCount)
 	for i := 0; i < demeCount; i++ {
@@ -171,25 +169,25 @@ func TestNNRun(t *testing.T) {
 			members[j][i] = nngOpt.Generate()
 		}
 	}
-	s := selection.ProbabilisticSelection{
+	s := selection.Probabilistic{
 		3,
 		1.7,
 	}
-	// s := selection.StochasticUniversalSelection{
+	// s := selection.StochasticUniversal{
 	// 	2,
 	// 	false,
 	// 	1.0,
 	// }
-	// s := selection.TournamentSelection{
+	// s := selection.Tournament{
 	// 	2,
 	// 	2,
 	// 	1.0,
 	// }
-	// s := selection.GreedySelection{
+	// s := selection.Greedy{
 	// 	2,
 	// }
 
-	pair := pairing.RandomPairing{}
+	pair := pairing.Random{}
 
 	in := make([][]float64, 5)
 	in[0] = []float64{3.0, 2.0, 0.0}

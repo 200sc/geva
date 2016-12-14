@@ -6,9 +6,9 @@ import (
 	"math/rand"
 )
 
-type RandomPairing struct{}
+type Random struct{}
 
-func (rp RandomPairing) Pair(p *population.Population, populated int) [][]int {
+func (rp Random) Pair(p *population.Population, populated int) [][]int {
 
 	out := make([][]int, len(p.Members)-populated)
 
@@ -30,11 +30,11 @@ func (rp RandomPairing) Pair(p *population.Population, populated int) [][]int {
 // Alpha pairing makes sure every new child has
 // at least one parent who was one of the best
 // of the previous generation.
-type AlphaPairing struct {
+type Alpha struct {
 	AlphaCount int
 }
 
-func (ap AlphaPairing) Pair(p *population.Population, populated int) [][]int {
+func (ap Alpha) Pair(p *population.Population, populated int) [][]int {
 
 	out := make([][]int, len(p.Members)-populated)
 

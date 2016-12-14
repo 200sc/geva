@@ -1,9 +1,11 @@
 package goevo
 
 import (
+	"goevo/alg"
 	"goevo/env"
 	"goevo/lgp"
 	"goevo/pairing"
+	"goevo/population"
 	"goevo/selection"
 	"testing"
 )
@@ -40,20 +42,19 @@ func TestLGPRun(t *testing.T) {
 		lgp.PointCrossover{2},
 		lgp.BaseActions,
 		1.0,
-		lgp.ComplexityFitness(lgp.Mem0Fitness, 0.1))
-
-	lgp.AddEnvironmentAccess(1.0)
+		lgp.ComplexityFitness(lgp.Mem0Fitness, 0.1),
+		100)
 
 	dg := MakeDemes(
 		5,
 		lgp.GeneratePopulation(gpOpt, 200),
-		selection.DeterministicTournamentSelection{2, 3},
-		pairing.RandomPairing{},
+		[]population.SelectionMethod{selection.DeterministicTournament{2, 3}},
+		[]population.PairingMethod{pairing.Random{}},
 		in,
 		out,
-		3,
 		1,
 		1,
+		alg.LinearIntRange{2, 4},
 		0.05)
 
 	RunDemeGroup(dg, 10000)

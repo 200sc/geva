@@ -217,12 +217,12 @@ func TestGPTartarus(t *testing.T) {
 			members[j][i] = gp.GenerateGP(gpOpt)
 		}
 	}
-	s := selection.ProbabilisticSelection{
+	s := selection.Probabilistic{
 		4,
 		2,
 	}
 
-	pair := pairing.RandomPairing{}
+	pair := pairing.Random{}
 
 	demes := make([]population.Population, demeCount)
 	for i := 0; i < demeCount; i++ {

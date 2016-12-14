@@ -35,10 +35,11 @@ var (
 	actionWeights    []float64
 	cumActionWeights []float64
 	fitness          FitnessFunc
+	quit_early       int
 )
 
 func Init(genOpt LGPOptions, e, m *env.I, cross LGPCrossover,
-	act []Action, baseActionWeight float64, f FitnessFunc) {
+	act []Action, baseActionWeight float64, f FitnessFunc, qe int) {
 
 	actions = act
 
@@ -53,6 +54,7 @@ func Init(genOpt LGPOptions, e, m *env.I, cross LGPCrossover,
 	fitness = f
 	gpOptions = genOpt
 	crossover = cross
+	quit_early = qe
 }
 
 func GeneratePopulation(opt interface{}, popSize int) []population.Individual {
@@ -82,8 +84,12 @@ func GenerateLGP(genOpt LGPOptions) *LGP {
 	return gp
 }
 
+func PrintActions() {
+	fmt.Println(actions)
+	fmt.Println(actionWeights)
+}
+
 func (gp *LGP) Run() {
-	quit_early := 300
 	i := 0
 
 	gp.lastRegister = 0

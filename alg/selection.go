@@ -1,4 +1,4 @@
-package algorithms
+package alg
 
 import (
 	"math/rand"

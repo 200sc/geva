@@ -2,29 +2,32 @@ package goevo
 
 import (
 	"fmt"
+	"goevo/alg"
 	"goevo/population"
 	"math/rand"
 	"time"
 )
 
 func MakeDemes(demeCount int, members []population.Individual,
-	s population.SelectionMethod, pair population.PairingMethod,
-	in, out [][]float64, tests, elites, goal int, migration float64) population.DemeGroup {
+	s []population.SelectionMethod, pair []population.PairingMethod,
+	in, out [][]float64, tests, goal int, elites alg.IntRange, migration float64) population.DemeGroup {
 
 	demeSize := len(members) / demeCount
 
 	demes := make([]population.Population, demeCount)
 
 	for i := 0; i < demeCount; i++ {
+		si := i % len(s)
+		pi := i % len(pair)
 		demes[i] = population.Population{
 			Members:      members[i*demeSize : (i+1)*demeSize],
 			Size:         demeSize,
-			Selection:    s,
-			Pairing:      pair,
+			Selection:    s[si],
+			Pairing:      pair[pi],
 			FitnessTests: tests,
 			TestInputs:   in,
 			TestExpected: out,
-			Elites:       elites,
+			Elites:       elites.Poll(),
 			Fitnesses:    make([]int, demeSize),
 			GoalFitness:  goal,
 		}

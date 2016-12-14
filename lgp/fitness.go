@@ -33,6 +33,16 @@ func MatchEnvFitness(g *LGP, inputs, outputs [][]float64) int {
 	return fitness
 }
 
+func MatchMemFitness(g *LGP, inputs, outputs [][]float64) int {
+	fitness := 1
+	for i, envDiff := range inputs {
+		g.Env = environment.New(envDiff)
+		g.Run()
+		fitness += g.Mem.MatchDiff(outputs[i])
+	}
+	return fitness
+}
+
 func Mem0Fitness(g *LGP, inputs, outputs [][]float64) int {
 	fitness := 1
 	for i, envDiff := range inputs {

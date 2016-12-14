@@ -4,7 +4,7 @@ import (
 	"goevo/population"
 )
 
-type StochasticUniversalSelection struct {
+type StochasticUniversal struct {
 	ParentProportion int
 	// Rank based doesn't do anything
 	// What it would do would it would
@@ -14,11 +14,11 @@ type StochasticUniversalSelection struct {
 	Power     float64
 }
 
-func (sus StochasticUniversalSelection) GetParentProportion() int {
+func (sus StochasticUniversal) GetParentProportion() int {
 	return sus.ParentProportion
 }
 
-func (sus StochasticUniversalSelection) Select(p_p *population.Population) []population.Individual {
+func (sus StochasticUniversal) Select(p_p *population.Population) []population.Individual {
 	p := *p_p
 
 	_, cumulativeWeights := p.Weights(sus.Power)

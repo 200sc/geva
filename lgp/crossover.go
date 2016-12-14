@@ -65,6 +65,7 @@ func (pc PointCrossover) Crossover(a, b *LGP) *LGP {
 	return c
 }
 
+// This looks like it doesn't work
 type UniformCrossover struct {
 	ChosenProportion float64
 }
@@ -76,17 +77,25 @@ func (uc UniformCrossover) Crossover(a, b *LGP) *LGP {
 	// This UniformCrossover will artificially lengthen everybody
 	// Recommend pairing with high ShrinkMutation
 	if len(a.Instructions) > len(b.Instructions) {
-		c = a.Copy()
-	} else {
 		c = b.Copy()
+	} else {
+		c = a.Copy()
 	}
 
-	for i := 0; i < len(b.Instructions); i++ {
+	i := 0
+	for i < len(c.Instructions) {
 		if rand.Float64() >= uc.ChosenProportion {
 			c.Instructions[i] = b.Instructions[i]
 		} else {
 			c.Instructions[i] = a.Instructions[i]
 		}
+		i++
+	}
+
+	if len(a.Instructions) > len(b.Instructions) {
+		c.Instructions = append(c.Instructions, a.Instructions[i:]...)
+	} else {
+		c.Instructions = append(c.Instructions, b.Instructions[i:]...)
 	}
 
 	if len(*a.Mem) > len(*b.Mem) {
