@@ -106,7 +106,8 @@ func TestGPPathing(t *testing.T) {
 		[]pop.PMethod{pairing.Random{}},
 		30,
 		alg.LinearIntRange{1, 6},
-		0.05)
+		0.05,
+		"TGP")
 }
 
 func TestLGPPathing(t *testing.T) {
@@ -166,5 +167,6 @@ func TestLGPPathing(t *testing.T) {
 		[]pop.PMethod{pairing.Random{}},
 		30,
 		alg.LinearIntRange{1, 6},
-		0.05)
+		0.05,
+		"LGP")
 }

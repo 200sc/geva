@@ -46,7 +46,8 @@ func TestGPReverseList(t *testing.T) {
 		[]pop.PMethod{pairing.Random{}},
 		1,
 		alg.LinearIntRange{4, 6},
-		0.05)
+		0.05,
+		"TGP")
 }
 
 func TestVSMReverseList(t *testing.T) {
@@ -99,7 +100,8 @@ func TestVSMReverseList(t *testing.T) {
 		[]pop.PMethod{pairing.Random{}},
 		1,
 		alg.LinearIntRange{1, 10},
-		0.10)
+		0.10,
+		"LGP")
 }
 
 func TestNNReverseList(t *testing.T) {
@@ -130,20 +132,18 @@ func TestNNReverseList(t *testing.T) {
 			NeuronMutationChance:    0.10,
 			ActivatorMutationChance: 0.01,
 		},
-		MinColumns:    3,
-		MaxColumns:    4,
-		Inputs:        6,
-		Outputs:       6,
+		MinColumns:    6,
+		MaxColumns:    7,
+		MaxInputs:     6,
+		MaxOutputs:    6,
 		BaseMutations: 20,
-		Activator:     neural.Rectifier,
 	}
 
-	members := make([]pop.Individual, 200)
-	for j := range members {
-		members[j] = nngOpt.Generate()
-	}
-
-	neural.Init(nngOpt, neural.AverageCrossover{2})
+	neural.Init(
+		nngOpt,
+		neural.AverageCrossover{2},
+		neural.MatchFitness(0.25),
+	)
 
 	RunSuite(
 		testCases,
@@ -157,5 +157,6 @@ func TestNNReverseList(t *testing.T) {
 		2.0,
 		alg.LinearIntRange{1, 4},
 		0.1,
+		"ENN",
 	)
 }

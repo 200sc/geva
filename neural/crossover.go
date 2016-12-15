@@ -5,6 +5,10 @@ import (
 	"math/rand"
 )
 
+type NeuralCrossover interface {
+	Crossover(a, b *Network) *Network
+}
+
 // For every neuron in the two networks, take the weights
 // that neuron has and average them for a new network.
 // They'll be averaged by ((weight1 * weightMod) + weight2) / (weightMod + 1)

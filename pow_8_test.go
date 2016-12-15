@@ -45,7 +45,8 @@ func TestGPPow8(t *testing.T) {
 		[]pop.PMethod{pairing.Random{}},
 		1,
 		alg.LinearIntRange{4, 6},
-		0.05)
+		0.05,
+		"TGP")
 }
 
 // VSM (virtual state machine) used instead of LGP
@@ -93,7 +94,8 @@ func TestVSMPow8(t *testing.T) {
 		[]pop.PMethod{pairing.Random{}},
 		1,
 		alg.LinearIntRange{4, 6},
-		0.05)
+		0.05,
+		"LGP")
 }
 
 func TestNNPow8(t *testing.T) {
@@ -126,18 +128,16 @@ func TestNNPow8(t *testing.T) {
 		},
 		MinColumns:    3,
 		MaxColumns:    4,
-		Inputs:        2,
-		Outputs:       1,
+		MaxInputs:     2,
+		MaxOutputs:    1,
 		BaseMutations: 20,
-		Activator:     neural.Rectifier,
 	}
 
-	members := make([]pop.Individual, 200)
-	for j := range members {
-		members[j] = nngOpt.Generate()
-	}
-
-	neural.Init(nngOpt, neural.AverageCrossover{2})
+	neural.Init(
+		nngOpt,
+		neural.AverageCrossover{2},
+		neural.AbsFitness,
+	)
 
 	RunSuite(
 		testCases,
@@ -151,5 +151,6 @@ func TestNNPow8(t *testing.T) {
 		2.0,
 		alg.LinearIntRange{1, 4},
 		0.1,
+		"ENN",
 	)
 }

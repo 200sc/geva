@@ -5,6 +5,12 @@ import (
 	"math"
 )
 
+// An activator function just maps float values to other
+// float values. The function can be as simplistic or complicated
+// as desired-- eventually a set of common activators will be
+// collected.
+type ActivatorFunc func(float64) float64
+
 var (
 	activatorTests = []float64{
 		-4.0, -3.75, -3.5, -3.25,

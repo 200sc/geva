@@ -6,6 +6,7 @@ import (
 	"goevo/env"
 	"goevo/gp"
 	"goevo/lgp"
+	"goevo/neural"
 	"goevo/pairing"
 	"goevo/pop"
 	"goevo/selection"
@@ -49,7 +50,8 @@ func TestGPMultiplyMatrix(t *testing.T) {
 		[]pop.PMethod{pairing.Random{}},
 		1,
 		alg.LinearIntRange{4, 6},
-		0.05)
+		0.05,
+		"TGP")
 }
 
 func TestVSMMultiplyMatrix(t *testing.T) {
@@ -105,5 +107,65 @@ func TestVSMMultiplyMatrix(t *testing.T) {
 		[]pop.PMethod{pairing.Random{}},
 		1,
 		alg.LinearIntRange{1, 10},
-		0.10)
+		0.10,
+		"LGP")
+}
+
+func TestNNMultiplyMatrix(t *testing.T) {
+
+	Seed()
+
+	testCases := []TestCase{MultiplyMatrixTestCase()}
+
+	nngOpt := neural.NetworkGenerationOptions{
+		NetworkMutationOptions: neural.NetworkMutationOptions{
+			WeightOptions: neural.FloatMutationOptions{
+				MutChance:     0.20,
+				MutMagnitude:  2.0,
+				MutRange:      60,
+				ZeroOutChance: 0.01,
+			},
+			ColumnOptions: neural.ColumnGenerationOptions{
+				MinSize:           3,
+				MaxSize:           4,
+				DefaultAxonWeight: 0.5,
+			},
+			ActivatorOptions:        neural.AllActivators,
+			NeuronReplacementChance: 0.05,
+			NeuronAdditionChance:    0.00,
+			WeightSwapChance:        0.05,
+			ColumnRemovalChance:     0.00,
+			ColumnAdditionChance:    0.00,
+			NeuronMutationChance:    0.10,
+			ActivatorMutationChance: 0.01,
+		},
+		MinColumns:    10,
+		MaxColumns:    11,
+		MaxInputs:     18,
+		MaxOutputs:    9,
+		BaseMutations: 20,
+	}
+
+	fmt.Println(testCases)
+
+	neural.Init(
+		nngOpt,
+		neural.AverageCrossover{2},
+		neural.MatchFitness(0.25),
+	)
+
+	RunSuite(
+		testCases,
+		4,
+		200,
+		100000,
+		nngOpt,
+		neural.GeneratePopulation,
+		[]pop.SMethod{selection.DeterministicTournament{3, 3}},
+		[]pop.PMethod{pairing.Random{}},
+		2.0,
+		alg.LinearIntRange{1, 4},
+		0.1,
+		"ENN",
+	)
 }

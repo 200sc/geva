@@ -1,11 +1,13 @@
 package goevo
 
 import (
+	"encoding/csv"
 	"fmt"
 	"goevo/alg"
 	"goevo/pop"
 	"math"
-	//"runtime"
+	"os"
+	"strconv"
 	"time"
 )
 
@@ -13,7 +15,26 @@ type SuiteFunc func(interface{}, int) []pop.Individual
 
 func RunSuite(testCases []TestCase, demeCount, popSize, testGenerations int, options interface{},
 	suiteFunc SuiteFunc, selection []pop.SMethod, pairing []pop.PMethod,
-	goal int, elites alg.IntRange, migration float64) {
+	goal int, elites alg.IntRange, migration float64, titleSuffix string) {
+
+	file := "logs/log"
+	file += time.Now().Format("_Jan_2_15-04-05_2006")
+	file += ".txt"
+	fHandle, _ := os.Create(file)
+	writer := csv.NewWriter(fHandle)
+
+	writer.Write([]string{
+		"Test Title",
+		"Total Generations",
+		"Mean Generations/Solution",
+		"Stdv Generations/Solution",
+		"Total Time",
+		"Mean Time/Generation",
+		"Stdv Time/Generation",
+		"Total Best Fitness",
+		"Mean Best Fitness",
+		"Stdv Best Fitness",
+	})
 
 	for _, tc := range testCases {
 		totalGenerations := 0
@@ -86,36 +107,52 @@ func RunSuite(testCases []TestCase, demeCount, popSize, testGenerations int, opt
 		fmt.Println("End Average Generations: ", mean)
 		fmt.Println("End Standard Deviation: ", stdDev)
 
-		timeMean := time.Duration(0)
+		timeTotal := time.Duration(0)
 		for _, f := range timings {
-			timeMean += f
+			timeTotal += f
 		}
-		timeMean /= time.Duration(len(timings))
+		timeMean := timeTotal / time.Duration(len(timings))
 
 		timeStdvTotal := 0.0
 		for _, f := range timings {
 			timeStdvTotal += math.Pow(float64(f-timeMean), 2)
 		}
 		timeStdvTotal /= float64(len(timings))
-		timeStdv := math.Sqrt(timeStdvTotal)
+		timeStdv := time.Duration(int(math.Sqrt(timeStdvTotal)))
 		fmt.Println("Average time per generation:", timeMean)
-		fmt.Println("Time per generation Standard Deviation:", time.Duration(int(timeStdv)))
+		fmt.Println("Time per generation Standard Deviation:", timeStdv)
 
-		fitnessMean := 0
+		fitnessTotal := 0.0
 		for _, f := range fitnesses {
-			fitnessMean += f
+			fitnessTotal += float64(f)
 		}
-		fmt.Println(fitnessMean, len(fitnesses))
-		fitnessMean /= len(fitnesses)
+		fitnessMean := fitnessTotal / float64(len(fitnesses))
 
 		fitnessStdv := 0.0
 		for _, f := range fitnesses {
-			fitnessStdv += math.Pow(float64(f-fitnessMean), 2)
+			fitnessStdv += math.Pow(float64(f)-fitnessMean, 2)
 		}
 		fitnessStdv /= float64(len(fitnesses))
 		fitnessStdv = math.Sqrt(fitnessStdv)
 
 		fmt.Println("Average best fitness:", fitnessMean)
 		fmt.Println("Stdv best fitness:", fitnessStdv)
+
+		line := []string{
+			tc.title + titleSuffix,
+			strconv.Itoa(totalGenerations),
+			floatString(mean),
+			floatString(stdDev),
+			timeTotal.String(),
+			timeMean.String(),
+			timeStdv.String(),
+			floatString(fitnessTotal),
+			floatString(fitnessMean),
+			floatString(fitnessStdv)}
+		writer.Write(line)
 	}
+}
+
+func floatString(f float64) string {
+	return strconv.FormatFloat(f, 'E', 3, 64)
 }

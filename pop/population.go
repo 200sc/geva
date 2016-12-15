@@ -1,6 +1,7 @@
 package pop
 
 import (
+	"fmt"
 	"math"
 	"math/rand"
 	"sort"
@@ -179,9 +180,13 @@ func (p_p *Population) Weights(power float64) ([]float64, []float64) {
 
 func (p *Population) BestMember() (Individual, int) {
 	w, _ := p.Weights(1.0)
-	maxWeight := 0.0
+	maxWeight := math.MaxFloat64 * -1
 	maxIndex := 0
 	for i, v := range w {
+		if v < 0 {
+			// Todo! Fix this!
+			fmt.Println("Negative crossover weight!")
+		}
 		if v > maxWeight {
 			maxWeight = v
 			maxIndex = i

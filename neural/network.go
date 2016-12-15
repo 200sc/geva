@@ -1,48 +1,66 @@
 package neural
 
-// Store functions exclusive to networks.
-
 import (
 	"fmt"
 	"goevo/pop"
-	"math"
 	"math/rand"
 )
 
+var (
+	ngo       NetworkGenerationOptions
+	crossover NeuralCrossover
+	fitness   FitnessFunc
+)
+
+func Init(newNgo NetworkGenerationOptions, newCrossover NeuralCrossover, f FitnessFunc) {
+	ngo = newNgo
+	crossover = newCrossover
+	fitness = f
+}
+
+// A Body is what we would like to call the actual network -- it's
+// just a 2d slice of neurons.
+type Body [][]Neuron
+
+// A Neural Network has a body which it runs values through and
+// an activator function which is used at each neuron to process
+// those values.
+type Network struct {
+	Activator ActivatorFunc
+	Body      Body
+}
+
+// A network output is returned by a network's output neurons.
+// It is equivalent to a normal neuron's output, but it preserves
+// the index of the output neuron.
+type networkOutput struct {
+	value float64
+	index int
+}
+
 func (nn *Network) Crossover(other pop.Individual) pop.Individual {
-	// Assert that other is a Network
-	nn2 := other.(*Network)
-	// Perform a crossover method as defined by global settings
-	return crossover.Crossover(nn, nn2)
+	return crossover.Crossover(nn, other.(*Network))
 }
 
 func (nn *Network) CanCrossover(other pop.Individual) bool {
 	switch other.(type) {
-	default:
-		return false
 	case *Network:
 		return true
+	default:
+		return false
 	}
 }
 
-/**
- * Copy a network
- */
-func (nn *Network) Copy() Network {
-	newBody := nn.Body.Copy()
-	return Network{
-		Body:      newBody,
+func (nn *Network) Copy() *Network {
+	return &Network{
+		Body:      nn.Body.Copy(),
 		Activator: nn.Activator,
 	}
 }
 
-/**
- * Copy a network body
- */
 func (nn_p *Body) Copy() Body {
 
 	nn := *nn_p
-
 	var newNetwork Body
 
 	for i := range nn {
@@ -51,10 +69,6 @@ func (nn_p *Body) Copy() Body {
 	}
 
 	return newNetwork
-}
-
-func (genOpt NetworkGenerationOptions) Generate() *Network {
-	return GenerateNetwork(genOpt)
 }
 
 func GeneratePopulation(opt interface{}, popSize int) []pop.Individual {
@@ -77,12 +91,12 @@ func GenerateNetwork(nnOpt NetworkGenerationOptions) *Network {
 	nn := make(Body, 0)
 
 	// Set up the input column
-	inputColumn := make([]Neuron, nnOpt.Inputs)
+	inputColumn := make([]Neuron, nnOpt.MaxInputs)
 
 	nn = append(nn, inputColumn)
 
 	// Set up the output column
-	outputColumn := make([]Neuron, nnOpt.Outputs)
+	outputColumn := make([]Neuron, nnOpt.MaxOutputs)
 
 	nn = append(nn, outputColumn)
 
@@ -202,7 +216,11 @@ func (modNet_p *Network) Run(inputs []float64) []float64 {
 
 	// Send the first row their initial values
 	for i, ch := range channels[0] {
-		ch <- inputs[i]
+		if i >= len(inputs) {
+			ch <- 0.0
+		} else {
+			ch <- inputs[i]
+		}
 	}
 
 	// We need to wait here, on the last columns being populated
@@ -233,13 +251,6 @@ func (b Body) CopyStructure() Body {
  * Evaluate the fitness of a network
  * low fitness is good, high fitness is bad.
  */
-func (n Network) Fitness(inputs, expected [][]float64) int {
-	fitness := 1.0
-	for i := range inputs {
-		output := n.Run(inputs[i])
-		for j := range output {
-			fitness += math.Abs(output[j] - expected[i][j])
-		}
-	}
-	return int(math.Ceil(fitness))
+func (n *Network) Fitness(inputs, expected [][]float64) int {
+	return fitness(n, inputs, expected)
 }

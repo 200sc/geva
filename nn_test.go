@@ -37,15 +37,9 @@ func TestNNRun(t *testing.T) {
 		},
 		MinColumns:    1,
 		MaxColumns:    2,
-		Inputs:        3,
-		Outputs:       1,
+		MaxInputs:     3,
+		MaxOutputs:    1,
 		BaseMutations: 20,
-		Activator:     neural.Rectifier,
-	}
-
-	members := make([]pop.Individual, 200)
-	for j := range members {
-		members[j] = nngOpt.Generate()
 	}
 
 	in := [][]float64{
@@ -60,7 +54,11 @@ func TestNNRun(t *testing.T) {
 		out[i] = []float64{(f[0] + f[1] + f[2]) * 3}
 	}
 
-	neural.Init(nngOpt, neural.AverageCrossover{2})
+	neural.Init(
+		nngOpt,
+		neural.AverageCrossover{2},
+		neural.AbsFitness,
+	)
 
 	RunSuite(
 		[]TestCase{{in, out, "x3Test"}},
@@ -74,5 +72,6 @@ func TestNNRun(t *testing.T) {
 		2.0,
 		alg.LinearIntRange{2, 3},
 		0.1,
+		"ENN",
 	)
 }

@@ -48,7 +48,8 @@ func TestGPPowSum(t *testing.T) {
 		[]pop.PMethod{pairing.Random{}},
 		1,
 		alg.LinearIntRange{1, 10},
-		0.05)
+		0.05,
+		"TGP")
 }
 
 func TestVSMPowSum(t *testing.T) {
@@ -93,7 +94,8 @@ func TestVSMPowSum(t *testing.T) {
 		[]pop.PMethod{pairing.Random{}},
 		1,
 		alg.LinearIntRange{1, 2},
-		0.05)
+		0.05,
+		"LGP")
 }
 
 func TestNNPowSum(t *testing.T) {
@@ -126,18 +128,16 @@ func TestNNPowSum(t *testing.T) {
 		},
 		MinColumns:    3,
 		MaxColumns:    4,
-		Inputs:        1,
-		Outputs:       1,
+		MaxInputs:     2,
+		MaxOutputs:    1,
 		BaseMutations: 20,
-		Activator:     neural.Rectifier,
 	}
 
-	members := make([]pop.Individual, 200)
-	for j := range members {
-		members[j] = nngOpt.Generate()
-	}
-
-	neural.Init(nngOpt, neural.AverageCrossover{2})
+	neural.Init(
+		nngOpt,
+		neural.AverageCrossover{2},
+		neural.AbsFitness,
+	)
 
 	RunSuite(
 		testCases,
@@ -151,5 +151,6 @@ func TestNNPowSum(t *testing.T) {
 		2.0,
 		alg.LinearIntRange{1, 4},
 		0.1,
+		"ENN",
 	)
 }
