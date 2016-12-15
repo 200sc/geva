@@ -7,6 +7,7 @@ import (
 	"goevo/pop"
 	"math"
 	"os"
+	"sort"
 	"strconv"
 	"time"
 )
@@ -29,11 +30,14 @@ func RunSuite(testCases []TestCase, demeCount, popSize, testGenerations int, opt
 		"Mean Generations/Solution",
 		"Stdv Generations/Solution",
 		"Total Time",
-		"Mean Time/Generation",
-		"Stdv Time/Generation",
-		"Total Best Fitness",
-		"Mean Best Fitness",
-		"Stdv Best Fitness",
+		"Mean Time/Gen",
+		"Stdv Time/Gen",
+		"Total Best Fitness/Gen",
+		"Mean Best Fitness/Gen",
+		"Stdv Best Fitness/Gen",
+		"Total Average Fitness/Gen",
+		"Mean Average Fitness/Gen",
+		"Stdv Average Fitness/Gen",
 	})
 
 	for _, tc := range testCases {
@@ -44,7 +48,8 @@ func RunSuite(testCases []TestCase, demeCount, popSize, testGenerations int, opt
 		nextPrint := 5000
 		results := []float64{}
 		timings := []time.Duration{}
-		fitnesses := []int{}
+		fitnesses := []float64{}
+		avrFitnesses := []float64{}
 		for totalGenerations < testGenerations {
 
 			dg := MakeDemes(
@@ -79,17 +84,19 @@ func RunSuite(testCases []TestCase, demeCount, popSize, testGenerations int, opt
 					totalGenerations += j + 1
 
 					results = append(results, float64(j+1))
+					ind, fitness := dg.BestMember()
+					fitnesses = append(fitnesses, float64(fitness))
+					avrFitness := dg.AverageFitness()
+					avrFitnesses = append(avrFitnesses, avrFitness)
 
 					if loops%20 == 1 || totalGenerations > nextPrint {
 						fmt.Println("Loop", loops, "Gens", totalGenerations)
-						ind, fitness := dg.BestMember()
 						ind.Print()
-						mean = float64(totalGenerations) / float64(loops)
 						fmt.Println("Best fitness reached: ", fitness)
-						fitnesses = append(fitnesses, fitness)
 						fmt.Println("Generations taken: ", j+1)
-						fmt.Println("Average Generations: ", mean)
+						fmt.Println("Average Generations: ", float64(totalGenerations)/float64(loops))
 						fmt.Println("Time taken per generation:", t2)
+						fmt.Println("Average Fitness", avrFitness)
 						nextPrint = totalGenerations + 5000
 					}
 					break
@@ -97,6 +104,7 @@ func RunSuite(testCases []TestCase, demeCount, popSize, testGenerations int, opt
 			}
 			loops++
 		}
+
 		mean = float64(totalGenerations) / float64(loops)
 		stdDevTotal := 0.0
 		for _, f := range results {
@@ -119,24 +127,20 @@ func RunSuite(testCases []TestCase, demeCount, popSize, testGenerations int, opt
 		}
 		timeStdvTotal /= float64(len(timings))
 		timeStdv := time.Duration(int(math.Sqrt(timeStdvTotal)))
+
 		fmt.Println("Average time per generation:", timeMean)
 		fmt.Println("Time per generation Standard Deviation:", timeStdv)
 
-		fitnessTotal := 0.0
-		for _, f := range fitnesses {
-			fitnessTotal += float64(f)
-		}
-		fitnessMean := fitnessTotal / float64(len(fitnesses))
-
-		fitnessStdv := 0.0
-		for _, f := range fitnesses {
-			fitnessStdv += math.Pow(float64(f)-fitnessMean, 2)
-		}
-		fitnessStdv /= float64(len(fitnesses))
-		fitnessStdv = math.Sqrt(fitnessStdv)
+		fitnessTotal, fitnessMean, fitnessStdv := floatSliceStatistics(fitnesses, 0)
 
 		fmt.Println("Average best fitness:", fitnessMean)
 		fmt.Println("Stdv best fitness:", fitnessStdv)
+
+		// We should do some evening on these ranges, dropping the lowest and highest two or something.
+		// This should also involve generalizing this total-mean-stdv generation for all of these sets
+		// which will require mass-conversion to []float64 first.
+
+		avrFitnessTotal, avrFitnessMean, avrFitnessStdv := floatSliceStatistics(avrFitnesses, 2)
 
 		line := []string{
 			tc.title + titleSuffix,
@@ -148,11 +152,32 @@ func RunSuite(testCases []TestCase, demeCount, popSize, testGenerations int, opt
 			timeStdv.String(),
 			floatString(fitnessTotal),
 			floatString(fitnessMean),
-			floatString(fitnessStdv)}
+			floatString(fitnessStdv),
+			floatString(avrFitnessTotal),
+			floatString(avrFitnessMean),
+			floatString(avrFitnessStdv),
+		}
 		writer.Write(line)
 	}
+	writer.Flush()
 }
 
 func floatString(f float64) string {
-	return strconv.FormatFloat(f, 'E', 3, 64)
+	return strconv.FormatFloat(f, 'f', 3, 64)
+}
+
+func floatSliceStatistics(fs []float64, prune int) (total float64, mean float64, stdv float64) {
+	sort.Float64s(fs)
+
+	for i := prune; i < len(fs)-prune; i++ {
+		total += float64(fs[i])
+	}
+	mean = total / float64(len(fs)-prune)
+
+	for i := prune; i < len(fs)-prune; i++ {
+		stdv += math.Pow(float64(fs[i])-mean, 2)
+	}
+	stdv /= float64(len(fs) - prune)
+	stdv = math.Sqrt(stdv)
+	return
 }

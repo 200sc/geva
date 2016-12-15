@@ -153,25 +153,22 @@ func KeySet_Int_SlInt(m map[int][]int) []int {
 	return keys
 }
 
-func (p_p *Population) Weights(power float64) ([]float64, []float64) {
-	p := *p_p
-	fitnesses := p.Fitnesses
-	maxFitness := p.MaxFitness
+func (p *Population) Weights(power float64) ([]float64, []float64) {
 
-	weights := make([]float64, len(fitnesses))
-	cumulativeWeights := make([]float64, len(fitnesses))
+	weights := make([]float64, len(p.Fitnesses))
+	cumulativeWeights := make([]float64, len(p.Fitnesses))
 
 	// Transform values which are low to equivalent high
 	// values on the same scale, applying the power
 	// as a further bias scaling towards the best
 	// individuals.
-	for i := 0; i < len(fitnesses); i++ {
-		weights[i] = math.Pow(float64((fitnesses[i]*-1)+maxFitness+1), power)
+	for i := 0; i < len(p.Fitnesses); i++ {
+		weights[i] = math.Pow(float64((p.Fitnesses[i]*-1)+p.MaxFitness+1), power)
 	}
 
 	cumulativeWeights[0] = weights[0]
 
-	for i := 0; i < len(fitnesses)-1; i++ {
+	for i := 0; i < len(p.Fitnesses)-1; i++ {
 		cumulativeWeights[i+1] = cumulativeWeights[i] + weights[i+1]
 	}
 
@@ -193,6 +190,20 @@ func (p *Population) BestMember() (Individual, int) {
 		}
 	}
 	return p.Members[maxIndex], p.Fitnesses[maxIndex]
+}
+
+func (p *Population) AverageFitness() float64 {
+
+	totalAverageFitness := 0.0
+
+	for _, v := range p.Fitnesses {
+		totalAverageFitness += float64(v)
+	}
+
+	totalAverageFitness /= float64(len(p.Fitnesses))
+
+	return totalAverageFitness
+
 }
 
 func (p_p *Population) Print() {

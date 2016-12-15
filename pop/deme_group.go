@@ -19,19 +19,19 @@ type DemeGroup struct {
 	// (This assertion is subject to change with
 	// further analysis)
 	MigrationChance float64
-	BestDeme        int
 }
 
-// Bug(patrick)
-// Sometimes this returns a bunch of bollocks
+func (dg *DemeGroup) AverageFitness() float64 {
+	totalAverageFitness := 0.0
+	for i := 0; i < len(dg.Demes); i++ {
+		totalAverageFitness += dg.Demes[i].AverageFitness()
+	}
+	return totalAverageFitness / float64(len(dg.Demes))
+}
+
 func (dg *DemeGroup) BestMember() (Individual, int) {
 
 	bestInd, bestFitness := dg.Demes[0].BestMember()
-
-	if dg.BestDeme != 0 {
-		bestInd, bestFitness = dg.Demes[dg.BestDeme-1].BestMember()
-		//fmt.Println(bestInd, bestFitness)
-	}
 
 	for i := 1; i < len(dg.Demes); i++ {
 		ind, fit := dg.Demes[i].BestMember()
@@ -86,10 +86,6 @@ func (dg *DemeGroup) NextGeneration() bool {
 	stopEarly := false
 	for i := range dg.Demes {
 		stopEarly = dg.Demes[i].NextGeneration() || stopEarly
-		if stopEarly && dg.BestDeme == 0 {
-			dg.BestDeme = i + 1
-			//fmt.Println(dg.Demes[i].BestMember())
-		}
 	}
 	return stopEarly
 }
