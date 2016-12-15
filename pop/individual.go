@@ -1,4 +1,4 @@
-package population
+package pop
 
 type Individual interface {
 	Fitness(input, expected [][]float64) int

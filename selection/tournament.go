@@ -1,7 +1,7 @@
 package selection
 
 import (
-	"goevo/population"
+	"goevo/pop"
 	"math/rand"
 	"sort"
 )
@@ -19,10 +19,10 @@ func (ts Tournament) GetParentProportion() int {
 	return ts.ParentProportion
 }
 
-func (ts Tournament) Select(p_p *population.Population) []population.Individual {
+func (ts Tournament) Select(p_p *pop.Population) []pop.Individual {
 	p := *p_p
 
-	members := make([]population.Individual, p.Size)
+	members := make([]pop.Individual, p.Size)
 	// We have an arbitrary buffer here.
 	// It should just effect how many goroutines can
 	// simultaneously end (or all end prior to a

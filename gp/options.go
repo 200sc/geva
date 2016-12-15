@@ -1,6 +1,6 @@
 package gp
 
-type GPOptions struct {
+type Options struct {
 	MaxNodeCount  int
 	MaxStartDepth int
 	MaxDepth      int

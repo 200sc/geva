@@ -1,6 +1,6 @@
 package lgp
 
-type LGPOptions struct {
+type Options struct {
 	MinActionCount  int
 	MaxActionCount  int
 	MaxStartActions int

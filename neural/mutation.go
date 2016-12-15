@@ -5,8 +5,7 @@ import (
 )
 
 func (genOpt NetworkGenerationOptions) Mutate(n *Network) *Network {
-	n.MutateOpts(&(genOpt.NetworkMutationOptions))
-	return n
+	return n.MutateOpts(genOpt.NetworkMutationOptions)
 }
 
 /**
@@ -28,17 +27,19 @@ func mutateFloat(toMutate float64, opt FloatMutationOptions) float64 {
 /**
  * Mutate this network
  */
-func (nn *Network) MutateOpts(mOpt *NetworkMutationOptions) {
+func (nn *Network) MutateOpts(mOpt NetworkMutationOptions) *Network {
 
 	nn.Body.Mutate(mOpt)
 
 	if rand.Float64() < mOpt.ActivatorMutationChance {
 		nn.Activator = MutateActivator(mOpt.ActivatorOptions)
 	}
+
+	return nn
 }
 
 func (nn *Network) Mutate() {
-	nn.MutateOpts(&ngo.NetworkMutationOptions)
+	nn.MutateOpts(ngo.NetworkMutationOptions)
 }
 
 // All activators are currently weighted the same
@@ -50,18 +51,16 @@ func (nn *Network) Mutate() {
 /**
  * Mutate an activator function.
  */
-func MutateActivator(mOpt_p *ActivatorMutationOptions) ActivatorFunc {
-	mOpt := *mOpt_p
+func MutateActivator(mOpt ActivatorMutationOptions) ActivatorFunc {
 	return mOpt[rand.Intn(len(mOpt))]
 }
 
 /**
  * Mutate this network body.
  */
-func (b *Body) Mutate(mOpt_p *NetworkMutationOptions) {
+func (b *Body) Mutate(mOpt NetworkMutationOptions) {
 
 	bv := *b
-	mOpt := *mOpt_p
 
 	if rand.Float64() < mOpt.ColumnRemovalChance {
 		// We currently only remove the len-1th column
@@ -114,12 +113,12 @@ func (b *Body) Mutate(mOpt_p *NetworkMutationOptions) {
 			if rand.Float64() < mOpt.NeuronAdditionChance {
 				// In the future a check on some max length
 				// for a column should exist.
-				b.addNeuron(i, (*mOpt.ColumnOptions).DefaultAxonWeight)
+				b.addNeuron(i, (mOpt.ColumnOptions).DefaultAxonWeight)
 			}
 
 			if rand.Float64() < mOpt.NeuronReplacementChance {
 				neuronIndex := rand.Intn(len(col))
-				b.replaceNeuron(i, neuronIndex, (*mOpt.ColumnOptions).DefaultAxonWeight)
+				b.replaceNeuron(i, neuronIndex, (mOpt.ColumnOptions).DefaultAxonWeight)
 			}
 		}
 	}
@@ -144,13 +143,13 @@ func (b *Body) Mutate(mOpt_p *NetworkMutationOptions) {
 	}
 }
 
-func (b *Body) mutateNeuron(columnIndex, neuronIndex int, wOpt_p *FloatMutationOptions) {
+func (b *Body) mutateNeuron(columnIndex, neuronIndex int, wOpt FloatMutationOptions) {
 
 	bv := *b
 
 	newNeuron := make(Neuron, len(bv[columnIndex][neuronIndex]))
 	for i, weight := range bv[columnIndex][neuronIndex] {
-		newNeuron[i] = mutateFloat(weight, *wOpt_p)
+		newNeuron[i] = mutateFloat(weight, wOpt)
 	}
 
 	bv[columnIndex][neuronIndex] = newNeuron
@@ -200,11 +199,9 @@ func (b *Body) addNeuron(columnIndex int, DefaultAxonWeight float64) {
 /**
  * Remove the column between our output column and the column two indexes prior.
  */
-func (b *Body) removeColumn(cOpt_p *ColumnGenerationOptions) {
+func (b *Body) removeColumn(cOpt ColumnGenerationOptions) {
 
 	bv := *b
-
-	cOpt := *cOpt_p
 
 	i := len(bv) - 2
 
@@ -237,10 +234,9 @@ func (b *Body) removeColumn(cOpt_p *ColumnGenerationOptions) {
 /**
  * Add a column between our output column and the column immediately prior.
  */
-func (b *Body) addColumn(cOpt_p *ColumnGenerationOptions) {
+func (b *Body) addColumn(cOpt ColumnGenerationOptions) {
 
 	bv := *b
-	cOpt := *cOpt_p
 
 	i := len(bv) - 1
 

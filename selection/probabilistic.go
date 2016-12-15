@@ -1,7 +1,7 @@
 package selection
 
 import (
-	"goevo/population"
+	"goevo/pop"
 	"math/rand"
 )
 
@@ -17,7 +17,7 @@ func (ps Probabilistic) GetParentProportion() int {
 // This specific algorithm is based on the algorithm described by
 // Adam Liposki and Dorota Lipowska in "Roulette-wheel selection
 // via stochastic acceptance" http://arxiv.org/pdf/1109.3627v2.pdf
-func (ps Probabilistic) Select(p_p *population.Population) []population.Individual {
+func (ps Probabilistic) Select(p_p *pop.Population) []pop.Individual {
 	p := *p_p
 
 	weights, _ := p.Weights(ps.Power)
@@ -30,7 +30,7 @@ func (ps Probabilistic) Select(p_p *population.Population) []population.Individu
 	}
 
 	next := 0
-	outNet := make([]population.Individual, p.Size)
+	outNet := make([]pop.Individual, p.Size)
 
 	for i := 0; i < p.Size/ps.ParentProportion; i++ {
 		for {

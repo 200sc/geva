@@ -4,19 +4,19 @@ package neural
 
 import (
 	"fmt"
-	"goevo/population"
+	"goevo/pop"
 	"math"
 	"math/rand"
 )
 
-func (nn *Network) Crossover(other population.Individual) population.Individual {
+func (nn *Network) Crossover(other pop.Individual) pop.Individual {
 	// Assert that other is a Network
 	nn2 := other.(*Network)
 	// Perform a crossover method as defined by global settings
 	return crossover.Crossover(nn, nn2)
 }
 
-func (nn *Network) CanCrossover(other population.Individual) bool {
+func (nn *Network) CanCrossover(other pop.Individual) bool {
 	switch other.(type) {
 	default:
 		return false
@@ -54,17 +54,25 @@ func (nn_p *Body) Copy() Body {
 }
 
 func (genOpt NetworkGenerationOptions) Generate() *Network {
-	return GenerateNetwork(&genOpt)
+	return GenerateNetwork(genOpt)
+}
+
+func GeneratePopulation(opt interface{}, popSize int) []pop.Individual {
+	nnOpt := opt.(NetworkGenerationOptions)
+	members := make([]pop.Individual, popSize)
+	for j := 0; j < popSize; j++ {
+		members[j] = GenerateNetwork(nnOpt)
+	}
+	return members
 }
 
 /**
  * Convert generation options into
  * a new neural network
  */
-func GenerateNetwork(nOpt_p *NetworkGenerationOptions) *Network {
+func GenerateNetwork(nnOpt NetworkGenerationOptions) *Network {
 
-	nnOpt := *nOpt_p
-	cOpt := *nnOpt.ColumnOptions
+	cOpt := nnOpt.ColumnOptions
 
 	nn := make(Body, 0)
 
@@ -87,11 +95,11 @@ func GenerateNetwork(nOpt_p *NetworkGenerationOptions) *Network {
 	columnCount := rand.Intn(nnOpt.MaxColumns-nnOpt.MinColumns) + nnOpt.MinColumns
 
 	for i := 0; i < columnCount; i++ {
-		nn.addColumn(&cOpt)
+		nn.addColumn(cOpt)
 	}
 
 	for i := 0; i < nnOpt.BaseMutations; i++ {
-		nn.Mutate(&nnOpt.NetworkMutationOptions)
+		nn.Mutate(nnOpt.NetworkMutationOptions)
 	}
 
 	return &Network{
@@ -118,7 +126,7 @@ func (nn Network) Print() {
  * Run some input through a neural network.
  * This returns the network's output column.
  */
-func (modNet_p *Network) Run(Inputs []float64) []float64 {
+func (modNet_p *Network) Run(inputs []float64) []float64 {
 
 	modNet := *modNet_p
 	act := modNet.Activator
@@ -128,7 +136,7 @@ func (modNet_p *Network) Run(Inputs []float64) []float64 {
 
 	channels := make([][]chan float64, len(nn))
 	for x, col := range nn {
-		channels = append(channels, []chan float64{})
+		channels[x] = []chan float64{}
 		for range col {
 			channels[x] = append(channels[x], make(chan float64))
 		}
@@ -174,7 +182,7 @@ func (modNet_p *Network) Run(Inputs []float64) []float64 {
 					//
 					// At this stage, that means we can
 					// just sum all of our already-weighted
-					// Inputs for our value.
+					// inputs for our value.
 					for i := 0; i < inputLength; i++ {
 						out += <-inputChannel
 					}
@@ -194,7 +202,7 @@ func (modNet_p *Network) Run(Inputs []float64) []float64 {
 
 	// Send the first row their initial values
 	for i, ch := range channels[0] {
-		ch <- Inputs[i]
+		ch <- inputs[i]
 	}
 
 	// We need to wait here, on the last columns being populated

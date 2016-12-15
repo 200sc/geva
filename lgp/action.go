@@ -76,6 +76,32 @@ var (
 		{one, "1", 1},
 		{two, "2", 1},
 	}
+	TartarusActions = []Action{
+		{neg, "neg", 1},
+		{add, "add", 3},
+		{subtract, "sub", 3},
+		{multiply, "mult", 3},
+		{bnez, "bnez", 1},
+		{bgz, "bgz", 1},
+		{jmp, "jmp", 1},
+		{randv, "rand", 1},
+		{zero, "0", 1},
+		{one, "1", 1},
+		{two, "2", 1},
+	}
+	SortActions = []Action{
+		{bnez, "bnez", 1},
+		{bgz, "bgz", 1},
+		{bgeq, "bgeq", 2},
+		{jmp, "jmp", 1},
+		{getEnv, "env", 2},
+		{envLen, "envLen", 1},
+		{divide, "div", 3},
+		{subtract, "sub", 3},
+		{zero, "0", 1},
+		{one, "1", 1},
+		{memSwap, "swap", 2},
+	}
 )
 
 func (gp *LGP) GetInstruction() Instruction {

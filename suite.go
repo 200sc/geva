@@ -3,16 +3,16 @@ package goevo
 import (
 	"fmt"
 	"goevo/alg"
-	"goevo/population"
+	"goevo/pop"
 	"math"
 	//"runtime"
 	"time"
 )
 
-type SuiteFunc func(interface{}, int) []population.Individual
+type SuiteFunc func(interface{}, int) []pop.Individual
 
 func RunSuite(testCases []TestCase, demeCount, popSize, testGenerations int, options interface{},
-	suiteFunc SuiteFunc, selection []population.SelectionMethod, pairing []population.PairingMethod,
+	suiteFunc SuiteFunc, selection []pop.SMethod, pairing []pop.PMethod,
 	goal int, elites alg.IntRange, migration float64) {
 
 	for _, tc := range testCases {
@@ -23,6 +23,7 @@ func RunSuite(testCases []TestCase, demeCount, popSize, testGenerations int, opt
 		nextPrint := 5000
 		results := []float64{}
 		timings := []time.Duration{}
+		fitnesses := []int{}
 		for totalGenerations < testGenerations {
 
 			dg := MakeDemes(
@@ -60,9 +61,11 @@ func RunSuite(testCases []TestCase, demeCount, popSize, testGenerations int, opt
 
 					if loops%20 == 1 || totalGenerations > nextPrint {
 						fmt.Println("Loop", loops, "Gens", totalGenerations)
-						ind, _ := dg.BestMember()
+						ind, fitness := dg.BestMember()
 						ind.Print()
 						mean = float64(totalGenerations) / float64(loops)
+						fmt.Println("Best fitness reached: ", fitness)
+						fitnesses = append(fitnesses, fitness)
 						fmt.Println("Generations taken: ", j+1)
 						fmt.Println("Average Generations: ", mean)
 						fmt.Println("Time taken per generation:", t2)
@@ -71,7 +74,7 @@ func RunSuite(testCases []TestCase, demeCount, popSize, testGenerations int, opt
 					break
 				}
 			}
-			loops += 1
+			loops++
 		}
 		mean = float64(totalGenerations) / float64(loops)
 		stdDevTotal := 0.0
@@ -97,5 +100,22 @@ func RunSuite(testCases []TestCase, demeCount, popSize, testGenerations int, opt
 		timeStdv := math.Sqrt(timeStdvTotal)
 		fmt.Println("Average time per generation:", timeMean)
 		fmt.Println("Time per generation Standard Deviation:", time.Duration(int(timeStdv)))
+
+		fitnessMean := 0
+		for _, f := range fitnesses {
+			fitnessMean += f
+		}
+		fmt.Println(fitnessMean, len(fitnesses))
+		fitnessMean /= len(fitnesses)
+
+		fitnessStdv := 0.0
+		for _, f := range fitnesses {
+			fitnessStdv += math.Pow(float64(f-fitnessMean), 2)
+		}
+		fitnessStdv /= float64(len(fitnesses))
+		fitnessStdv = math.Sqrt(fitnessStdv)
+
+		fmt.Println("Average best fitness:", fitnessMean)
+		fmt.Println("Stdv best fitness:", fitnessStdv)
 	}
 }

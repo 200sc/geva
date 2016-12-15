@@ -3,7 +3,7 @@ package lgp
 import (
 	"fmt"
 	"goevo/env"
-	"goevo/population"
+	"goevo/pop"
 	"math/rand"
 )
 
@@ -27,7 +27,7 @@ const (
 )
 
 var (
-	gpOptions        LGPOptions
+	gpOptions        Options
 	crossover        LGPCrossover
 	environment      *env.I
 	memory           *env.I
@@ -38,7 +38,7 @@ var (
 	quit_early       int
 )
 
-func Init(genOpt LGPOptions, e, m *env.I, cross LGPCrossover,
+func Init(genOpt Options, e, m *env.I, cross LGPCrossover,
 	act []Action, baseActionWeight float64, f FitnessFunc, qe int) {
 
 	actions = act
@@ -57,16 +57,16 @@ func Init(genOpt LGPOptions, e, m *env.I, cross LGPCrossover,
 	quit_early = qe
 }
 
-func GeneratePopulation(opt interface{}, popSize int) []population.Individual {
-	gpOpt := opt.(LGPOptions)
-	members := make([]population.Individual, popSize)
+func GeneratePopulation(opt interface{}, popSize int) []pop.Individual {
+	gpOpt := opt.(Options)
+	members := make([]pop.Individual, popSize)
 	for j := 0; j < popSize; j++ {
 		members[j] = GenerateLGP(gpOpt)
 	}
 	return members
 }
 
-func GenerateLGP(genOpt LGPOptions) *LGP {
+func GenerateLGP(genOpt Options) *LGP {
 
 	gp := new(LGP)
 
@@ -125,7 +125,7 @@ func (gp *LGP) Print() {
 	fmt.Println("")
 }
 
-func (gp *LGP) CanCrossover(other population.Individual) bool {
+func (gp *LGP) CanCrossover(other pop.Individual) bool {
 	switch other.(type) {
 	default:
 		return false
@@ -138,7 +138,7 @@ func (gp *LGP) CanCrossover(other population.Individual) bool {
 // (multi)point crossover
 // uniform crossover
 // these should be brought out and used for all list-like structures
-func (gp *LGP) Crossover(other population.Individual) population.Individual {
+func (gp *LGP) Crossover(other pop.Individual) pop.Individual {
 	return crossover.Crossover(gp, other.(*LGP))
 }
 

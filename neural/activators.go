@@ -17,7 +17,19 @@ var (
 		3.0, 3.25, 3.5, 3.75,
 		4.0,
 	}
-	testSize = 33
+	testSize      = 33
+	AllActivators = ActivatorMutationOptions{
+		Rectifier,
+		Identity,
+		BentIdentity,
+		Softplus,
+		Softstep,
+		Softsign,
+		Sinc,
+		Perceptron_Threshold(0.5),
+		Rectifier_Exponential(1.5),
+		Rectifier_Exponential(4),
+	}
 )
 
 // This list egregiously copied from Wikipedia.

@@ -1,6 +1,7 @@
 package goevo
 
 import (
+	"fmt"
 	"goevo/alg"
 	"goevo/env"
 	"goevo/gp"
@@ -11,16 +12,17 @@ import (
 	"testing"
 )
 
-func TestGPTransposeMatrix(t *testing.T) {
+// Could be improved with more specific actions
+func TestGPSortList(t *testing.T) {
 	Seed()
 
 	testCases := make([]TestCase, 0)
-	testCases = append(testCases, TransposeMatrixTestCase())
+	testCases = append(testCases, SortListTestCase())
 
 	gpOpt := gp.Options{
-		MaxNodeCount:         50,
-		MaxStartDepth:        5,
-		MaxDepth:             10,
+		MaxNodeCount:         250,
+		MaxStartDepth:        6,
+		MaxDepth:             12,
 		SwapMutationChance:   0.10,
 		ShrinkMutationChance: 0.05,
 	}
@@ -33,7 +35,7 @@ func TestGPTransposeMatrix(t *testing.T) {
 		1.0,
 		gp.MatchMemFitness)
 
-	gp.AddStorage(10, 1.0)
+	gp.AddStorage(20, 1.0)
 
 	RunSuite(
 		testCases,
@@ -49,12 +51,14 @@ func TestGPTransposeMatrix(t *testing.T) {
 		0.05)
 }
 
-func TestVSMTransposeMatrix(t *testing.T) {
+func TestVSMSortList(t *testing.T) {
 
 	Seed()
 
 	testCases := make([]TestCase, 0)
-	testCases = append(testCases, TransposeMatrixTestCase())
+	testCases = append(testCases, SortListTestCase())
+
+	fmt.Println(testCases)
 
 	gpOpt := lgp.Options{
 		MinActionCount:  10,
@@ -66,11 +70,10 @@ func TestVSMTransposeMatrix(t *testing.T) {
 		ValueMutationChance:  0.15,
 		ShrinkMutationChance: 0.10,
 		ExpandMutationChance: 0.10,
-		MemMutationChance:    0.10,
+		MemMutationChance:    0.00,
 	}
 
-	actions := lgp.BaseActions
-	actions = append(actions, lgp.EnvActions...)
+	actions := lgp.SortActions
 
 	lgp.Init(gpOpt,
 		env.NewI(5, 0),

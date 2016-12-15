@@ -1,4 +1,4 @@
-package population
+package pop
 
 import (
 	"math"
@@ -9,8 +9,8 @@ import (
 type Population struct {
 	Members      []Individual
 	Size         int
-	Selection    SelectionMethod
-	Pairing      PairingMethod
+	Selection    SMethod
+	Pairing      PMethod
 	FitnessTests int
 	TestInputs   [][]float64
 	TestExpected [][]float64
@@ -95,6 +95,9 @@ func (p_p *Population) GenerateFitness() {
 
 	for i := 0; i < p_p.Size; i++ {
 		v := <-channels[i]
+		if v < 0 {
+			v = math.MaxInt32
+		}
 		close(channels[i])
 		if v < p_p.LowFitness {
 			p_p.LowFitness = v
@@ -193,11 +196,11 @@ func (p_p *Population) Print() {
 	}
 }
 
-type SelectionMethod interface {
+type SMethod interface {
 	Select(p *Population) []Individual
 	GetParentProportion() int
 }
 
-type PairingMethod interface {
+type PMethod interface {
 	Pair(p *Population, populated int) [][]int
 }

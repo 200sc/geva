@@ -2,13 +2,13 @@ package pairing
 
 import (
 	"container/heap"
-	"goevo/population"
+	"goevo/pop"
 	"math/rand"
 )
 
 type Random struct{}
 
-func (rp Random) Pair(p *population.Population, populated int) [][]int {
+func (rp Random) Pair(p *pop.Population, populated int) [][]int {
 
 	out := make([][]int, len(p.Members)-populated)
 
@@ -34,7 +34,7 @@ type Alpha struct {
 	AlphaCount int
 }
 
-func (ap Alpha) Pair(p *population.Population, populated int) [][]int {
+func (ap Alpha) Pair(p *pop.Population, populated int) [][]int {
 
 	out := make([][]int, len(p.Members)-populated)
 
@@ -67,5 +67,5 @@ func (ap Alpha) Pair(p *population.Population, populated int) [][]int {
 }
 
 type Method interface {
-	Pair(p *population.Population, populated int) [][]int
+	Pair(p *pop.Population, populated int) [][]int
 }

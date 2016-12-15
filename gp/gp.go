@@ -2,7 +2,7 @@ package gp
 
 import (
 	"goevo/env"
-	"goevo/population"
+	"goevo/pop"
 	"math/rand"
 )
 
@@ -15,7 +15,7 @@ type GP struct {
 }
 
 var (
-	gpOptions            GPOptions
+	gpOptions            Options
 	crossover            GPCrossover
 	environment          *env.I
 	memory               *env.I
@@ -26,7 +26,7 @@ var (
 	fitness              FitnessFunc
 )
 
-func Init(genOpt GPOptions, e *env.I, cross GPCrossover,
+func Init(genOpt Options, e *env.I, cross GPCrossover,
 	act [][]Action, baseActionWeight float64, f FitnessFunc) {
 
 	environment = e
@@ -45,16 +45,16 @@ func Init(genOpt GPOptions, e *env.I, cross GPCrossover,
 	crossover = cross
 }
 
-func GeneratePopulation(opt interface{}, popSize int) []population.Individual {
-	gpOpt := opt.(GPOptions)
-	members := make([]population.Individual, popSize)
+func GeneratePopulation(opt interface{}, popSize int) []pop.Individual {
+	gpOpt := opt.(Options)
+	members := make([]pop.Individual, popSize)
 	for j := 0; j < popSize; j++ {
 		members[j] = GenerateGP(gpOpt)
 	}
 	return members
 }
 
-func GenerateGP(genOpt GPOptions) *GP {
+func GenerateGP(genOpt Options) *GP {
 
 	// Eventually we'll do something
 	// with creation types here
@@ -80,7 +80,7 @@ func (gp *GP) Print() {
 	gp.First.Print("", true)
 }
 
-func (gp *GP) CanCrossover(other population.Individual) bool {
+func (gp *GP) CanCrossover(other pop.Individual) bool {
 	switch other.(type) {
 	default:
 		return false
@@ -89,7 +89,7 @@ func (gp *GP) CanCrossover(other population.Individual) bool {
 	}
 }
 
-func (gp *GP) Crossover(other population.Individual) population.Individual {
+func (gp *GP) Crossover(other pop.Individual) pop.Individual {
 	return crossover.Crossover(gp, other.(*GP))
 }
 

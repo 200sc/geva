@@ -76,9 +76,9 @@ type ColumnGenerationOptions struct {
 type ActivatorMutationOptions []ActivatorFunc
 
 type NetworkMutationOptions struct {
-	WeightOptions    *FloatMutationOptions
-	ColumnOptions    *ColumnGenerationOptions
-	ActivatorOptions *ActivatorMutationOptions
+	WeightOptions    FloatMutationOptions
+	ColumnOptions    ColumnGenerationOptions
+	ActivatorOptions ActivatorMutationOptions
 	// checked per column
 	NeuronReplacementChance float64
 	NeuronAdditionChance    float64

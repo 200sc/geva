@@ -1,6 +1,7 @@
 package goevo
 
 import (
+	"fmt"
 	"goevo/alg"
 	"goevo/env"
 	"goevo/gp"
@@ -11,16 +12,18 @@ import (
 	"testing"
 )
 
-func TestGPTransposeMatrix(t *testing.T) {
+// TGPs need the ability to use an arbitrary number count as nodes
+// to be able to easily access all elements of this environment
+func TestGPMultiplyMatrix(t *testing.T) {
 	Seed()
 
 	testCases := make([]TestCase, 0)
-	testCases = append(testCases, TransposeMatrixTestCase())
+	testCases = append(testCases, MultiplyMatrixTestCase())
 
 	gpOpt := gp.Options{
-		MaxNodeCount:         50,
-		MaxStartDepth:        5,
-		MaxDepth:             10,
+		MaxNodeCount:         250,
+		MaxStartDepth:        6,
+		MaxDepth:             12,
 		SwapMutationChance:   0.10,
 		ShrinkMutationChance: 0.05,
 	}
@@ -33,12 +36,12 @@ func TestGPTransposeMatrix(t *testing.T) {
 		1.0,
 		gp.MatchMemFitness)
 
-	gp.AddStorage(10, 1.0)
+	gp.AddStorage(20, 1.0)
 
 	RunSuite(
 		testCases,
-		5,
-		200,
+		25,
+		3000,
 		100000,
 		gpOpt,
 		gp.GeneratePopulation,
@@ -49,24 +52,26 @@ func TestGPTransposeMatrix(t *testing.T) {
 		0.05)
 }
 
-func TestVSMTransposeMatrix(t *testing.T) {
+func TestVSMMultiplyMatrix(t *testing.T) {
 
 	Seed()
 
 	testCases := make([]TestCase, 0)
-	testCases = append(testCases, TransposeMatrixTestCase())
+	testCases = append(testCases, MultiplyMatrixTestCase())
+
+	fmt.Println(testCases)
 
 	gpOpt := lgp.Options{
 		MinActionCount:  10,
 		MaxActionCount:  200,
-		MaxStartActions: 40,
+		MaxStartActions: 80,
 		MinStartActions: 20,
 
 		SwapMutationChance:   0.15,
 		ValueMutationChance:  0.15,
 		ShrinkMutationChance: 0.10,
 		ExpandMutationChance: 0.10,
-		MemMutationChance:    0.10,
+		MemMutationChance:    0.00,
 	}
 
 	actions := lgp.BaseActions
@@ -74,7 +79,7 @@ func TestVSMTransposeMatrix(t *testing.T) {
 
 	lgp.Init(gpOpt,
 		env.NewI(5, 0),
-		env.NewI(10, 0),
+		env.NewI(20, 0),
 		lgp.PointCrossover{3},
 		actions,
 		1.0,
@@ -85,7 +90,7 @@ func TestVSMTransposeMatrix(t *testing.T) {
 
 	RunSuite(
 		testCases,
-		75,
+		25,
 		3000,
 		100000,
 		gpOpt,

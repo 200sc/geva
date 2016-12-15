@@ -1,7 +1,7 @@
 package selection
 
 import (
-	"goevo/population"
+	"goevo/pop"
 )
 
 type StochasticUniversal struct {
@@ -18,14 +18,14 @@ func (sus StochasticUniversal) GetParentProportion() int {
 	return sus.ParentProportion
 }
 
-func (sus StochasticUniversal) Select(p_p *population.Population) []population.Individual {
+func (sus StochasticUniversal) Select(p_p *pop.Population) []pop.Individual {
 	p := *p_p
 
 	_, cumulativeWeights := p.Weights(sus.Power)
 
 	inc := cumulativeWeights[len(cumulativeWeights)-1] / float64(p.Size/sus.ParentProportion)
 
-	outNet := make([]population.Individual, p.Size)
+	outNet := make([]pop.Individual, p.Size)
 
 	i := 0
 	j := 0

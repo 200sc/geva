@@ -5,7 +5,7 @@ import (
 	"goevo/env"
 	"goevo/lgp"
 	"goevo/pairing"
-	"goevo/population"
+	"goevo/pop"
 	"goevo/selection"
 	"testing"
 )
@@ -14,7 +14,7 @@ func TestLGPRun(t *testing.T) {
 
 	Seed()
 
-	gpOpt := lgp.LGPOptions{
+	gpOpt := lgp.Options{
 		MinActionCount:  2,
 		MaxActionCount:  20,
 		MaxStartActions: 10,
@@ -48,8 +48,8 @@ func TestLGPRun(t *testing.T) {
 	dg := MakeDemes(
 		5,
 		lgp.GeneratePopulation(gpOpt, 200),
-		[]population.SelectionMethod{selection.DeterministicTournament{2, 3}},
-		[]population.PairingMethod{pairing.Random{}},
+		[]pop.SMethod{selection.DeterministicTournament{2, 3}},
+		[]pop.PMethod{pairing.Random{}},
 		in,
 		out,
 		1,

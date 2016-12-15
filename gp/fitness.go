@@ -50,9 +50,6 @@ func OutputFitness(g *GP, inputs, outputs [][]float64) int {
 		out := Eval(g.First)
 		fitness += int(math.Abs(float64(out - int(outputs[i][0]))))
 	}
-	if fitness < 0 {
-		fitness = math.MaxInt32
-	}
 	return fitness
 }
 
@@ -65,9 +62,6 @@ func Mem0Fitness(g *GP, inputs, outputs [][]float64) int {
 		g.Env = environment.New(envDiff)
 		Eval(g.First)
 		fitness += int(math.Abs(float64(*(*g.Mem)[0]) - outputs[i][0]))
-	}
-	if fitness < 0 {
-		fitness = math.MaxInt32
 	}
 	return fitness
 }
@@ -96,9 +90,6 @@ func TimeFitness(f FitnessFunc, threshold int, timeLimit int) FitnessFunc {
 			}
 		}
 		i += threshold
-		if i < 0 {
-			i = math.MaxInt32
-		}
 		return i
 	}
 }

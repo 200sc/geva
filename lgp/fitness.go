@@ -1,7 +1,6 @@
 package lgp
 
 import (
-	//"fmt"
 	"math"
 	"time"
 )
@@ -51,9 +50,6 @@ func Mem0Fitness(g *LGP, inputs, outputs [][]float64) int {
 		v := int(math.Abs(float64(*(*g.Mem)[0]) - outputs[i][0]))
 		fitness += v
 	}
-	if fitness < 0 {
-		fitness = math.MaxInt32
-	}
 	return fitness
 }
 
@@ -81,9 +77,6 @@ func TimeFitness(f FitnessFunc, threshold int, timeLimit int) FitnessFunc {
 			}
 		}
 		i += threshold
-		if i < 0 {
-			i = math.MaxInt32
-		}
 		return i
 	}
 }

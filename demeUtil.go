@@ -3,23 +3,23 @@ package goevo
 import (
 	"fmt"
 	"goevo/alg"
-	"goevo/population"
+	"goevo/pop"
 	"math/rand"
 	"time"
 )
 
-func MakeDemes(demeCount int, members []population.Individual,
-	s []population.SelectionMethod, pair []population.PairingMethod,
-	in, out [][]float64, tests, goal int, elites alg.IntRange, migration float64) population.DemeGroup {
+func MakeDemes(demeCount int, members []pop.Individual,
+	s []pop.SMethod, pair []pop.PMethod,
+	in, out [][]float64, tests, goal int, elites alg.IntRange, migration float64) pop.DemeGroup {
 
 	demeSize := len(members) / demeCount
 
-	demes := make([]population.Population, demeCount)
+	demes := make([]pop.Population, demeCount)
 
 	for i := 0; i < demeCount; i++ {
 		si := i % len(s)
 		pi := i % len(pair)
-		demes[i] = population.Population{
+		demes[i] = pop.Population{
 			Members:      members[i*demeSize : (i+1)*demeSize],
 			Size:         demeSize,
 			Selection:    s[si],
@@ -33,7 +33,7 @@ func MakeDemes(demeCount int, members []population.Individual,
 		}
 	}
 
-	return population.DemeGroup{
+	return pop.DemeGroup{
 		Demes:           demes,
 		MigrationChance: migration,
 	}
@@ -43,7 +43,7 @@ func Seed() {
 	rand.Seed(time.Now().UTC().UnixNano())
 }
 
-func RunDemeGroup(dg population.DemeGroup, numGens int) {
+func RunDemeGroup(dg pop.DemeGroup, numGens int) {
 	for i := 0; i < numGens; i++ {
 		fmt.Println("Gen", i+1)
 		stopEarly := dg.NextGeneration()

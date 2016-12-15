@@ -1,7 +1,7 @@
 package selection
 
 import (
-	"goevo/population"
+	"goevo/pop"
 	"sort"
 )
 
@@ -19,11 +19,11 @@ func (gs Greedy) GetParentProportion() int {
 // I'm assuming here that it means picking the top x members of the
 // population where x is the proportion of members who are parents
 // in the new generation, so that's what this is.
-func (gs Greedy) Select(p_p *population.Population) []population.Individual {
+func (gs Greedy) Select(p_p *pop.Population) []pop.Individual {
 	p := *p_p
 
 	fitMap := make(map[int][]int)
-	members := make([]population.Individual, p.Size)
+	members := make([]pop.Individual, p.Size)
 
 	for i := 0; i < p.Size; i++ {
 		f := p.Fitnesses[i]

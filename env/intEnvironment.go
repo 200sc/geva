@@ -3,6 +3,7 @@ package env
 import (
 	//"fmt"
 	"math"
+	"strconv"
 )
 
 // I represents an integer-valued environment
@@ -81,4 +82,14 @@ func NewI(size int, baseVal int) *I {
 		*env[i] = baseVal
 	}
 	return &env
+}
+
+func (env *I) String() string {
+	str := "["
+	for _, v := range *env {
+		str += strconv.Itoa(*v)
+		str += " "
+	}
+	str += "]"
+	return str
 }

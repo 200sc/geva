@@ -1,7 +1,7 @@
 package selection
 
 import (
-	"goevo/population"
+	"goevo/pop"
 	"math"
 )
 
@@ -14,11 +14,11 @@ func (dts DeterministicTournament) GetParentProportion() int {
 	return dts.ParentProportion
 }
 
-func (dts DeterministicTournament) Select(p *population.Population) []population.Individual {
+func (dts DeterministicTournament) Select(p *pop.Population) []pop.Individual {
 	// We move as much initialization down here as we can,
 	// because we expect the above goroutines to be the
 	// most expensive time sink in this function.
-	members := make([]population.Individual, p.Size)
+	members := make([]pop.Individual, p.Size)
 
 	// Send off goroutines to process tournament battles
 	for i := 0; i < p.Size/dts.ParentProportion; i++ {

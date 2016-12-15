@@ -1,7 +1,7 @@
 package selection
 
 import (
-	"goevo/population"
+	"goevo/pop"
 	"math/rand"
 )
 
@@ -43,6 +43,6 @@ func KeySet_IntInt(m map[int]int) []int {
 }
 
 type Method interface {
-	Select(p *population.Population) []population.Individual
+	Select(p *pop.Population) []pop.Individual
 	GetParentProportion() int
 }

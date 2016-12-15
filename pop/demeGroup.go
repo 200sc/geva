@@ -1,4 +1,4 @@
-package population
+package pop
 
 import (
 	"math"
@@ -21,6 +21,8 @@ type DemeGroup struct {
 	MigrationChance float64
 }
 
+// Bug(patrick)
+// Sometimes this returns a bunch of bollocks
 func (dg *DemeGroup) BestMember() (Individual, int) {
 
 	bestInd, bestFitness := dg.Demes[0].BestMember()

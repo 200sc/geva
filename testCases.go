@@ -2,6 +2,7 @@ package goevo
 
 import (
 	"math"
+	"sort"
 )
 
 type TestCase struct {
@@ -88,6 +89,27 @@ func ReverseList(lst []float64) []float64 {
 	return outList
 }
 
+func SortListTestCase() TestCase {
+	in := [][]float64{
+		{2.0, 3.0, 1.0, 5.0, 4.0},
+		{7.0, 9.0, 8.0, 11.0, 12.0, 10.0},
+		{15.0, 14.0, 13.0},
+	}
+
+	out := make([][]float64, len(in))
+	for i, f := range in {
+		out[i] = make([]float64, len(f))
+		copy(out[i], f)
+		sort.Float64s(out[i])
+	}
+
+	return TestCase{
+		in,
+		out,
+		"SortList",
+	}
+}
+
 func TransposeMatrixTestCase() TestCase {
 	in := [][]float64{
 		{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0},
@@ -101,4 +123,53 @@ func TransposeMatrixTestCase() TestCase {
 		out,
 		"TransposeMatrix",
 	}
+}
+
+func MultiplyMatrixTestCase() TestCase {
+	in := [][]float64{
+		{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0,
+			3.0, 2.0, 0.0, 0.0, 1.0, 0.0, 4.0, 4.0, 3.0},
+	}
+
+	out := make([][]float64, len(in))
+	for i, f := range in {
+		l := len(f) / 2
+		out[i] = MatrixMultiply(f[0:l], f[l:])
+	}
+	return TestCase{
+		in,
+		out,
+		"MultiplyMatrix",
+	}
+}
+
+// matrices are assumed to be square
+func MatrixMultiply(a []float64, b []float64) []float64 {
+	sqrtA := math.Sqrt(float64(len(a)))
+	sqrtB := math.Sqrt(float64(len(b)))
+	if sqrtA != math.Ceil(sqrtA) {
+		panic("Bad input to Matrix Multiply: not a square matrix a")
+	}
+	if sqrtB != math.Ceil(sqrtB) {
+		panic("Bad input to Matrix Multiply: not a square matrix b")
+	}
+	if sqrtA != sqrtB {
+		panic("Non-multipliable matrices in Matrix Multiply")
+	}
+	out := make([]float64, len(a))
+	// index
+	for i := 0; i < len(a); i++ {
+		// row to multiply
+		k1 := i - i%int(sqrtA)
+		// column to multiply
+		j := i % int(sqrtA)
+		for k := k1; k < k1+int(sqrtA); k++ {
+
+			//fmt.Println("Adding to index", i, "k, j", k, j)
+			out[i] += a[k] * b[j]
+
+			j += int(sqrtA)
+		}
+	}
+	return out
 }
