@@ -12,12 +12,6 @@ var (
 	fitness   FitnessFunc
 )
 
-func Init(newNgo NetworkGenerationOptions, newCrossover NeuralCrossover, f FitnessFunc) {
-	ngo = newNgo
-	crossover = newCrossover
-	fitness = f
-}
-
 // A Body is what we would like to call the actual network -- it's
 // just a 2d slice of neurons.
 type Body [][]Neuron

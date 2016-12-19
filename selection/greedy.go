@@ -19,8 +19,7 @@ func (gs Greedy) GetParentProportion() int {
 // I'm assuming here that it means picking the top x members of the
 // population where x is the proportion of members who are parents
 // in the new generation, so that's what this is.
-func (gs Greedy) Select(p_p *pop.Population) []pop.Individual {
-	p := *p_p
+func (gs Greedy) Select(p *pop.Population) []pop.Individual {
 
 	fitMap := make(map[int][]int)
 	members := make([]pop.Individual, p.Size)

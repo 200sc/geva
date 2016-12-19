@@ -12,12 +12,37 @@ import (
 	"time"
 )
 
+type TestSuite struct {
+	testCases                           []TestCase
+	demeCount, popSize, testGenerations int
+	options                             interface{}
+	suiteFunc                           SuiteFunc
+	initOptions                         interface{}
+	suiteInitFunc                       SuiteInitFunc
+	selection                           []pop.SMethod
+	pairing                             []pop.PMethod
+	goal                                int
+	elites                              alg.IntRange
+	migration                           float64
+	titleSuffix                         string
+}
+
+func RunTestSuites(suites []TestSuite) {
+	writer := SuiteWriter()
+
+	for _, suite := range suites {
+		RunSingleSuite(suite, writer)
+		writer.Flush()
+	}
+
+	writer.Flush()
+}
+
 type SuiteFunc func(interface{}, int) []pop.Individual
 
-func RunSuite(testCases []TestCase, demeCount, popSize, testGenerations int, options interface{},
-	suiteFunc SuiteFunc, selection []pop.SMethod, pairing []pop.PMethod,
-	goal int, elites alg.IntRange, migration float64, titleSuffix string) {
+type SuiteInitFunc func(interface{})
 
+func SuiteWriter() *csv.Writer {
 	file := "logs/log"
 	file += time.Now().Format("_Jan_2_15-04-05_2006")
 	file += ".txt"
@@ -39,8 +64,37 @@ func RunSuite(testCases []TestCase, demeCount, popSize, testGenerations int, opt
 		"Mean Average Fitness/Gen",
 		"Stdv Average Fitness/Gen",
 	})
+	return writer
+}
 
-	for _, tc := range testCases {
+func RunSuite(testCases []TestCase, demeCount, popSize, testGenerations int, options interface{},
+	suiteFunc SuiteFunc, selection []pop.SMethod,
+	pairing []pop.PMethod, goal int, elites alg.IntRange, migration float64, titleSuffix string) {
+
+	writer := SuiteWriter()
+
+	RunSingleSuite(TestSuite{
+		testCases,
+		demeCount,
+		popSize,
+		testGenerations,
+		options,
+		suiteFunc,
+		nil,
+		nil,
+		selection,
+		pairing,
+		goal,
+		elites,
+		migration,
+		titleSuffix,
+	}, writer)
+
+	writer.Flush()
+}
+
+func RunSingleSuite(s TestSuite, writer *csv.Writer) {
+	for _, tc := range s.testCases {
 		totalGenerations := 0
 		fmt.Println(tc.title)
 		loops := 1
@@ -50,19 +104,23 @@ func RunSuite(testCases []TestCase, demeCount, popSize, testGenerations int, opt
 		timings := []time.Duration{}
 		fitnesses := []float64{}
 		avrFitnesses := []float64{}
-		for totalGenerations < testGenerations {
+		for totalGenerations < s.testGenerations {
+
+			if s.suiteInitFunc != nil {
+				s.suiteInitFunc(s.initOptions)
+			}
 
 			dg := MakeDemes(
-				demeCount,
-				suiteFunc(options, popSize),
-				selection,
-				pairing,
+				s.demeCount,
+				s.suiteFunc(s.options, s.popSize),
+				s.selection,
+				s.pairing,
 				tc.inputs,
 				tc.outputs,
 				len(tc.inputs),
-				goal,
-				elites,
-				migration)
+				s.goal,
+				s.elites,
+				s.migration)
 
 			numGens := 5000
 
@@ -143,7 +201,7 @@ func RunSuite(testCases []TestCase, demeCount, popSize, testGenerations int, opt
 		avrFitnessTotal, avrFitnessMean, avrFitnessStdv := floatSliceStatistics(avrFitnesses, 2)
 
 		line := []string{
-			tc.title + titleSuffix,
+			tc.title + s.titleSuffix,
 			strconv.Itoa(totalGenerations),
 			floatString(mean),
 			floatString(stdDev),
@@ -159,7 +217,6 @@ func RunSuite(testCases []TestCase, demeCount, popSize, testGenerations int, opt
 		}
 		writer.Write(line)
 	}
-	writer.Flush()
 }
 
 func floatString(f float64) string {

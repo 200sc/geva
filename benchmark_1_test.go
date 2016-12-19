@@ -2,11 +2,11 @@ package goevo
 
 // TGPs need the ability to use an arbitrary number count as nodes
 // to be able to easily access all elements of this environment
-// func TestGPMultiplyMatrix(t *testing.T) {
+// func TestSuiteOne(t *testing.T) {
+
 // 	Seed()
 
-// 	testCases := make([]TestCase, 0)
-// 	testCases = append(testCases, MultiplyMatrixTestCase())
+// 	suites := make([]TestSuite, 0)
 
 // 	gpOpt := gp.Options{
 // 		MaxNodeCount:         250,
@@ -16,41 +16,33 @@ package goevo
 // 		ShrinkMutationChance: 0.05,
 // 	}
 
-// 	gp.Init(
-// 		gpOpt,
-// 		env.NewI(1, 0),
-// 		gp.PointCrossover{},
-// 		gp.BaseActions,
-// 		1.0,
-// 		gp.MatchMemFitness)
-
-// 	gp.AddStorage(20, 1.0)
-
-// 	RunSuite(
-// 		testCases,
+// 	suites = append(suites, TestSuite{
+// 		[]TestCase{MultiplyMatrixTestCase()},
 // 		25,
 // 		3000,
 // 		100000,
 // 		gpOpt,
 // 		gp.GeneratePopulation,
+// 		gp.InitOptions{
+// 			gpOpt,
+// 			env.NewI(1, 0),
+// 			gp.PointCrossover{},
+// 			gp.BaseActions,
+// 			1.0,
+// 			gp.MatchMemFitness,
+// 			20,
+// 			1.0,
+// 		},
+// 		gp.OptInit,
 // 		[]pop.SMethod{selection.DeterministicTournament{2, 3}},
 // 		[]pop.PMethod{pairing.Random{}},
 // 		1,
 // 		alg.LinearIntRange{4, 6},
 // 		0.05,
-// 		"TGP")
-// }
+// 		"TGP",
+// 	})
 
-// func TestVSMMultiplyMatrix(t *testing.T) {
-
-// 	Seed()
-
-// 	testCases := make([]TestCase, 0)
-// 	testCases = append(testCases, MultiplyMatrixTestCase())
-
-// 	fmt.Println(testCases)
-
-// 	gpOpt := lgp.Options{
+// 	lgpOpt := lgp.Options{
 // 		MinActionCount:  10,
 // 		MaxActionCount:  200,
 // 		MaxStartActions: 80,
@@ -63,27 +55,27 @@ package goevo
 // 		MemMutationChance:    0.00,
 // 	}
 
-// 	actions := lgp.BaseActions
-// 	actions = append(actions, lgp.EnvActions...)
+// 	l_actions := lgp.BaseActions
+// 	l_actions = append(l_actions, lgp.EnvActions...)
 
-// 	lgp.Init(gpOpt,
-// 		env.NewI(5, 0),
-// 		env.NewI(20, 0),
-// 		lgp.PointCrossover{3},
-// 		actions,
-// 		1.0,
-// 		lgp.MatchMemFitness,
-// 		600)
-
-// 	lgp.PrintActions()
-
-// 	RunSuite(
-// 		testCases,
+// 	suites = append(suites, TestSuite{
+// 		[]TestCase{MultiplyMatrixTestCase()},
 // 		25,
 // 		3000,
 // 		100000,
-// 		gpOpt,
+// 		lgpOpt,
 // 		lgp.GeneratePopulation,
+// 		lgp.InitOptions{
+// 			lgpOpt,
+// 			env.NewI(5, 0),
+// 			env.NewI(20, 0),
+// 			lgp.PointCrossover{3},
+// 			l_actions,
+// 			1.0,
+// 			lgp.MatchMemFitness,
+// 			600,
+// 		},
+// 		lgp.OptInit,
 // 		[]pop.SMethod{
 // 			selection.Probabilistic{3, 2},
 // 			selection.Probabilistic{2, 2},
@@ -95,14 +87,8 @@ package goevo
 // 		1,
 // 		alg.LinearIntRange{1, 10},
 // 		0.10,
-// 		"LGP")
-// }
-
-// func TestNNMultiplyMatrix(t *testing.T) {
-
-// 	Seed()
-
-// 	testCases := []TestCase{MultiplyMatrixTestCase()}
+// 		"LGP",
+// 	})
 
 // 	nngOpt := neural.NetworkGenerationOptions{
 // 		NetworkMutationOptions: neural.NetworkMutationOptions{
@@ -133,26 +119,26 @@ package goevo
 // 		BaseMutations: 20,
 // 	}
 
-// 	fmt.Println(testCases)
-
-// 	neural.Init(
-// 		nngOpt,
-// 		neural.AverageCrossover{2},
-// 		neural.MatchFitness(0.25),
-// 	)
-
-// 	RunSuite(
-// 		testCases,
+// 	suites = append(suites, TestSuite{
+// 		[]TestCase{MultiplyMatrixTestCase()},
 // 		4,
 // 		200,
 // 		100000,
 // 		nngOpt,
 // 		neural.GeneratePopulation,
+// 		neural.InitOptions{
+// 			nngOpt,
+// 			neural.AverageCrossover{2},
+// 			neural.MatchFitness(0.25),
+// 		},
+// 		neural.OptInit,
 // 		[]pop.SMethod{selection.DeterministicTournament{3, 3}},
 // 		[]pop.PMethod{pairing.Random{}},
 // 		2.0,
 // 		alg.LinearIntRange{1, 4},
 // 		0.1,
 // 		"ENN",
-// 	)
+// 	})
+
+// 	RunTestSuites(suites)
 // }

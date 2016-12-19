@@ -38,25 +38,6 @@ var (
 	quit_early       int
 )
 
-func Init(genOpt Options, e, m *env.I, cross LGPCrossover,
-	act []Action, baseActionWeight float64, f FitnessFunc, qe int) {
-
-	actions = act
-
-	actionWeights = make([]float64, len(actions))
-	for i := range actions {
-		actionWeights[i] = baseActionWeight
-	}
-	ResetCumActionWeights()
-
-	environment = e
-	memory = m
-	fitness = f
-	gpOptions = genOpt
-	crossover = cross
-	quit_early = qe
-}
-
 func GeneratePopulation(opt interface{}, popSize int) []pop.Individual {
 	gpOpt := opt.(Options)
 	members := make([]pop.Individual, popSize)

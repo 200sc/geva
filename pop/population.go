@@ -25,8 +25,8 @@ type Population struct {
 // This will change as more things take place
 // in a generation. Selection, Crossover, and Mutation
 // are granted.
-func (p_p *Population) NextGeneration() bool {
-	p := *p_p
+func (p *Population) NextGeneration() bool {
+
 	// The number of parents in the next generation
 	parentSize := p.Size / p.Selection.GetParentProportion()
 
@@ -35,7 +35,7 @@ func (p_p *Population) NextGeneration() bool {
 		return true
 	}
 	elites := p.GetElites()
-	nextGen := p.Selection.Select(&p)
+	nextGen := p.Selection.Select(p)
 
 	// Ensure that the elites (the best members)
 	// stay in the next generation
@@ -46,7 +46,7 @@ func (p_p *Population) NextGeneration() bool {
 	parentSize += p.Elites
 
 	p.Members = nextGen
-	pairs := p.Pairing.Pair(&p, parentSize)
+	pairs := p.Pairing.Pair(p, parentSize)
 
 	// i does not start at 0,
 	// but pairs, sensibly, does.
@@ -65,7 +65,6 @@ func (p_p *Population) NextGeneration() bool {
 		p.Members[i].Mutate()
 	}
 
-	*p_p = p
 	return false
 }
 

@@ -26,25 +26,6 @@ var (
 	fitness              FitnessFunc
 )
 
-func Init(genOpt Options, e *env.I, cross GPCrossover,
-	act [][]Action, baseActionWeight float64, f FitnessFunc) {
-
-	environment = e
-	actions = act
-	actionWeights = make([][]float64, len(actions))
-	for i, tier := range actions {
-		actionWeights[i] = make([]float64, len(tier))
-		for j := range tier {
-			actionWeights[i][j] = baseActionWeight
-		}
-	}
-	cumZeroActionWeights = CalculateCumulativeActionWeights(0)
-	cumActionWeights = CalculateCumulativeActionWeights(1, 2, 3)
-	fitness = f
-	gpOptions = genOpt
-	crossover = cross
-}
-
 func GeneratePopulation(opt interface{}, popSize int) []pop.Individual {
 	gpOpt := opt.(Options)
 	members := make([]pop.Individual, popSize)
