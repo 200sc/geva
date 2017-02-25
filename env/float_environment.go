@@ -1,5 +1,7 @@
 package env
 
+import "math/rand"
+
 type F []*float64
 
 func (env *F) Copy() *F {
@@ -45,6 +47,19 @@ func (env *F) Diff(envDiff []float64) (diff int) {
 func (env *F) SetAll(f float64) {
 	for i := range *env {
 		*(*env)[i] = f
+	}
+}
+
+func (env *F) Randomize(min *F, max *F) {
+	// Probably shouldn't do this
+	// if len(env) != len(min) || len(env) != len(max) {
+	// 	panic("It won't do what you want")
+	// }
+	for i := 0; i < len(*env); i++ {
+		mn := *(*min)[i]
+		mx := *(*max)[i]
+		diff := mx - mn
+		*(*env)[i] = (diff * rand.Float64()) + mn
 	}
 }
 

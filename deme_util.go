@@ -2,10 +2,11 @@ package goevo
 
 import (
 	"fmt"
-	"bitbucket.org/StephenPatrick/goevo/alg"
-	"bitbucket.org/StephenPatrick/goevo/pop"
 	"math/rand"
 	"time"
+
+	"bitbucket.org/StephenPatrick/goevo/alg"
+	"bitbucket.org/StephenPatrick/goevo/pop"
 )
 
 func MakeDemes(demeCount int, members []pop.Individual,
@@ -43,7 +44,31 @@ func Seed() {
 	rand.Seed(time.Now().UTC().UnixNano())
 }
 
-func RunDemeGroup(dg pop.DemeGroup, numGens int) {
+func SilentRunDemeGroup(dg pop.DemeGroup, numGens int) pop.Individual {
+	for i := 0; i < numGens; i++ {
+		stopEarly := dg.NextGeneration()
+		if i == numGens-1 || stopEarly {
+			for _, p := range dg.Demes {
+				w, _ := p.Weights(1.0)
+				fmt.Println(w)
+				maxWeight := 0.0
+				maxIndex := 0
+				for i, v := range w {
+					if v > maxWeight {
+						maxWeight = v
+						maxIndex = i
+					}
+				}
+				fmt.Println(p.Fitnesses)
+				p.Members[maxIndex].Print()
+			}
+		}
+	}
+	best, _ := dg.BestMember()
+	return best
+}
+
+func RunDemeGroup(dg pop.DemeGroup, numGens int) pop.Individual {
 	for i := 0; i < numGens; i++ {
 		fmt.Println("Gen", i+1)
 		stopEarly := dg.NextGeneration()
@@ -66,4 +91,6 @@ func RunDemeGroup(dg pop.DemeGroup, numGens int) {
 			break
 		}
 	}
+	best, _ := dg.BestMember()
+	return best
 }
