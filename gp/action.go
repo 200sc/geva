@@ -61,6 +61,28 @@ var (
 		//{eight, "8"},
 		//{nine, "9"},
 	}
+	Pow8Actions = [][]Action{
+		{
+			{randv, "rand"},
+			{zero, "0"},
+			{one, "1"},
+			{two, "2"},
+		},
+		{
+			{neg, "neg"},
+			{getEnv, "env"},
+		},
+		{
+			{add, "add"},
+			{subtract, "sub"},
+			{multiply, "multiply"},
+		},
+		{
+			{isPositive, "+?"},
+			{ifRand, "rand?"},
+			{neZero, "!0?"},
+		},
+	}
 	BaseActions = [][]Action{
 		ZeroArgActions,
 		OneArgActions,

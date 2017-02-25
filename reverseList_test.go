@@ -1,150 +1,162 @@
 package goevo
 
-// func TestGPReverseList(t *testing.T) {
-// 	Seed()
+import (
+	"goevo/alg"
+	"goevo/env"
+	"goevo/gp"
+	"goevo/lgp"
+	"goevo/neural"
+	"goevo/pairing"
+	"goevo/pop"
+	"goevo/selection"
+	"testing"
+)
 
-// 	testCases := []TestCase{ReverseListTestCase()}
+func TestGPReverseList(t *testing.T) {
+	Seed()
 
-// 	gpOpt := gp.Options{
-// 		MaxNodeCount:         50,
-// 		MaxStartDepth:        5,
-// 		MaxDepth:             10,
-// 		SwapMutationChance:   0.10,
-// 		ShrinkMutationChance: 0.05,
-// 	}
+	testCases := []TestCase{ReverseListTestCase()}
 
-// 	gp.Init(
-// 		gpOpt,
-// 		env.NewI(1, 0),
-// 		gp.PointCrossover{},
-// 		gp.BaseActions,
-// 		1.0,
-// 		gp.MatchMemFitness)
+	gpOpt := gp.Options{
+		MaxNodeCount:         50,
+		MaxStartDepth:        5,
+		MaxDepth:             10,
+		SwapMutationChance:   0.10,
+		ShrinkMutationChance: 0.05,
+	}
 
-// 	gp.AddStorage(10, 1.0)
+	gp.Init(
+		gpOpt,
+		env.NewI(1, 0),
+		gp.PointCrossover{},
+		gp.BaseActions,
+		1.0,
+		gp.MatchMemFitness)
 
-// 	RunSuite(
-// 		testCases,
-// 		5,
-// 		200,
-// 		100000,
-// 		gpOpt,
-// 		gp.GeneratePopulation,
-// 		[]pop.SMethod{selection.DeterministicTournament{2, 3}},
-// 		[]pop.PMethod{pairing.Random{}},
-// 		1,
-// 		alg.LinearIntRange{4, 6},
-// 		0.05,
-// 		"TGP")
-// }
+	gp.AddStorage(10, 1.0)
 
-// func TestVSMReverseList(t *testing.T) {
+	RunSuite(
+		testCases,
+		5,
+		200,
+		100000,
+		gpOpt,
+		gp.GeneratePopulation,
+		[]pop.SMethod{selection.DeterministicTournament{2, 3}},
+		[]pop.PMethod{pairing.Random{}},
+		1,
+		alg.LinearIntRange{4, 6},
+		0.05,
+		"TGP")
+}
 
-// 	Seed()
+func TestVSMReverseList(t *testing.T) {
 
-// 	testCases := []TestCase{ReverseListTestCase()}
+	Seed()
 
-// 	gpOpt := lgp.Options{
-// 		MinActionCount:  10,
-// 		MaxActionCount:  200,
-// 		MaxStartActions: 40,
-// 		MinStartActions: 20,
+	testCases := []TestCase{ReverseListTestCase()}
 
-// 		SwapMutationChance:   0.15,
-// 		ValueMutationChance:  0.15,
-// 		ShrinkMutationChance: 0.10,
-// 		ExpandMutationChance: 0.10,
-// 		MemMutationChance:    0.10,
-// 	}
+	gpOpt := lgp.Options{
+		MinActionCount:  10,
+		MaxActionCount:  200,
+		MaxStartActions: 40,
+		MinStartActions: 20,
 
-// 	actions := lgp.BaseActions
-// 	actions = append(actions, lgp.EnvActions...)
+		SwapMutationChance:   0.15,
+		ValueMutationChance:  0.15,
+		ShrinkMutationChance: 0.10,
+		ExpandMutationChance: 0.10,
+		MemMutationChance:    0.10,
+	}
 
-// 	lgp.Init(gpOpt,
-// 		env.NewI(5, 0),
-// 		env.NewI(10, 0),
-// 		lgp.PointCrossover{3},
-// 		actions,
-// 		1.0,
-// 		lgp.MatchMemFitness,
-// 		600)
+	actions := lgp.BaseActions
+	actions = append(actions, lgp.EnvActions...)
 
-// 	lgp.PrintActions()
+	lgp.Init(gpOpt,
+		env.NewI(5, 0),
+		env.NewI(10, 0),
+		lgp.PointCrossover{3},
+		actions,
+		1.0,
+		lgp.MatchMemFitness,
+		600)
 
-// 	RunSuite(
-// 		testCases,
-// 		75,
-// 		3000,
-// 		100000,
-// 		gpOpt,
-// 		lgp.GeneratePopulation,
-// 		[]pop.SMethod{
-// 			selection.Probabilistic{3, 2},
-// 			selection.Probabilistic{2, 2},
-// 			selection.DeterministicTournament{2, 3},
-// 			selection.DeterministicTournament{3, 3},
-// 			selection.Tournament{4, 3, 0.5},
-// 		},
-// 		[]pop.PMethod{pairing.Random{}},
-// 		1,
-// 		alg.LinearIntRange{1, 10},
-// 		0.10,
-// 		"LGP")
-// }
+	lgp.PrintActions()
 
-// func TestNNReverseList(t *testing.T) {
+	RunSuite(
+		testCases,
+		75,
+		3000,
+		100000,
+		gpOpt,
+		lgp.GeneratePopulation,
+		[]pop.SMethod{
+			selection.Probabilistic{3, 2},
+			selection.Probabilistic{2, 2},
+			selection.DeterministicTournament{2, 3},
+			selection.DeterministicTournament{3, 3},
+			selection.Tournament{4, 3, 0.5},
+		},
+		[]pop.PMethod{pairing.Random{}},
+		1,
+		alg.LinearIntRange{1, 10},
+		0.10,
+		"LGP")
+}
 
-// 	Seed()
+func TestNNReverseList(t *testing.T) {
 
-// 	testCases := []TestCase{ReverseListTestCase()}
+	Seed()
 
-// 	nngOpt := neural.NetworkGenerationOptions{
-// 		NetworkMutationOptions: neural.NetworkMutationOptions{
-// 			WeightOptions: neural.FloatMutationOptions{
-// 				MutChance:     0.20,
-// 				MutMagnitude:  2.0,
-// 				MutRange:      60,
-// 				ZeroOutChance: 0.01,
-// 			},
-// 			ColumnOptions: neural.ColumnGenerationOptions{
-// 				MinSize:           3,
-// 				MaxSize:           4,
-// 				DefaultAxonWeight: 0.5,
-// 			},
-// 			ActivatorOptions:        neural.AllActivators,
-// 			NeuronReplacementChance: 0.05,
-// 			NeuronAdditionChance:    0.00,
-// 			WeightSwapChance:        0.05,
-// 			ColumnRemovalChance:     0.00,
-// 			ColumnAdditionChance:    0.00,
-// 			NeuronMutationChance:    0.10,
-// 			ActivatorMutationChance: 0.01,
-// 		},
-// 		MinColumns:    6,
-// 		MaxColumns:    7,
-// 		MaxInputs:     6,
-// 		MaxOutputs:    6,
-// 		BaseMutations: 20,
-// 	}
+	testCases := []TestCase{ReverseListTestCase()}
 
-// 	neural.Init(
-// 		nngOpt,
-// 		neural.AverageCrossover{2},
-// 		neural.MatchFitness(0.25),
-// 	)
+	nngOpt := neural.NetworkGenerationOptions{
+		NetworkMutationOptions: neural.NetworkMutationOptions{
+			WeightOptions: neural.FloatMutationOptions{
+				MutChance:     0.20,
+				MutMagnitude:  2.0,
+				MutRange:      60,
+				ZeroOutChance: 0.01,
+			},
+			ColumnOptions: neural.ColumnGenerationOptions{
+				MinSize:           3,
+				MaxSize:           4,
+				DefaultAxonWeight: 0.5,
+			},
+			ActivatorOptions:        neural.AllActivators,
+			NeuronReplacementChance: 0.05,
+			NeuronAdditionChance:    0.00,
+			WeightSwapChance:        0.05,
+			ColumnRemovalChance:     0.00,
+			ColumnAdditionChance:    0.00,
+			NeuronMutationChance:    0.10,
+			ActivatorMutationChance: 0.01,
+		},
+		MinColumns:    6,
+		MaxColumns:    7,
+		MaxInputs:     6,
+		MaxOutputs:    6,
+		BaseMutations: 20,
+	}
 
-// 	RunSuite(
-// 		testCases,
-// 		4,
-// 		200,
-// 		100000,
-// 		nngOpt,
-// 		neural.GeneratePopulation,
-// 		[]pop.SMethod{selection.DeterministicTournament{3, 3}},
-// 		[]pop.PMethod{pairing.Random{}},
-// 		2.0,
-// 		alg.LinearIntRange{1, 4},
-// 		0.1,
-// 		"ENN",
-// 	)
-// }
+	neural.Init(
+		nngOpt,
+		neural.AverageCrossover{2},
+		neural.MatchFitness(0.25),
+	)
+
+	RunSuite(
+		testCases,
+		4,
+		200,
+		100000,
+		nngOpt,
+		neural.GeneratePopulation,
+		[]pop.SMethod{selection.DeterministicTournament{3, 3}},
+		[]pop.PMethod{pairing.Random{}},
+		2.0,
+		alg.LinearIntRange{1, 4},
+		0.1,
+		"ENN",
+	)
+}

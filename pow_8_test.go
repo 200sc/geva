@@ -30,9 +30,11 @@ func TestGPPow8(t *testing.T) {
 		gpOpt,
 		env.NewI(1, 0),
 		gp.PointCrossover{},
-		gp.BaseActions,
+		gp.Pow8Actions,
 		1.0,
-		gp.ComplexityFitness(gp.OutputFitness, 0.05))
+		gp.ComplexityFitness(gp.Mem0Fitness, 0.01))
+
+	gp.AddStorage(3, 1)
 
 	RunSuite(
 		testCases,
