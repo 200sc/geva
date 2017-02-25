@@ -1,13 +1,14 @@
 package goevo
 
 import (
-	"goevo/alg"
-	"goevo/env"
-	"goevo/lgp"
-	"goevo/pairing"
-	"goevo/pop"
-	"goevo/selection"
 	"testing"
+
+	"bitbucket.org/StephenPatrick/goevo/alg"
+	"bitbucket.org/StephenPatrick/goevo/env"
+	"bitbucket.org/StephenPatrick/goevo/lgp"
+	"bitbucket.org/StephenPatrick/goevo/pairing"
+	"bitbucket.org/StephenPatrick/goevo/pop"
+	"bitbucket.org/StephenPatrick/goevo/selection"
 )
 
 func TestLGPRun(t *testing.T) {

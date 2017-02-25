@@ -1,6 +1,6 @@
 package gp
 
-import "goevo/env"
+import "bitbucket.org/StephenPatrick/goevo/env"
 
 type InitOptions struct {
 	GenOpt           Options

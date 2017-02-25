@@ -1,14 +1,14 @@
 package goevo
 
 import (
-	"goevo/alg"
-	"goevo/env"
-	"goevo/gp"
-	"goevo/lgp"
-	"goevo/neural"
-	"goevo/pairing"
-	"goevo/pop"
-	"goevo/selection"
+	"bitbucket.org/StephenPatrick/goevo/alg"
+	"bitbucket.org/StephenPatrick/goevo/env"
+	"bitbucket.org/StephenPatrick/goevo/gp"
+	"bitbucket.org/StephenPatrick/goevo/lgp"
+	"bitbucket.org/StephenPatrick/goevo/neural"
+	"bitbucket.org/StephenPatrick/goevo/pairing"
+	"bitbucket.org/StephenPatrick/goevo/pop"
+	"bitbucket.org/StephenPatrick/goevo/selection"
 	"testing"
 )
 

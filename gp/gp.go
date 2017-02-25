@@ -1,8 +1,8 @@
 package gp
 
 import (
-	"goevo/env"
-	"goevo/pop"
+	"bitbucket.org/StephenPatrick/goevo/env"
+	"bitbucket.org/StephenPatrick/goevo/pop"
 	"math/rand"
 )
 

@@ -1,7 +1,7 @@
 package lgp
 
 import (
-	"goevo/alg"
+	"bitbucket.org/StephenPatrick/goevo/alg"
 	"math/rand"
 	"strconv"
 )

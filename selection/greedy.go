@@ -1,7 +1,7 @@
 package selection
 
 import (
-	"goevo/pop"
+	"bitbucket.org/StephenPatrick/goevo/pop"
 	"sort"
 )
 

@@ -2,7 +2,7 @@ package neural
 
 import (
 	"fmt"
-	"goevo/pop"
+	"bitbucket.org/StephenPatrick/goevo/pop"
 	"math/rand"
 )
 

@@ -2,8 +2,8 @@ package goevo
 
 import (
 	"fmt"
-	"goevo/alg"
-	"goevo/pop"
+	"bitbucket.org/StephenPatrick/goevo/alg"
+	"bitbucket.org/StephenPatrick/goevo/pop"
 	"math/rand"
 	"time"
 )
