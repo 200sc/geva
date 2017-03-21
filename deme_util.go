@@ -48,20 +48,7 @@ func SilentRunDemeGroup(dg pop.DemeGroup, numGens int) pop.Individual {
 	for i := 0; i < numGens; i++ {
 		stopEarly := dg.NextGeneration()
 		if i == numGens-1 || stopEarly {
-			for _, p := range dg.Demes {
-				w, _ := p.Weights(1.0)
-				fmt.Println(w)
-				maxWeight := 0.0
-				maxIndex := 0
-				for i, v := range w {
-					if v > maxWeight {
-						maxWeight = v
-						maxIndex = i
-					}
-				}
-				fmt.Println(p.Fitnesses)
-				p.Members[maxIndex].Print()
-			}
+			break
 		}
 	}
 	best, _ := dg.BestMember()
