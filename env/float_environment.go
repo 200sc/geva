@@ -1,6 +1,9 @@
 package env
 
-import "math/rand"
+import (
+	"math"
+	"math/rand"
+)
 
 type F []*float64
 
@@ -32,16 +35,26 @@ func (env *F) New(envDiff []float64) *F {
 
 // Returns the absolute difference between the given environment
 // and the passed in expectations. 0 in envDiff is treated as
-// insinificant.
-func (env *F) Diff(envDiff []float64) (diff int) {
-	diff_f := 0.0
+// insignificant.
+func (env *F) Diff(envDiff []float64) int {
+	diff := 0.0
 	for i, f := range envDiff {
 		if f != 0.0 {
-			diff_f += *(*env)[i] - f
+			diff += math.Abs(*(*env)[i] - f)
 		}
 	}
-	diff = int(diff_f)
-	return
+	return int(diff)
+}
+
+// DiffSingle returns the difference between
+func (env *F) DiffSingle(check float64) int {
+	diff := 0.0
+	for i, f := range *env {
+		if *f != 0.0 {
+			diff += math.Abs(*(*env)[i] - check)
+		}
+	}
+	return int(diff)
 }
 
 func (env *F) SetAll(f float64) {
@@ -63,12 +76,18 @@ func (env *F) Randomize(min *F, max *F) {
 	}
 }
 
-func NewF(size int, baseVal int) *F {
+func (env *F) RandomizeSingle(mn float64, mx float64) {
+	diff := mx - mn
+	for i := 0; i < len(*env); i++ {
+		*(*env)[i] = (diff * rand.Float64()) + mn
+	}
+}
+
+func NewF(size int, baseVal float64) *F {
 	env := make(F, size)
-	baseVal_f := float64(baseVal)
 	for i := 0; i < size; i++ {
 		env[i] = new(float64)
-		*env[i] = baseVal_f
+		*env[i] = baseVal
 	}
 	return &env
 }
