@@ -2,7 +2,7 @@ package eda
 
 import "bitbucket.org/StephenPatrick/goevo/env"
 
-type EDA func(...Option) Model
+type EDA func(...Option) (Model, error)
 
 type Model interface {
 	BaseModel() *Base
@@ -20,7 +20,10 @@ type Problem struct {
 }
 
 func Loop(eda EDA, samples int, opts ...Option) {
-	model := eda(opts...)
+	model, err := eda(opts...)
+	if err != nil {
+		panic(err)
+	}
 	for model.ShouldContinue() {
 		model = model.Adjust(samples)
 	}

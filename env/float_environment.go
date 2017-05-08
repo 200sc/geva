@@ -83,6 +83,16 @@ func (env *F) RandomizeSingle(mn float64, mx float64) {
 	}
 }
 
+func (env *F) ToIntRandom() *I {
+	envI := NewI(len(*env), 0)
+	for i, f := range *env {
+		if rand.Float64() < *f {
+			*(*envI)[i] = 1
+		}
+	}
+	return envI
+}
+
 func NewF(size int, baseVal float64) *F {
 	env := make(F, size)
 	for i := 0; i < size; i++ {

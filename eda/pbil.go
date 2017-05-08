@@ -1,6 +1,11 @@
 package eda
 
-import "bitbucket.org/StephenPatrick/goevo/env"
+import (
+	"math"
+	"math/rand"
+
+	"bitbucket.org/StephenPatrick/goevo/env"
+)
 
 type PBIL struct {
 	Base
@@ -12,6 +17,27 @@ func (pbil *PBIL) ShouldContinue() bool {
 }
 
 func (pbil *PBIL) Adjust(samples int) Model {
+	bestCandidateFitness := math.MaxInt32
+	var bestCandidate *env.F
+	eCopy := pbil.e.Copy()
+	for i := 0; i < samples; i++ {
+		pbil.e = pbil.e.Copy()
+		for j, f := range *pbil.e {
+			if rand.Float64() < *f {
+				*(*pbil.e)[j] = 1
+			} else {
+				*(*pbil.e)[j] = 0
+			}
+		}
+		f := pbil.fitness(pbil)
+		if f < bestCandidateFitness {
+			bestCandidateFitness = f
+			bestCandidate = pbil.e.Copy()
+		}
+	}
+	pbil.e = eCopy
+	pbil.e.Learn(eCopy, pbil.learningRate)
+	//pbil.e.Mutate()
 	return pbil
 }
 
@@ -31,6 +57,7 @@ func PBILModel(opts ...Option) (Model, error) {
 	if pbil.randomize {
 		pbil.e.RandomizeSingle(0.0, 1.0)
 	}
+	return pbil, nil
 }
 
 type InvalidLengthError struct{}

@@ -9,12 +9,13 @@ import "bitbucket.org/StephenPatrick/goevo/env"
 // that do not want as many fields as Base provides do not need to have
 // wasted memory in their structs.
 type Base struct {
-	e           *env.F
-	fitness     Fitness
-	goalFitness int
-	length      int
-	baseValue   float64
-	randomize   bool
+	e            *env.F
+	fitness      Fitness
+	goalFitness  int
+	length       int
+	baseValue    float64
+	randomize    bool
+	learningRate float64
 }
 
 // BaseModel is a function which is used by all Options to obtain the
@@ -62,5 +63,12 @@ func BaseValue(bv float64) func(Model) {
 func Randomize(r bool) func(Model) {
 	return func(m Model) {
 		m.BaseModel().randomize = r
+	}
+}
+
+// LearningRate is an option which sets the learning rate
+func LearningRate(lr float64) func(Model) {
+	return func(m Model) {
+		m.BaseModel().learningRate = lr
 	}
 }
