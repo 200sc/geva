@@ -36,7 +36,7 @@ func (pbil *PBIL) Adjust(samples int) Model {
 		}
 	}
 	pbil.e = eCopy
-	pbil.e.Learn(eCopy, pbil.learningRate)
+	pbil.e.Reinforce(bestCandidate, pbil.learningRate)
 	//pbil.e.Mutate()
 	return pbil
 }
