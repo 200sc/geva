@@ -1,7 +1,7 @@
 # GoEvo #
 # Version 0.0.2#
 
-This can build and evolve neural networks.
+This can build and evolve gps and neural networks.
 
 Usage: see test files, helper functions for usage don't exist yet really.
 
