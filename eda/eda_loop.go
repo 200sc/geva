@@ -2,8 +2,11 @@ package eda
 
 import "bitbucket.org/StephenPatrick/goevo/env"
 
+// An EDA is a function which constructs an
+// EDA model from a set of initialization options.
 type EDA func(...Option) (Model, error)
 
+// A Model is an iteratively adjusting EDA model
 type Model interface {
 	BaseModel() *Base
 	ShouldContinue() bool
@@ -12,19 +15,18 @@ type Model interface {
 	ToEnv() *env.F
 }
 
+// A Fitness function for EDAs return an integer
+// from a given model
 type Fitness func(m Model) int
 
-type Problem struct {
-	length  int
-	fitness Fitness
-}
-
-func Loop(eda EDA, samples int, opts ...Option) {
+// Loop is the main EDA loop
+func Loop(eda EDA, samples int, opts ...Option) (Model, error) {
 	model, err := eda(opts...)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	for model.ShouldContinue() {
 		model = model.Adjust(samples)
 	}
+	return model, nil
 }

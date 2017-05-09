@@ -16,8 +16,8 @@ import (
 func OnemaxABS(m Model) int {
 	e := m.ToEnv()
 	diff := 0.0
-	for i, f := range *e {
-		diff += math.Abs(*(*e)[i] - 1)
+	for _, f := range *e {
+		diff += math.Abs(*f - 1)
 	}
 	return int(diff)
 }
@@ -25,7 +25,7 @@ func OnemaxABS(m Model) int {
 func OnemaxChance(m Model) int {
 	e := m.ToEnv()
 	diff := 0
-	for i, f := range *e {
+	for _, f := range *e {
 		if rand.Float64() > *f {
 			diff++
 		}

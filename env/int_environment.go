@@ -54,7 +54,7 @@ func (env *I) New(envDiff []float64) *I {
 func (env *I) Diff(envDiff []float64) (diff int) {
 	for i, f := range envDiff {
 		if f != 0.0 {
-			diff += int(math.Ceil(float64(*(*env)[i]) - f))
+			diff += int(math.Ceil(math.Abs(float64(*(*env)[i]) - f)))
 		}
 	}
 	return

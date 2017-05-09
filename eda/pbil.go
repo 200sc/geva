@@ -5,6 +5,7 @@ import (
 	"math/rand"
 
 	"bitbucket.org/StephenPatrick/goevo/env"
+	"bitbucket.org/StephenPatrick/goevo/evoerr"
 )
 
 type PBIL struct {
@@ -19,49 +20,40 @@ func (pbil *PBIL) ShouldContinue() bool {
 func (pbil *PBIL) Adjust(samples int) Model {
 	bestCandidateFitness := math.MaxInt32
 	var bestCandidate *env.F
-	eCopy := pbil.e.Copy()
+	eCopy := pbil.F.Copy()
 	for i := 0; i < samples; i++ {
-		pbil.e = pbil.e.Copy()
-		for j, f := range *pbil.e {
+		pbil.F = pbil.F.Copy()
+		for j, f := range *pbil.F {
 			if rand.Float64() < *f {
-				*(*pbil.e)[j] = 1
+				*(*pbil.F)[j] = 1
 			} else {
-				*(*pbil.e)[j] = 0
+				*(*pbil.F)[j] = 0
 			}
 		}
 		f := pbil.fitness(pbil)
 		if f < bestCandidateFitness {
 			bestCandidateFitness = f
-			bestCandidate = pbil.e.Copy()
+			bestCandidate = pbil.F.Copy()
 		}
 	}
-	pbil.e = eCopy
-	pbil.e.Reinforce(bestCandidate, pbil.learningRate)
-	//pbil.e.Mutate()
+	pbil.F = eCopy
+	pbil.F.Reinforce(bestCandidate, pbil.learningRate)
+	pbil.F.Mutate(pbil.mutationRate, pbil.fmutator)
 	return pbil
-}
-
-func (pbil *PBIL) ToEnv() *env.F {
-	return pbil.e
 }
 
 func PBILModel(opts ...Option) (Model, error) {
 	pbil := new(PBIL)
+	pbil.Base = DefaultBase()
 	for _, opt := range opts {
 		opt(pbil)
 	}
 	if pbil.length <= 0 {
-		return nil, InvalidLengthError{}
+		return nil, evoerr.InvalidLengthError{}
 	}
-	pbil.e = env.NewF(pbil.length, pbil.baseValue)
+	pbil.F = env.NewF(pbil.length, pbil.baseValue)
 	if pbil.randomize {
-		pbil.e.RandomizeSingle(0.0, 1.0)
+		pbil.F.RandomizeSingle(0.0, 1.0)
 	}
 	return pbil, nil
-}
-
-type InvalidLengthError struct{}
-
-func (ile InvalidLengthError) Error() string {
-	return "The length given was less than or equal to zero"
 }

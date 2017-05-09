@@ -1,6 +1,9 @@
 package eda
 
-import "bitbucket.org/StephenPatrick/goevo/env"
+import (
+	"bitbucket.org/StephenPatrick/goevo/env"
+	"bitbucket.org/StephenPatrick/goevo/mut"
+)
 
 // Base is a struct which all EDA models should be composed of so that
 // they can use generic option functions. Future work: create several
@@ -9,13 +12,22 @@ import "bitbucket.org/StephenPatrick/goevo/env"
 // that do not want as many fields as Base provides do not need to have
 // wasted memory in their structs.
 type Base struct {
-	e            *env.F
+	*env.F
 	fitness      Fitness
 	goalFitness  int
 	length       int
 	baseValue    float64
-	randomize    bool
 	learningRate float64
+	mutationRate float64
+	fmutator     mut.FloatMutator
+	randomize    bool
+}
+
+// DefaultBase initializes some base fields to non-automatic zero values
+func DefaultBase() Base {
+	b := Base{}
+	b.fmutator = mut.None()
+	return b
 }
 
 // BaseModel is a function which is used by all Options to obtain the
@@ -70,5 +82,19 @@ func Randomize(r bool) func(Model) {
 func LearningRate(lr float64) func(Model) {
 	return func(m Model) {
 		m.BaseModel().learningRate = lr
+	}
+}
+
+// MutationRate is an option which sets the mutation rate
+func MutationRate(mr float64) func(Model) {
+	return func(m Model) {
+		m.BaseModel().mutationRate = mr
+	}
+}
+
+// FMutator sets a model's float mutator
+func FMutator(mtr mut.FloatMutator) func(Model) {
+	return func(m Model) {
+		m.BaseModel().fmutator = mtr
 	}
 }
