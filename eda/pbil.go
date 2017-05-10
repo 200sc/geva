@@ -1,32 +1,7 @@
 package eda
 
-import (
-	"math/rand"
-
-	"bitbucket.org/StephenPatrick/goevo/env"
-	"bitbucket.org/StephenPatrick/goevo/evoerr"
-)
-
 type PBIL struct {
 	Base
-}
-
-func (pbil *PBIL) Continue() bool {
-	fitness := pbil.fitness(pbil)
-	//fmt.Println(fitness, pbil.goalFitness)
-	return fitness > pbil.goalFitness
-}
-
-func GetSample(e *env.F) *env.F {
-	sample := e.Copy()
-	for _, f := range *sample {
-		if rand.Float64() <= *f {
-			*f = 1
-		} else {
-			*f = 0
-		}
-	}
-	return sample
 }
 
 func (pbil *PBIL) Adjust() Model {
@@ -57,17 +32,8 @@ func (pbil *PBIL) Adjust() Model {
 }
 
 func PBILModel(opts ...Option) (Model, error) {
+	var err error
 	pbil := new(PBIL)
-	pbil.Base = DefaultBase()
-	for _, opt := range opts {
-		opt(pbil)
-	}
-	if pbil.length <= 0 {
-		return nil, evoerr.InvalidLengthError{}
-	}
-	pbil.F = env.NewF(pbil.length, pbil.baseValue)
-	if pbil.randomize {
-		pbil.F.RandomizeSingle(0.0, 1.0)
-	}
-	return pbil, nil
+	pbil.Base, err = DefaultBase(opts...)
+	return pbil, err
 }

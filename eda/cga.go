@@ -1,20 +1,9 @@
 package eda
 
-import (
-	"fmt"
-
-	"bitbucket.org/StephenPatrick/goevo/env"
-	"bitbucket.org/StephenPatrick/goevo/evoerr"
-)
+import "fmt"
 
 type CGA struct {
 	Base
-}
-
-func (cga *CGA) Continue() bool {
-	fitness := cga.fitness(cga)
-	fmt.Println(fitness, cga.goalFitness)
-	return fitness > cga.goalFitness
 }
 
 func (cga *CGA) Adjust() Model {
@@ -30,10 +19,9 @@ func (cga *CGA) Adjust() Model {
 	}
 
 	cga.F = eCopy
-	bcsList := bcs.Slice()
-	cand := bcsList[0]
+	cand := bcs.Front.F
 
-	cand.SubF(bcsList[1])
+	cand.SubF(bcs.Back.F)
 	fmt.Println(cand)
 	cand.Mult(cga.learningRate)
 	cga.F.AddF(cand)
@@ -44,17 +32,8 @@ func (cga *CGA) Adjust() Model {
 }
 
 func CGAModel(opts ...Option) (Model, error) {
+	var err error
 	cga := new(CGA)
-	cga.Base = DefaultBase()
-	for _, opt := range opts {
-		opt(cga)
-	}
-	if cga.length <= 0 {
-		return nil, evoerr.InvalidLengthError{}
-	}
-	cga.F = env.NewF(cga.length, cga.baseValue)
-	if cga.randomize {
-		cga.F.RandomizeSingle(0.0, 1.0)
-	}
-	return cga, nil
+	cga.Base, err = DefaultBase(opts...)
+	return cga, err
 }

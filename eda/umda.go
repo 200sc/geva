@@ -4,18 +4,11 @@ import (
 	"fmt"
 
 	"bitbucket.org/StephenPatrick/goevo/env"
-	"bitbucket.org/StephenPatrick/goevo/evoerr"
 	"bitbucket.org/StephenPatrick/goevo/pop"
 )
 
 type UMDA struct {
 	Base
-}
-
-func (umda *UMDA) Continue() bool {
-	fitness := umda.fitness(umda)
-	fmt.Println(fitness, umda.goalFitness)
-	return fitness > umda.goalFitness
 }
 
 func (umda *UMDA) Adjust() Model {
@@ -25,7 +18,7 @@ func (umda *UMDA) Adjust() Model {
 
 	// This is a bastardization of the evolutionary population model
 	// because the evolutionary population model assumes you will follow its
-	// rules and not replace its elements and call its NextGeneration function
+	// rules and don't replace its elements and call its NextGeneration function
 	// and we are breaking all of its rules,
 	// which implies there are problems with the evolutionary population model
 	// in that there should be some lower tiered struct that can't do
@@ -73,19 +66,10 @@ func (umda *UMDA) Adjust() Model {
 }
 
 func UMDAModel(opts ...Option) (Model, error) {
+	var err error
 	umda := new(UMDA)
-	umda.Base = DefaultBase()
-	for _, opt := range opts {
-		opt(umda)
-	}
-	if umda.length <= 0 {
-		return nil, evoerr.InvalidLengthError{}
-	}
-	umda.F = env.NewF(umda.length, umda.baseValue)
-	if umda.randomize {
-		umda.F.RandomizeSingle(0.0, 1.0)
-	}
-	return umda, nil
+	umda.Base, err = DefaultBase(opts...)
+	return umda, err
 }
 
 type UMDAIndividual struct {

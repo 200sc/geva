@@ -1,7 +1,10 @@
 package eda
 
 import (
+	"fmt"
+
 	"bitbucket.org/StephenPatrick/goevo/env"
+	"bitbucket.org/StephenPatrick/goevo/evoerr"
 	"bitbucket.org/StephenPatrick/goevo/mut"
 	"bitbucket.org/StephenPatrick/goevo/selection"
 )
@@ -29,19 +32,41 @@ type Base struct {
 }
 
 // DefaultBase initializes some base fields to non-automatic zero values
-func DefaultBase() Base {
-	b := Base{}
+func DefaultBase(opts ...Option) (Base, error) {
+	b := new(Base)
 	b.fmutator = mut.None()
 	b.lmutator = mut.None()
 	b.length = 1
 	b.samples = 1
 	b.learningSamples = 1
-	return b
+	for _, opt := range opts {
+		opt(b)
+	}
+	if b.length <= 0 {
+		return *b, evoerr.InvalidLengthError{}
+	}
+	b.F = env.NewF(b.length, b.baseValue)
+	if b.randomize {
+		b.F.RandomizeSingle(0.0, 1.0)
+	}
+	return *b, nil
 }
 
 // BaseModel is a function which is used by all Options to obtain the
 // base from any given model. All models must implement BaseModel.
 func (b *Base) BaseModel() *Base {
+	return b
+}
+
+// Default Continue
+func (b *Base) Continue() bool {
+	fitness := b.fitness(b)
+	fmt.Println(fitness, b.goalFitness)
+	return fitness > b.goalFitness
+}
+
+// Default Adjust
+func (b *Base) Adjust() Model {
 	return b
 }
 

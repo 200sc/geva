@@ -16,7 +16,7 @@ func Seed() {
 	rand.Seed(time.Now().UTC().UnixNano())
 }
 
-func TestOneMax(t *testing.T) {
+func TestOneMaxPBIL(t *testing.T) {
 	Seed()
 	rng := floatrange.NewLinear(0.0, 1.0)
 	//lrng := floatrange.NewLinear(0.05, 1.0)

@@ -1,6 +1,10 @@
 package eda
 
-import "bitbucket.org/StephenPatrick/goevo/env"
+import (
+	"math/rand"
+
+	"bitbucket.org/StephenPatrick/goevo/env"
+)
 
 type BestCandidates struct {
 	Front  *Candidate
@@ -68,4 +72,16 @@ func (bc *BestCandidates) add(cand *Candidate) {
 			bc.Front = cand
 		}
 	}
+}
+
+func GetSample(e *env.F) *env.F {
+	sample := e.Copy()
+	for _, f := range *sample {
+		if rand.Float64() <= *f {
+			*f = 1
+		} else {
+			*f = 0
+		}
+	}
+	return sample
 }
