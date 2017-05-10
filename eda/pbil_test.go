@@ -34,7 +34,7 @@ func TestOneMax(t *testing.T) {
 		MutationRate(3.0/(length/10.0)),
 		FMutator( //mut.Or(
 			mut.And(
-				mut.LinearRange(0.10),
+				mut.Or(mut.Add(.1), mut.Add(-.1), .5),
 				rng.EnforceRange),
 			//mut.DropOut(0.5),
 			//0.999,

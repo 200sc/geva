@@ -32,6 +32,13 @@ func Scale(s float64) FloatMutator {
 	}
 }
 
+// Add combines a and f through addition
+func Add(a float64) FloatMutator {
+	return func(f float64) float64 {
+		return f + a
+	}
+}
+
 // None performs no mutation on f
 func None() FloatMutator {
 	return func(f float64) float64 {
