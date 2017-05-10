@@ -15,13 +15,11 @@ func (pbil *PBIL) Adjust() Model {
 		pbil.F = GetSample(eCopy)
 		bcs.Add(pbil.fitness(pbil), pbil.F)
 	}
-	// Also could add a worst candidate and a negative learning rate
 	pbil.F = eCopy
 	bcsList := bcs.Slice()
 	// Hypothetically bcsList has a length equal to
 	// pbil.learningSamples but if samples < learningSamples
 	// this this case ensures we still learn a total of learningRate.
-	//fmt.Println("Learning rate:", pbil.learningRate)
 	realRate := pbil.learningRate / float64(len(bcsList))
 	for _, cand := range bcsList {
 		pbil.F.Reinforce(cand, realRate)
