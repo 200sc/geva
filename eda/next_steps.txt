@@ -2,3 +2,62 @@
 
 Do a write up to go in the final essay on how PBIL works and how UMDA does not
 work without additional learning methods. 
+
+
+Doneish
+
+UMDA [2]
+PBIL [3]
+cGA [4]
+SHCLVND [20]
+
+Similar to done
+
+• BMDA [7]
+• Adaptive
+Gaussian
+PBIL [23]
+• ECGA [5]
+
+To do
+
+Last univariate algorithm 
+EGA (Equilibrium Genetic Algorithm) (http://dl.acm.org/citation.cfm?id=1329468)
+
+Bivariate
+
+• MIMIC [6]
+BMDA(above)
+Dependency Trees (https://www.cs.ubc.ca/~hutter/EARG.shtml/earg/stack/baluja_shumeet_1997_2.pdf)
+
+Multivariate
+
+• BOA [8]
+• hierarchical
+BOA [9]
+• mixed-BOA
+[10]
+• real-coded
+BOA [11]
+
+• EBNA [12]
+
+• LFDA [13]
+
+• MOA [14]
+
+• AffEDA [15]
+• dtEDA [16]
+
+• ICE [17]
+
+• EHBSA [18]
+• NHBSA [19]
+
+• EGNA [21]
+
+• IDEA [22]
+• mIDEA [10]
+
+ECGA (above)
+AGPBIL (above)
