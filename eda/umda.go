@@ -67,6 +67,8 @@ func (umda *UMDA) Adjust() Model {
 	umda.F = newenv
 	// return that
 
+	umda.F.Mutate(umda.mutationRate, umda.fmutator)
+
 	return umda
 }
 

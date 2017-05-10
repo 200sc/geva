@@ -2,7 +2,6 @@ package eda
 
 import (
 	"fmt"
-	"time"
 
 	"bitbucket.org/StephenPatrick/goevo/env"
 	"bitbucket.org/StephenPatrick/goevo/evoerr"
@@ -15,7 +14,6 @@ type CGA struct {
 func (cga *CGA) Continue() bool {
 	fitness := cga.fitness(cga)
 	fmt.Println(fitness, cga.goalFitness)
-	time.Sleep(1 * time.Second)
 	return fitness > cga.goalFitness
 }
 
@@ -34,7 +32,7 @@ func (cga *CGA) Adjust() Model {
 	cga.F = eCopy
 	bcsList := bcs.Slice()
 	cand := bcsList[0]
-	
+
 	cand.SubF(bcsList[1])
 	fmt.Println(cand)
 	cand.Mult(cga.learningRate)
