@@ -17,6 +17,7 @@ func TestOneMaxCGA(t *testing.T) {
 		//FitnessFunc(OnemaxChance),
 		FitnessFunc(OnemaxABS),
 		GoalFitness(4),
+		Samples(100),
 		Length(int(length)),
 		BaseValue(0.5),
 		//Randomize(true),

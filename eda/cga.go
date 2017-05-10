@@ -8,9 +8,9 @@ type CGA struct {
 
 func (cga *CGA) Adjust() Model {
 
-	bcs := NewBestCandidates(2)
+	bcs := NewBestCandidates(cga.samples)
 	eCopy := cga.F.Copy()
-	for i := 0; i < 2; i++ {
+	for i := 0; i < cga.samples; i++ {
 		// We set the sample to cga.F right now
 		// as our fitness function takes in a model
 		// this might change
