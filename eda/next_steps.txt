@@ -21,8 +21,6 @@ PBIL [23]
 
 To do
 
-Last univariate algorithm 
-EGA (Equilibrium Genetic Algorithm) (http://dl.acm.org/citation.cfm?id=1329468)
 
 Bivariate
 
