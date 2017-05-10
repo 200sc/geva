@@ -19,6 +19,12 @@ func (env *F) ToEnv() *F {
 	return env
 }
 
+func (env *F) Divide(s float64) {
+	for _, f := range *env {
+		*f = *f / s
+	}
+}
+
 // Copy returns a copy of F.
 func (env *F) Copy() *F {
 	newEnv := make(F, len(*env))

@@ -3,6 +3,7 @@ package eda
 import (
 	"bitbucket.org/StephenPatrick/goevo/env"
 	"bitbucket.org/StephenPatrick/goevo/mut"
+	"bitbucket.org/StephenPatrick/goevo/selection"
 )
 
 // Base is a struct which all EDA models should be composed of so that
@@ -23,6 +24,7 @@ type Base struct {
 	fmutator        mut.FloatMutator
 	samples         int
 	learningSamples int
+	selection       selection.Method
 	randomize       bool
 }
 
@@ -122,5 +124,11 @@ func FMutator(mtr mut.FloatMutator) func(Model) {
 func LMutator(mtr mut.FloatMutator) func(Model) {
 	return func(m Model) {
 		m.BaseModel().lmutator = mtr
+	}
+}
+
+func SelectionMethod(sm selection.Method) func(Model) {
+	return func(m Model) {
+		m.BaseModel().selection = sm
 	}
 }

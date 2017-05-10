@@ -17,19 +17,27 @@ func (pbil *PBIL) Continue() bool {
 	return fitness > pbil.goalFitness
 }
 
+func GetSample(e *env.F) *env.F {
+	sample := e.Copy()
+	for _, f := range *sample {
+		if rand.Float64() <= *f {
+			*f = 1
+		} else {
+			*f = 0
+		}
+	}
+	return sample
+}
+
 func (pbil *PBIL) Adjust() Model {
 
 	bcs := NewBestCandidates(pbil.learningSamples)
 	eCopy := pbil.F.Copy()
 	for i := 0; i < pbil.samples; i++ {
-		pbil.F = eCopy.Copy()
-		for j, f := range *pbil.F {
-			if rand.Float64() <= *f {
-				*(*pbil.F)[j] = 1
-			} else {
-				*(*pbil.F)[j] = 0
-			}
-		}
+		// We set the sample to pbil.F right now
+		// as our fitness function takes in a model
+		// this might change
+		pbil.F = GetSample(eCopy)
 		bcs.Add(pbil.fitness(pbil), pbil.F)
 	}
 	// Also could add a worst candidate and a negative learning rate
