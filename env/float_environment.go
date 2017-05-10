@@ -25,6 +25,48 @@ func (env *F) Divide(s float64) {
 	}
 }
 
+func (env *F) Mult(s float64) {
+	for _, f := range *env {
+		*f = *f * s
+	}
+}
+
+func (env *F) Add(s float64) {
+	for _, f := range *env {
+		*f = *f + s
+	}
+}
+
+func (env *F) Sub(s float64) {
+	for _, f := range *env {
+		*f = *f - s
+	}
+}
+
+func (env *F) DivideF(env2 *F) {
+	for i, f := range *env {
+		*f = *f / *(*env2)[i]
+	}
+}
+
+func (env *F) MultF(env2 *F) {
+	for i, f := range *env {
+		*f = *f * *(*env2)[i]
+	}
+}
+
+func (env *F) AddF(env2 *F) {
+	for i, f := range *env {
+		*f = *f + *(*env2)[i]
+	}
+}
+
+func (env *F) SubF(env2 *F) {
+	for i, f := range *env {
+		*f = *f - *(*env2)[i]
+	}
+}
+
 // Copy returns a copy of F.
 func (env *F) Copy() *F {
 	newEnv := make(F, len(*env))

@@ -12,16 +12,16 @@ import (
 func TestOneMaxUMDA(t *testing.T) {
 	Seed()
 
-	length := 1000.0
+	length := 64.0
 	model, err := Loop(UMDAModel,
-		Samples(40),
-		LearningSamples(10),
+		Samples(100),
+		LearningSamples(30),
 		//FitnessFunc(OnemaxChance),
 		FitnessFunc(OnemaxABS),
 		GoalFitness(4),
 		Length(int(length)),
 		BaseValue(0.5),
-		Randomize(true),
+		//Randomize(true),
 		SelectionMethod(selection.DeterministicTournament{2, 1}),
 	)
 	assert.Nil(t, err)
