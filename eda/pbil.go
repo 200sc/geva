@@ -1,8 +1,6 @@
 package eda
 
 import (
-	"fmt"
-	"math"
 	"math/rand"
 
 	"bitbucket.org/StephenPatrick/goevo/env"
@@ -15,35 +13,38 @@ type PBIL struct {
 
 func (pbil *PBIL) Continue() bool {
 	fitness := pbil.fitness(pbil)
-	fmt.Println(fitness, pbil.goalFitness)
+	//fmt.Println(fitness, pbil.goalFitness)
 	return fitness > pbil.goalFitness
 }
 
-func (pbil *PBIL) Adjust(samples int) Model {
-	bestCandidateFitness := math.MaxInt32
-	var bestCandidate *env.F
+func (pbil *PBIL) Adjust() Model {
+
+	bcs := NewBestCandidates(pbil.learningSamples)
 	eCopy := pbil.F.Copy()
-	for i := 0; i < samples; i++ {
+	for i := 0; i < pbil.samples; i++ {
 		pbil.F = eCopy.Copy()
 		for j, f := range *pbil.F {
-			if rand.Float64() < *f {
+			if rand.Float64() <= *f {
 				*(*pbil.F)[j] = 1
 			} else {
 				*(*pbil.F)[j] = 0
 			}
 		}
-		f := pbil.fitness(pbil)
-		if f < bestCandidateFitness {
-			bestCandidateFitness = f
-			bestCandidate = pbil.F.Copy()
-		}
+		bcs.Add(pbil.fitness(pbil), pbil.F)
 	}
+	// Also could add a worst candidate and a negative learning rate
 	pbil.F = eCopy
-	//fmt.Println("Prelearn", pbil.ToEnv())
-	//fmt.Println("Bestcandidate", bestCandidate)
-	pbil.F.Reinforce(bestCandidate, pbil.learningRate)
+	bcsList := bcs.Slice()
+	// Hypothetically bcsList has a length equal to
+	// pbil.learningSamples but if samples < learningSamples
+	// this this case ensures we still learn a total of learningRate.
+	//fmt.Println("Learning rate:", pbil.learningRate)
+	realRate := pbil.learningRate / float64(len(bcsList))
+	for _, cand := range bcsList {
+		pbil.F.Reinforce(cand, realRate)
+	}
 	pbil.F.Mutate(pbil.mutationRate, pbil.fmutator)
-	//fmt.Println("Postlearn", pbil.ToEnv())
+	pbil.learningRate = pbil.lmutator(pbil.learningRate)
 	return pbil
 }
 

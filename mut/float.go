@@ -25,6 +25,13 @@ func DropOut(setTo float64) FloatMutator {
 	}
 }
 
+// Scale scales the input float by s
+func Scale(s float64) FloatMutator {
+	return func(f float64) float64 {
+		return f * s
+	}
+}
+
 // None performs no mutation on f
 func None() FloatMutator {
 	return func(f float64) float64 {

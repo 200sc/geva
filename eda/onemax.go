@@ -13,6 +13,8 @@ import (
 //
 // These two ideas are represented here separately.
 
+// OnemaxABS is a fitness function which returns the absolute difference
+// in an environment from an environment of all ones.
 func OnemaxABS(m Model) int {
 	e := m.ToEnv()
 	diff := 0.0
@@ -22,6 +24,9 @@ func OnemaxABS(m Model) int {
 	return int(diff)
 }
 
+// OnemaxChance is a fitness function which rolls rng on every value in
+// an environment and returns the number of values which were not rolled
+// under.
 func OnemaxChance(m Model) int {
 	e := m.ToEnv()
 	diff := 0
@@ -32,3 +37,7 @@ func OnemaxChance(m Model) int {
 	}
 	return diff
 }
+
+// Preliminary experimental results seem to show that OnemaxABS learns faster
+// than OnemaxChance, however that could just be due to it being a faster
+// fitness function to run (no rng rolls needed)

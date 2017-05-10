@@ -10,7 +10,7 @@ type EDA func(...Option) (Model, error)
 type Model interface {
 	BaseModel() *Base
 	Continue() bool
-	Adjust(samples int) Model
+	Adjust() Model
 	// Should be generalized
 	ToEnv() *env.F
 }
@@ -20,13 +20,13 @@ type Model interface {
 type Fitness func(m Model) int
 
 // Loop is the main EDA loop
-func Loop(eda EDA, samples int, opts ...Option) (Model, error) {
+func Loop(eda EDA, opts ...Option) (Model, error) {
 	model, err := eda(opts...)
 	if err != nil {
 		return nil, err
 	}
 	for model.Continue() {
-		model = model.Adjust(samples)
+		model = model.Adjust()
 	}
 	return model, nil
 }

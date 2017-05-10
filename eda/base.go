@@ -13,20 +13,27 @@ import (
 // wasted memory in their structs.
 type Base struct {
 	*env.F
-	fitness      Fitness
-	goalFitness  int
-	length       int
-	baseValue    float64
-	learningRate float64
-	mutationRate float64
-	fmutator     mut.FloatMutator
-	randomize    bool
+	fitness         Fitness
+	goalFitness     int
+	length          int
+	baseValue       float64
+	learningRate    float64
+	mutationRate    float64
+	lmutator        mut.FloatMutator
+	fmutator        mut.FloatMutator
+	samples         int
+	learningSamples int
+	randomize       bool
 }
 
 // DefaultBase initializes some base fields to non-automatic zero values
 func DefaultBase() Base {
 	b := Base{}
 	b.fmutator = mut.None()
+	b.lmutator = mut.None()
+	b.length = 1
+	b.samples = 1
+	b.learningSamples = 1
 	return b
 }
 
@@ -64,6 +71,18 @@ func Length(l int) func(Model) {
 	}
 }
 
+func Samples(s int) func(Model) {
+	return func(m Model) {
+		m.BaseModel().samples = s
+	}
+}
+
+func LearningSamples(l int) func(Model) {
+	return func(m Model) {
+		m.BaseModel().learningSamples = l
+	}
+}
+
 // BaseValue is an option which sets the starting environment values
 func BaseValue(bv float64) func(Model) {
 	return func(m Model) {
@@ -96,5 +115,12 @@ func MutationRate(mr float64) func(Model) {
 func FMutator(mtr mut.FloatMutator) func(Model) {
 	return func(m Model) {
 		m.BaseModel().fmutator = mtr
+	}
+}
+
+// LMutator sets a model's learning rate mutator
+func LMutator(mtr mut.FloatMutator) func(Model) {
+	return func(m Model) {
+		m.BaseModel().lmutator = mtr
 	}
 }
