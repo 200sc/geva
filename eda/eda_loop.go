@@ -9,7 +9,7 @@ type EDA func(...Option) (Model, error)
 // A Model is an iteratively adjusting EDA model
 type Model interface {
 	BaseModel() *Base
-	ShouldContinue() bool
+	Continue() bool
 	Adjust(samples int) Model
 	// Should be generalized
 	ToEnv() *env.F
@@ -25,7 +25,7 @@ func Loop(eda EDA, samples int, opts ...Option) (Model, error) {
 	if err != nil {
 		return nil, err
 	}
-	for model.ShouldContinue() {
+	for model.Continue() {
 		model = model.Adjust(samples)
 	}
 	return model, nil

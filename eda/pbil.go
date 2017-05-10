@@ -1,6 +1,7 @@
 package eda
 
 import (
+	"fmt"
 	"math"
 	"math/rand"
 
@@ -12,9 +13,10 @@ type PBIL struct {
 	Base
 }
 
-func (pbil *PBIL) ShouldContinue() bool {
+func (pbil *PBIL) Continue() bool {
 	fitness := pbil.fitness(pbil)
-	return fitness < pbil.goalFitness
+	fmt.Println(fitness, pbil.goalFitness)
+	return fitness > pbil.goalFitness
 }
 
 func (pbil *PBIL) Adjust(samples int) Model {
@@ -22,7 +24,7 @@ func (pbil *PBIL) Adjust(samples int) Model {
 	var bestCandidate *env.F
 	eCopy := pbil.F.Copy()
 	for i := 0; i < samples; i++ {
-		pbil.F = pbil.F.Copy()
+		pbil.F = eCopy.Copy()
 		for j, f := range *pbil.F {
 			if rand.Float64() < *f {
 				*(*pbil.F)[j] = 1
@@ -37,8 +39,11 @@ func (pbil *PBIL) Adjust(samples int) Model {
 		}
 	}
 	pbil.F = eCopy
+	//fmt.Println("Prelearn", pbil.ToEnv())
+	//fmt.Println("Bestcandidate", bestCandidate)
 	pbil.F.Reinforce(bestCandidate, pbil.learningRate)
 	pbil.F.Mutate(pbil.mutationRate, pbil.fmutator)
+	//fmt.Println("Postlearn", pbil.ToEnv())
 	return pbil
 }
 

@@ -6,6 +6,7 @@ import (
 
 	"bitbucket.org/StephenPatrick/goevo/mut"
 
+	"github.com/200sc/go-compgeo/printutil"
 	"github.com/200sc/go-dist/floatrange"
 )
 
@@ -136,4 +137,14 @@ func NewF(size int, baseVal float64) *F {
 		*env[i] = baseVal
 	}
 	return &env
+}
+
+func (env *F) String() string {
+	str := "["
+	for _, v := range *env {
+		str += printutil.Stringf64(*v)
+		str += " "
+	}
+	str += "]"
+	return str
 }
