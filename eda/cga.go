@@ -1,7 +1,5 @@
 package eda
 
-import "fmt"
-
 type CGA struct {
 	Base
 }
@@ -22,7 +20,6 @@ func (cga *CGA) Adjust() Model {
 	cand := bcs.Front.F
 
 	cand.SubF(bcs.Back.F)
-	fmt.Println(cand)
 	cand.Mult(cga.learningRate)
 	cga.F.AddF(cand)
 

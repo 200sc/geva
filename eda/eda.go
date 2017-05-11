@@ -1,6 +1,10 @@
 package eda
 
-import "bitbucket.org/StephenPatrick/goevo/env"
+import (
+	"math"
+
+	"bitbucket.org/StephenPatrick/goevo/env"
+)
 
 // An EDA is a function which constructs an
 // EDA model from a set of initialization options.
@@ -25,8 +29,23 @@ func Loop(eda EDA, opts ...Option) (Model, error) {
 	if err != nil {
 		return nil, err
 	}
+	bestFitness := math.MaxInt32
 	for model.Continue() {
 		model = model.Adjust()
+		bm := model.BaseModel()
+		if bm.trackBest {
+			fitness := bm.fitness(model)
+			if fitness < bestFitness {
+				bm.best = bm.F.Copy()
+				bestFitness = fitness
+				bm.bestIteration = bm.iterations
+			}
+		}
+		bm.iterations++
+	}
+	bm := model.BaseModel()
+	if bm.report != nil {
+		bm.report(model)
 	}
 	return model, nil
 }

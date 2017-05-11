@@ -40,8 +40,6 @@ func (umda *UMDA) Adjust() Model {
 
 	p.Size = umda.learningSamples
 
-	fmt.Println(p.Fitnesses)
-
 	// Select a sub population of size learningSamples from samples
 	// interface problem: we need to be able to ensure that parentProportion here
 	// leaves us with at least (ideally exactly) learningSamples members.

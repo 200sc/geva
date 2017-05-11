@@ -2,11 +2,14 @@ package eda
 
 import (
 	"fmt"
+	"math"
 
 	"bitbucket.org/StephenPatrick/goevo/env"
 	"bitbucket.org/StephenPatrick/goevo/evoerr"
 	"bitbucket.org/StephenPatrick/goevo/mut"
 	"bitbucket.org/StephenPatrick/goevo/selection"
+
+	"github.com/200sc/go-dist/floatrange"
 )
 
 // Base is a struct which all EDA models should be composed of so that
@@ -17,18 +20,27 @@ import (
 // wasted memory in their structs.
 type Base struct {
 	*env.F
-	fitness         Fitness
-	goalFitness     int
-	length          int
-	baseValue       float64
-	learningRate    float64
-	mutationRate    float64
-	lmutator        mut.FloatMutator
-	fmutator        mut.FloatMutator
-	samples         int
-	learningSamples int
-	selection       selection.Method
-	randomize       bool
+	iterations        int
+	maxIterations     int
+	fitness           Fitness
+	goalFitness       int
+	length            int
+	valueRange        floatrange.Range
+	baseValue         float64
+	learningRate      float64
+	mutationRate      float64
+	lmutator          mut.FloatMutator
+	fmutator          mut.FloatMutator
+	samples           int
+	learningSamples   int
+	selection         selection.Method
+	cont              func(Model) bool
+	report            func(Model)
+	bestIteration     int
+	attemptsAfterBest int
+	best              *env.F
+	randomize         bool
+	trackBest         bool
 }
 
 // DefaultBase initializes some base fields to non-automatic zero values
@@ -39,11 +51,24 @@ func DefaultBase(opts ...Option) (Base, error) {
 	b.length = 1
 	b.samples = 1
 	b.learningSamples = 1
+	b.maxIterations = math.MaxInt32
+	b.valueRange = floatrange.NewLinear(0, math.MaxFloat64)
+	b.cont = DefContinue
+	b.report = DefReport
 	for _, opt := range opts {
 		opt(b)
 	}
 	if b.length <= 0 {
-		return *b, evoerr.InvalidLengthError{}
+		return *b, evoerr.InvalidParamError{"length"}
+	}
+	if b.samples <= 0 {
+		return *b, evoerr.InvalidParamError{"samples"}
+	}
+	if b.learningSamples <= 0 {
+		return *b, evoerr.InvalidParamError{"learningSamples"}
+	}
+	if !b.valueRange.InRange(b.baseValue) {
+		return *b, evoerr.InvalidParamError{"baseValue"}
 	}
 	b.F = env.NewF(b.length, b.baseValue)
 	if b.randomize {
@@ -58,11 +83,28 @@ func (b *Base) BaseModel() *Base {
 	return b
 }
 
-// Default Continue
-func (b *Base) Continue() bool {
+// DefReport is the Default Report function
+func DefReport(m Model) {
+	bm := m.BaseModel()
+	fmt.Println("Iterations taken:", bm.iterations)
+	if bm.best != nil {
+		fmt.Println("Best Model:", bm.best)
+		bm.F = bm.best
+		fmt.Println("Best Fitness:", bm.fitness(bm))
+		fmt.Println("Iteration of best model:", bm.bestIteration)
+	}
+}
+
+// DefContinue is the Default Continue function
+func DefContinue(m Model) bool {
+	b := m.BaseModel()
 	fitness := b.fitness(b)
-	fmt.Println(fitness, b.goalFitness)
-	return fitness > b.goalFitness
+	//fmt.Println(fitness, b.goalFitness)
+	return fitness > b.goalFitness && b.iterations < b.maxIterations
+}
+
+func (b *Base) Continue() bool {
+	return b.cont(b)
 }
 
 // Default Adjust
@@ -98,12 +140,15 @@ func Length(l int) func(Model) {
 	}
 }
 
+// Samples sets the number of samples the algorithm will use.
 func Samples(s int) func(Model) {
 	return func(m Model) {
 		m.BaseModel().samples = s
 	}
 }
 
+// LearningSamples sets the number of learning samples the algorithm will use.
+// learning samples should be less than samples.
 func LearningSamples(l int) func(Model) {
 	return func(m Model) {
 		m.BaseModel().learningSamples = l
@@ -152,8 +197,59 @@ func LMutator(mtr mut.FloatMutator) func(Model) {
 	}
 }
 
+// SelectionMethod sets the algorithm's population selection method for
+// algorithms that use selection
 func SelectionMethod(sm selection.Method) func(Model) {
 	return func(m Model) {
 		m.BaseModel().selection = sm
+	}
+}
+
+// StopCondition replaces the default stop condition (goal fitness reached
+// or maximum iteration reached)
+func StopCondition(c func(m Model) bool) func(Model) {
+	return func(m Model) {
+		m.BaseModel().cont = c
+	}
+}
+
+// TrackBest sets whether or not the algorithm should keep track of
+// the best model it has found so far
+func TrackBest(b bool) func(Model) {
+	return func(m Model) {
+		m.BaseModel().trackBest = b
+	}
+}
+
+// AttemptsAfterBest terminates an EDA if it fails to improve on its best
+// model after i iterations
+func AttemptsAfterBest(i int) func(Model) {
+	return func(m Model) {
+		bm := m.BaseModel()
+		bm.trackBest = true
+		bm.attemptsAfterBest = i
+		oldCont := bm.cont
+		bm.cont = func(m Model) bool {
+			bm := m.BaseModel()
+			return oldCont(m) && (bm.bestIteration+bm.attemptsAfterBest) > bm.iterations
+		}
+	}
+}
+
+// MaxIterations sets the maximum number of iterations the algorithm
+// will evolve before preemptively stopping
+func MaxIterations(j int) func(Model) {
+	return func(m Model) {
+		m.BaseModel().maxIterations = j
+	}
+}
+
+// And can be used to chain together multiple settings in order to
+// prepackage common settings among several algorithms.
+// Consider: should this be called Cons?
+func And(a, b Option) func(Model) {
+	return func(m Model) {
+		a(m)
+		b(m)
 	}
 }

@@ -13,16 +13,22 @@ import (
 //
 // These two ideas are represented here separately.
 
+// MaxABS is an abstracted form of Onemax for targetting any
+// floating point value
+func MaxABS(t float64) func(m Model) int {
+	return func(m Model) int {
+		e := m.ToEnv()
+		diff := 0.0
+		for _, f := range *e {
+			diff += math.Abs(*f - t)
+		}
+		return int(diff)
+	}
+}
+
 // OnemaxABS is a fitness function which returns the absolute difference
 // in an environment from an environment of all ones.
-func OnemaxABS(m Model) int {
-	e := m.ToEnv()
-	diff := 0.0
-	for _, f := range *e {
-		diff += math.Abs(*f - 1)
-	}
-	return int(diff)
-}
+var OnemaxABS = MaxABS(1)
 
 // OnemaxChance is a fitness function which rolls rng on every value in
 // an environment and returns the number of values which were not rolled

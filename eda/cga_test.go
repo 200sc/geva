@@ -11,33 +11,43 @@ import (
 )
 
 func TestOneMaxCGA(t *testing.T) {
+	fmt.Println("OneMaxCGA")
 	Seed()
 	length := 1000.0
 	model, err := Loop(CGAModel,
-		//FitnessFunc(OnemaxChance),
+		BenchTest,
 		FitnessFunc(OnemaxABS),
-		GoalFitness(4),
-		Samples(100),
 		Length(int(length)),
-		BaseValue(0.5),
-		//Randomize(true),
 		LearningRate(0.1),
 		MutationRate(3.0/(length/10.0)),
-		FMutator( //mut.Or(
+		FMutator(
 			mut.And(
 				mut.Or(mut.Add(.1), mut.Add(-.1), .5),
 				EnforceRange(floatrange.NewLinear(0.0, 1.0))),
-			//mut.DropOut(0.5),
-			//0.999,
 		),
-		// LMutator(
-		// 	mut.And(
-		// 		mut.Scale(0.999),
-		// 		lrng.EnforceRange),
-		// ),
 	)
 	assert.Nil(t, err)
-	fmt.Println(model.ToEnv())
+	assert.NotNil(t, model)
+}
+
+func TestFourPeakCGA(t *testing.T) {
+	fmt.Println("FourPeakCGA")
+	Seed()
+	length := 100.0
+	model, err := Loop(CGAModel,
+		BenchTest,
+		FitnessFunc(FourPeaks(int(length/10))),
+		Length(int(length)),
+		LearningRate(0.1),
+		MutationRate(3.0/(length/10.0)),
+		FMutator(
+			mut.And(
+				mut.Or(mut.Add(.1), mut.Add(-.1), .5),
+				EnforceRange(floatrange.NewLinear(0.0, 1.0))),
+		),
+	)
+	assert.Nil(t, err)
+	assert.NotNil(t, model)
 }
 
 func EnforceRange(fr floatrange.Range) mut.FloatMutator {

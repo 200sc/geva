@@ -17,34 +17,41 @@ func Seed() {
 }
 
 func TestOneMaxPBIL(t *testing.T) {
+	fmt.Println("OneMaxPBIL")
 	Seed()
-	rng := floatrange.NewLinear(0.0, 1.0)
-	//lrng := floatrange.NewLinear(0.05, 1.0)
 	length := 1000.0
 	model, err := Loop(PBILModel,
-		Samples(40),
-		LearningSamples(3),
-		//FitnessFunc(OnemaxChance),
+		BenchTest,
 		FitnessFunc(OnemaxABS),
-		GoalFitness(4),
 		Length(int(length)),
-		BaseValue(0.5),
-		Randomize(true),
-		LearningRate(0.5),
+		LearningRate(0.2),
 		MutationRate(3.0/(length/10.0)),
-		FMutator( //mut.Or(
+		FMutator(
 			mut.And(
 				mut.Or(mut.Add(.1), mut.Add(-.1), .5),
-				rng.EnforceRange),
-			//mut.DropOut(0.5),
-			//0.999,
+				EnforceRange(floatrange.NewLinear(0.0, 1.0))),
 		),
-		// LMutator(
-		// 	mut.And(
-		// 		mut.Scale(0.999),
-		// 		lrng.EnforceRange),
-		// ),
 	)
 	assert.Nil(t, err)
-	fmt.Println(model.ToEnv())
+	assert.NotNil(t, model)
+}
+
+func TestFourPeaksPBIL(t *testing.T) {
+	fmt.Println("FourPeakPBIL")
+	Seed()
+	length := 100.0
+	model, err := Loop(PBILModel,
+		BenchTest,
+		FitnessFunc(FourPeaks(int(length/10))),
+		Length(int(length)),
+		LearningRate(0.2),
+		MutationRate(3.0/(length/10.0)),
+		FMutator(
+			mut.And(
+				mut.Or(mut.Add(.1), mut.Add(-.1), .5),
+				EnforceRange(floatrange.NewLinear(0.0, 1.0))),
+		),
+	)
+	assert.Nil(t, err)
+	assert.NotNil(t, model)
 }

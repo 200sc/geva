@@ -12,28 +12,21 @@ import (
 )
 
 func TestOneMaxUMDA(t *testing.T) {
+	fmt.Println("OneMaxUMDA")
 	Seed()
-
 	length := 1000.0
 	model, err := Loop(UMDAModel,
-		Samples(100),
-		LearningSamples(30),
-		//FitnessFunc(OnemaxChance),
+		BenchTest,
 		FitnessFunc(OnemaxABS),
-		GoalFitness(4),
 		Length(int(length)),
-		BaseValue(0.5),
-		//Randomize(true),
 		SelectionMethod(selection.DeterministicTournament{2, 1}),
 		MutationRate(3.0/(length/10.0)),
-		FMutator( //mut.Or(
+		FMutator(
 			mut.And(
 				mut.Or(mut.Add(.1), mut.Add(-.1), .5),
 				EnforceRange(floatrange.NewLinear(0.0, 1.0))),
-			//mut.DropOut(0.5),
-			//0.999,
 		),
 	)
 	assert.Nil(t, err)
-	fmt.Println(model.ToEnv())
+	assert.NotNil(t, model)
 }

@@ -1,7 +1,6 @@
 package eda
 
 import (
-	"fmt"
 	"math"
 
 	"bitbucket.org/StephenPatrick/goevo/env"
@@ -46,18 +45,11 @@ func (shc *SHCLVND) Adjust() Model {
 		mid.AddF(bcsList[i])
 	}
 	mid.Divide(float64(len(bcsList)))
-	fmt.Println(mid)
 
-	// P(i+1) := P(i)(μ + μmove * (mid-μ), σreduce * σ); (*
-	//                                        ^ appears to be learning rate decay
-	//                    ^ but this is called learning rate
-	//                ^ this appears to be shc.F
 	mid.SubF(shc.F)
 	mid.Mult(shc.learningRate)
 	shc.F.AddF(mid)
 	shc.Sigma = shc.lmutator(shc.Sigma)
-	fmt.Println(shc.Sigma)
-	//fmt.Println(shc.F)
 
 	shc.F.Mutate(shc.mutationRate, shc.fmutator)
 	return shc

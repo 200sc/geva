@@ -6,6 +6,10 @@ import (
 	"bitbucket.org/StephenPatrick/goevo/env"
 )
 
+// BestCandidates represents the top N candidates sampled
+// from an EDA.
+// Todo: This should be a heap, not a linked list,
+// for sufficiently large sizes
 type BestCandidates struct {
 	Front  *Candidate
 	Back   *Candidate
@@ -13,6 +17,7 @@ type BestCandidates struct {
 	Limit  int
 }
 
+// Candidate is an individual candidate in a BestCandidates list
 type Candidate struct {
 	*env.F
 	Fitness int
@@ -20,12 +25,14 @@ type Candidate struct {
 	Prev    *Candidate
 }
 
+// NewBestCandidates creates a default BestCandidates
 func NewBestCandidates(l int) *BestCandidates {
 	bc := new(BestCandidates)
 	bc.Limit = l
 	return bc
 }
 
+// Slice converts BestCandidates from a linked list to a slice
 func (bc *BestCandidates) Slice() []*env.F {
 	sl := make([]*env.F, bc.Length)
 	i := 0
@@ -36,6 +43,8 @@ func (bc *BestCandidates) Slice() []*env.F {
 	return sl
 }
 
+// Add appends a new candidate to the best candidates,
+// if it is better than any existing candidate
 func (bc *BestCandidates) Add(f int, c *env.F) {
 	if bc.Front == nil {
 		bc.Front = &Candidate{c, f, nil, nil}
@@ -74,6 +83,9 @@ func (bc *BestCandidates) add(cand *Candidate) {
 	}
 }
 
+// GetSample returns an environment candidate where each input element is treated
+// as a percent from 0 to 1 inclusive, and each output is each input randomized to
+// either 1 or 0.
 func GetSample(e *env.F) *env.F {
 	sample := e.Copy()
 	for _, f := range *sample {
