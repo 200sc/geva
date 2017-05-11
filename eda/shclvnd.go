@@ -1,21 +1,19 @@
 package eda
 
 import (
-	"math"
-
 	"bitbucket.org/StephenPatrick/goevo/env"
 	"github.com/200sc/go-dist/floatrange"
 )
 
+// SHCLVND represents the Stochastic Hill Climbing with Learning by Vectors
+// of Normal Distributions algorithm.
 type SHCLVND struct {
 	Base
 	Sigma float64
 }
 
-func BoxMueller(fr floatrange.Range) float64 {
-	return math.Sqrt(-2*math.Log(fr.Poll())) * math.Sin(2*math.Pi*fr.Poll())
-}
-
+// SigmaSample is a way to sample an environment based on a standard
+// deviation spread from an average
 func (shc *SHCLVND) SigmaSample() *env.F {
 	env := env.NewF(shc.length, 0.0)
 	for i := 0; i < shc.length; i++ {
@@ -25,6 +23,10 @@ func (shc *SHCLVND) SigmaSample() *env.F {
 	return env
 }
 
+// Adjust on a SHCLVND polls learningSamples best samples and creates an
+// average candidate from the collected samples. Then the distribution of
+// the SHCLVND is reinforced closer to the average candidate, and the standard
+// deviation used to generate the samples is reduced.
 func (shc *SHCLVND) Adjust() Model {
 
 	bcs := NewBestCandidates(shc.learningSamples)
@@ -55,12 +57,14 @@ func (shc *SHCLVND) Adjust() Model {
 	return shc
 }
 
+// SHCLVNDModel initializes a SHCLVND EDA
 func SHCLVNDModel(opts ...Option) (Model, error) {
 	var err error
 	shc := new(SHCLVND)
 	shc.Base, err = DefaultBase(opts...)
 	// Implicit min and max of 0 and 1
-	// This .5 is taken from a paper
+	// This .5 is taken from the paper, "Stochastic hill climbing with learning
+	// by vectors of normal distributions"
 	shc.Sigma = (1 - 0) * 0.5
 	return shc, err
 }

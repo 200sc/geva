@@ -103,11 +103,12 @@ func DefContinue(m Model) bool {
 	return fitness > b.goalFitness && b.iterations < b.maxIterations
 }
 
+// Continue is a wrapper around b.cont
 func (b *Base) Continue() bool {
 	return b.cont(b)
 }
 
-// Default Adjust
+// Adjust is the default Adjust method, which is expected to be overwritten
 func (b *Base) Adjust() Model {
 	return b
 }

@@ -5,6 +5,8 @@ import (
 	"math/rand"
 )
 
+// FourPeaks represents a problem where there are four explicit
+//
 func FourPeaks(t int) func(m Model) int {
 	return func(m Model) int {
 		e := m.ToEnv()

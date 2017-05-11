@@ -1,16 +1,18 @@
 package eda
 
 import (
-	"fmt"
-
 	"bitbucket.org/StephenPatrick/goevo/env"
 	"bitbucket.org/StephenPatrick/goevo/pop"
 )
 
+// UMDA represents the Univariate Marginal Distribution Algorithm
 type UMDA struct {
 	Base
 }
 
+// Adjust on a UMDA creates a population from sampling the umda's distribution,
+// then selects from that population top fitness members, then sets its
+// distribution to be the average of the selected members
 func (umda *UMDA) Adjust() Model {
 	// Classically the UMDA begins iterations as a population
 	// We're rotating this algorithm so that it begins as distribution
@@ -56,44 +58,15 @@ func (umda *UMDA) Adjust() Model {
 	// to obtain a new umda
 	newenv.Divide(float64(len(subPop)))
 	umda.F = newenv
-	// return that
-
 	umda.F.Mutate(umda.mutationRate, umda.fmutator)
 
 	return umda
 }
 
+// UMDAModel initializes a UMDA EDA
 func UMDAModel(opts ...Option) (Model, error) {
 	var err error
 	umda := new(UMDA)
 	umda.Base, err = DefaultBase(opts...)
 	return umda, err
-}
-
-type UMDAIndividual struct {
-	*env.F
-}
-
-func NewUMDAIndividual(e *env.F) *UMDAIndividual {
-	sample := GetSample(e)
-	return &UMDAIndividual{sample}
-}
-
-// Placeholder interface satisfying functions
-
-func (umdaI *UMDAIndividual) Fitness(input, expected [][]float64) int {
-	return 0
-}
-func (umdaI *UMDAIndividual) Mutate() {}
-
-func (umdaI *UMDAIndividual) Crossover(other pop.Individual) pop.Individual {
-	return umdaI
-}
-
-func (umdaI *UMDAIndividual) CanCrossover(other pop.Individual) bool {
-	return false
-}
-
-func (umdaI *UMDAIndividual) Print() {
-	fmt.Println("UMDAInvidual")
 }
