@@ -9,7 +9,6 @@ import (
 
 type MIMIC struct {
 	Base
-	Percentile float64
 }
 
 func (mimic *MIMIC) Adjust() Model {
@@ -18,7 +17,7 @@ func (mimic *MIMIC) Adjust() Model {
 
 	// Filter the samples so that they are only those with a fitness under some
 	// percentile of fitness
-	thetaFitness := fitnesses[int(float64(mimic.samples)*mimic.Percentile)]
+	thetaFitness := fitnesses[int(float64(mimic.samples)*mimic.learningRate)]
 	filtered := []*env.F{}
 	for _, s := range samples {
 		mimic.F = s
@@ -29,6 +28,8 @@ func (mimic *MIMIC) Adjust() Model {
 	}
 	// Recalculate mimic.F based on the filtered samples
 	mimic.UpdateFromSamples(filtered)
+	mimic.F.Mutate(mimic.mutationRate, mimic.fmutator)
+	mimic.learningRate = mimic.lmutator(mimic.learningRate)
 	return mimic
 }
 
@@ -56,7 +57,6 @@ func NSamples(n int, senv *env.F) []*env.F {
 func MIMICModel(opts ...Option) (Model, error) {
 	var err error
 	mimic := new(MIMIC)
-	mimic.Percentile = .25
 	mimic.Base, err = DefaultBase(opts...)
 	// Generate a random population of samples
 	samples := NSamples(mimic.samples, env.NewF(mimic.length, mimic.baseValue))

@@ -99,7 +99,7 @@ func DefReport(m Model) {
 func DefContinue(m Model) bool {
 	b := m.BaseModel()
 	fitness := b.fitness(b)
-	//fmt.Println(fitness, b.goalFitness)
+	fmt.Println(fitness, b.goalFitness)
 	return fitness > b.goalFitness && b.iterations < b.maxIterations
 }
 

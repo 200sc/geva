@@ -31,6 +31,6 @@ func FourPeaks(t int) func(m Model) int {
 		if trailingZeroes > t && leadingOnes > t {
 			base += len(*e)
 		}
-		return (2 * len(*e)) - base
+		return ((2 * len(*e)) - t) - base
 	}
 }
