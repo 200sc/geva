@@ -52,7 +52,7 @@ func DefaultBase(opts ...Option) (Base, error) {
 	b.samples = 1
 	b.learningSamples = 1
 	b.maxIterations = math.MaxInt32
-	b.valueRange = floatrange.NewLinear(0, math.MaxFloat64)
+	b.valueRange = floatrange.NewLinear(0, 1)
 	b.cont = DefContinue
 	b.report = DefReport
 	for _, opt := range opts {
