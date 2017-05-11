@@ -39,6 +39,7 @@ func Loop(eda EDA, opts ...Option) (Model, error) {
 				bm.best = bm.F.Copy()
 				bestFitness = fitness
 				bm.bestIteration = bm.iterations
+				bm.bestFitnessEvals = bm.fitnessEvals
 			}
 		}
 		bm.iterations++

@@ -34,3 +34,7 @@ func FourPeaks(t int) func(m Model) int {
 		return ((2 * len(*e)) - t) - base
 	}
 }
+
+// Related problems:
+// Six peaks
+// K-Coloring

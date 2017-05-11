@@ -30,7 +30,7 @@ func TestOneMaxCGA(t *testing.T) {
 	assert.NotNil(t, model)
 }
 
-func TestFourPeakCGA(t *testing.T) {
+func TestFourPeaksCGA(t *testing.T) {
 	fmt.Println("FourPeakCGA")
 	Seed()
 	length := 100.0
@@ -39,7 +39,7 @@ func TestFourPeakCGA(t *testing.T) {
 		FitnessFunc(FourPeaks(int(length/10))),
 		Length(int(length)),
 		LearningRate(0.1),
-		MutationRate(3.0/(length/10.0)),
+		MutationRate(.03),
 		FMutator(
 			mut.And(
 				mut.Or(mut.Add(.1), mut.Add(-.1), .5),
