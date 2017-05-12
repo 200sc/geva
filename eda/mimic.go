@@ -6,12 +6,19 @@ import (
 	"bitbucket.org/StephenPatrick/goevo/env"
 )
 
+// MIMIC is an EDA of the Mutual information maximizing input clustering algorithm
 type MIMIC struct {
 	Base
 	PTF     *env.F
 	Indices []int
 }
 
+// Adjust on a MIMIC generates samples from MIMIC's chain model, filters
+// them with a straight greed selection algorithm to get the top-percentile
+// samples and retrains its chain on the top-percentile samples.
+// Todo: would mimic perform way better if it wasn't using a straight greed
+// selection? (the paper doesn't refer to this selection algorithm as a selection
+// algorithm but it totally is)
 func (mimic *MIMIC) Adjust() Model {
 	samples := mimic.NSamples()
 	fitnesses := SampleFitnesses(mimic, samples)
@@ -34,6 +41,9 @@ func (mimic *MIMIC) Adjust() Model {
 	return mimic
 }
 
+// GetSample on a MIMIC iterates through the marked indices of the model
+// where the first index uses a univariate sampling and each following index
+// is a bivariate sampling based on the result of the previous sampled index.
 func (mimic *MIMIC) GetSample() *env.F {
 	// A mimic sample goes through mimic.Indices
 	s := env.NewF(mimic.length, 0.0)
@@ -52,6 +62,7 @@ func (mimic *MIMIC) GetSample() *env.F {
 	return s
 }
 
+// NSamples runs mimic.GetSample n times to produce a sample list
 func (mimic *MIMIC) NSamples() []*env.F {
 	samples := make([]*env.F, mimic.samples)
 	for i := 0; i < mimic.samples; i++ {
@@ -60,6 +71,8 @@ func (mimic *MIMIC) NSamples() []*env.F {
 	return samples
 }
 
+// SampleFitnesses returns a sorted list of fitnesses for the given
+// samples in model m
 func SampleFitnesses(m Model, samples []*env.F) []int {
 	bm := m.BaseModel()
 	initF := bm.F.Copy()
@@ -74,6 +87,7 @@ func SampleFitnesses(m Model, samples []*env.F) []int {
 	return fitnesses
 }
 
+// MIMICModel returns an initialized MIMIC EDA
 func MIMICModel(opts ...Option) (Model, error) {
 	var err error
 	mimic := new(MIMIC)
@@ -92,6 +106,10 @@ func MIMICModel(opts ...Option) (Model, error) {
 	return mimic, err
 }
 
+// UpdateFromSamples updates the two floating point vectors that
+// a MIMIC stores, the former for the probability that an element is
+// true given the former in the index list is true, and the latter
+// given the former in the index list is false.
 func (mimic *MIMIC) UpdateFromSamples(samples []*env.F) {
 	// Let mimic.F be the density estimator of the median fitness
 	//

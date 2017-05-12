@@ -6,6 +6,10 @@ import (
 	"bitbucket.org/StephenPatrick/goevo/env"
 )
 
+// MinConditionalEntropy finds the index of the given samples with the
+// lowest entropy given the provided previous index, only checking indices
+// in the available list. Afterward, the index chosen is removed from the
+// available list.
 func MinConditionalEntropy(samples []*env.F, prev int, available *[]int) int {
 	min := 0
 	minV := math.MaxFloat64
@@ -23,6 +27,8 @@ func MinConditionalEntropy(samples []*env.F, prev int, available *[]int) int {
 	return min
 }
 
+// MinEntropy finds the index of the given samples with the lowest
+// entropy. Also returns the univariate probability of the returned index.
 func MinEntropy(samples []*env.F) (int, float64) {
 	min := 0
 	minV := math.MaxFloat64
@@ -43,6 +49,7 @@ func MinEntropy(samples []*env.F) (int, float64) {
 	return min, minF
 }
 
+// Entropy returns the entropy of a float64
 func Entropy(f float64) float64 {
 	if f == 0 || f == 1 {
 		return 0
@@ -50,6 +57,8 @@ func Entropy(f float64) float64 {
 	return -1 * ((f * math.Log2(f)) + ((1 - f) * math.Log2(1-f)))
 }
 
+// ConditionalEntropy returns the conditional entropy of (a|b)
+// in the assumption that the provided samples are bitstrings
 func ConditionalEntropy(samples []*env.F, a, b int) float64 {
 	// Assume bitstrings, assumption can be removed later
 	h := 0.0
@@ -81,6 +90,5 @@ func ConditionalEntropy(samples []*env.F, a, b int) float64 {
 			h += pab * math.Log2(pb/pab)
 		}
 	}
-	// Also need to return P(a=T|b)
 	return h
 }

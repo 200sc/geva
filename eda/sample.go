@@ -23,6 +23,7 @@ func GetSample(e *env.F) *env.F {
 	return sample
 }
 
+// NSamples returns an array of n samples from calling GetSample
 func NSamples(n int, senv *env.F) []*env.F {
 	samples := make([]*env.F, n)
 	for i := 0; i < n; i++ {

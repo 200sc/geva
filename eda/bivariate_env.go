@@ -2,8 +2,12 @@ package eda
 
 import "bitbucket.org/StephenPatrick/goevo/env"
 
+// A FullBivariateEnv represents a 2d array of Bivariate environments
+// where each potential pairing of (a|b) is represented at index [a][b]
 type FullBivariateEnv []*BivariateEnv
 
+// NewFullBSBivariateEnv returns a FullBivariateEnv under the assumption
+// that the input samples are bitstrings.
 func NewFullBSBivariateEnv(samples []*env.F) FullBivariateEnv {
 	length := len(*samples[0])
 	fbs := make([]*BivariateEnv, length)
@@ -13,11 +17,15 @@ func NewFullBSBivariateEnv(samples []*env.F) FullBivariateEnv {
 	return fbs
 }
 
+// BivariateEnv represents the relationship (a|b) for all b
+// in some sample set
 type BivariateEnv struct {
 	domain []float64
 	bf     []*env.F
 }
 
+// NewBSBivariateEnv returns a bivariate environment
+// from samples and a index a for (a|b)
 func NewBSBivariateEnv(samples []*env.F, a int) *BivariateEnv {
 	be := new(BivariateEnv)
 	be.domain = []float64{0.0, 1.0}
@@ -39,6 +47,7 @@ func NewBSBivariateEnv(samples []*env.F, a int) *BivariateEnv {
 	return be
 }
 
+// BitStringBivariate returns the probabilities p(a|b=t) and p(a|b=f)
 func BitStringBivariate(samples []*env.F, a, b int) (float64, float64) {
 	ptt := 0.0
 	ptf := 0.0

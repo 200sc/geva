@@ -49,6 +49,7 @@ func UMDAModel(opts ...Option) (Model, error) {
 	return umda, err
 }
 
+// Pop generates a population of UMDAIndividuals from sampling umda
 func (umda *UMDA) Pop() *pop.Population {
 	// This is a bastardization of the evolutionary population model
 	// because the evolutionary population model assumes you will follow its

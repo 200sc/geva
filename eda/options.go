@@ -129,6 +129,8 @@ func AttemptsAfterBest(i int) func(Model) {
 	}
 }
 
+// TrackFitnessRuns tells the model to track how many times it calls its
+// fitness function.
 func TrackFitnessRuns(b bool) func(Model) {
 	return func(m Model) {
 		m.BaseModel().trackFitness = b

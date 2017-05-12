@@ -5,12 +5,14 @@ import (
 	"bitbucket.org/StephenPatrick/goevo/pop"
 )
 
+// BMDA represents the Bivariate Marginal Distribution Algorithm
 type BMDA struct {
 	UMDA
-	BF      []*BivariateEnv
+	BF      FullBivariateEnv
 	LastPop *pop.Population
 }
 
+// Adjust on a BMDA is incomplete
 func (bmda *BMDA) Adjust() Model {
 	// ??????????
 	// Create dependency forest
@@ -26,6 +28,7 @@ func (bmda *BMDA) Adjust() Model {
 	return bmda
 }
 
+// BMDAModel returns an initialized BMDA
 func BMDAModel(opts ...Option) (Model, error) {
 	var err error
 	bmda := new(BMDA)
