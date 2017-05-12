@@ -18,28 +18,7 @@ func (umda *UMDA) Adjust() Model {
 	// We're rotating this algorithm so that it begins as distribution
 	// and generates two populations within the adjust function
 
-	// This is a bastardization of the evolutionary population model
-	// because the evolutionary population model assumes you will follow its
-	// rules and don't replace its elements and call its NextGeneration function
-	// and we are breaking all of its rules,
-	// which implies there are problems with the evolutionary population model
-	// in that there should be some lower tiered struct that can't do
-	// NextGeneration but can be selected on and crossovered on, etc.
-
-	// Generate a population of size samples by sampling umda
-	p := new(pop.Population)
-	p.Members = make([]pop.Individual, umda.samples)
-	for i := 0; i < umda.samples; i++ {
-		p.Members[i] = NewUMDAIndividual(umda.F)
-	}
-
-	// Generate fitnesses for the population
-	p.Fitnesses = make([]int, umda.samples)
-	for i := 0; i < umda.samples; i++ {
-		umda.F = p.Members[i].(*UMDAIndividual).F
-		p.Fitnesses[i] = umda.fitness(umda)
-	}
-
+	p := umda.Pop()
 	p.Size = umda.learningSamples
 
 	// Select a sub population of size learningSamples from samples
@@ -69,4 +48,31 @@ func UMDAModel(opts ...Option) (Model, error) {
 	umda := new(UMDA)
 	umda.Base, err = DefaultBase(opts...)
 	return umda, err
+}
+
+func (umda *UMDA) Pop() *pop.Population {
+	// This is a bastardization of the evolutionary population model
+	// because the evolutionary population model assumes you will follow its
+	// rules and don't replace its elements and call its NextGeneration function
+	// and we are breaking all of its rules,
+	// which implies there are problems with the evolutionary population model
+	// in that there should be some lower tiered struct that can't do
+	// NextGeneration but can be selected on and crossovered on, etc.
+
+	// Generate a population of size samples by sampling umda
+	p := new(pop.Population)
+	p.Members = make([]pop.Individual, umda.samples)
+	for i := 0; i < umda.samples; i++ {
+		p.Members[i] = NewUMDAIndividual(umda.F)
+	}
+
+	// Generate fitnesses for the population
+	p.Fitnesses = make([]int, umda.samples)
+	for i := 0; i < umda.samples; i++ {
+		umda.F = p.Members[i].(*UMDAIndividual).F
+		p.Fitnesses[i] = umda.fitness(umda)
+	}
+
+	p.Size = umda.samples
+	return p
 }

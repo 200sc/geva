@@ -6,7 +6,8 @@ import (
 )
 
 // FourPeaks represents a problem where there are four explicit
-//
+// maxima in the search space and two of the maxima can hide the
+// other two.
 func FourPeaks(t int) func(m Model) int {
 	return func(m Model) int {
 		e := m.ToEnv()

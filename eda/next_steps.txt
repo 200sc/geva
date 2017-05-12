@@ -10,6 +10,7 @@ UMDA [2]
 PBIL [3]
 cGA [4]
 SHCLVND [20]
+MIMIC
 
 Similar to done
 

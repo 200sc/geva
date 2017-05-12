@@ -1,7 +1,6 @@
 package eda
 
 import (
-	"math"
 	"sort"
 
 	"bitbucket.org/StephenPatrick/goevo/env"
@@ -9,10 +8,12 @@ import (
 
 type MIMIC struct {
 	Base
+	PTF     *env.F
+	Indices []int
 }
 
 func (mimic *MIMIC) Adjust() Model {
-	samples := NSamples(mimic.samples, mimic.F)
+	samples := mimic.NSamples()
 	fitnesses := SampleFitnesses(mimic, samples)
 
 	// Filter the samples so that they are only those with a fitness under some
@@ -26,11 +27,39 @@ func (mimic *MIMIC) Adjust() Model {
 			filtered = append(filtered, s)
 		}
 	}
+	//fmt.Println("Length of filtered", len(filtered))
 	// Recalculate mimic.F based on the filtered samples
 	mimic.UpdateFromSamples(filtered)
 	mimic.F.Mutate(mimic.mutationRate, mimic.fmutator)
+	mimic.PTF.Mutate(mimic.mutationRate, mimic.fmutator)
 	mimic.learningRate = mimic.lmutator(mimic.learningRate)
 	return mimic
+}
+
+func (mimic *MIMIC) GetSample() *env.F {
+	// A mimic sample goes through mimic.Indices
+	s := env.NewF(mimic.length, 0.0)
+	// Index zero is univariate, stored in the PTT environment
+	s.Set(mimic.Indices[0], mimic.F.GetBinary(mimic.Indices[0]))
+	// Each following index is based on whatever exists in the previous index
+	for i := 1; i < len(mimic.Indices); i++ {
+		var e *env.F
+		if s.Get(mimic.Indices[i-1]) == 0.0 {
+			e = mimic.PTF
+		} else {
+			e = mimic.F
+		}
+		s.Set(mimic.Indices[i], e.GetBinary(mimic.Indices[i]))
+	}
+	return s
+}
+
+func (mimic *MIMIC) NSamples() []*env.F {
+	samples := make([]*env.F, mimic.samples)
+	for i := 0; i < mimic.samples; i++ {
+		samples[i] = mimic.GetSample()
+	}
+	return samples
 }
 
 func SampleFitnesses(m Model, samples []*env.F) []int {
@@ -43,26 +72,21 @@ func SampleFitnesses(m Model, samples []*env.F) []int {
 	}
 	sort.Slice(fitnesses, func(i, j int) bool { return fitnesses[i] < fitnesses[j] })
 	bm.F = initF
+	//fmt.Println(fitnesses)
 	return fitnesses
-}
-
-func NSamples(n int, senv *env.F) []*env.F {
-	samples := make([]*env.F, n)
-	for i := 0; i < n; i++ {
-		samples[i] = GetSample(senv)
-	}
-	return samples
 }
 
 func MIMICModel(opts ...Option) (Model, error) {
 	var err error
 	mimic := new(MIMIC)
 	mimic.Base, err = DefaultBase(opts...)
+	mimic.PTF = mimic.F.Copy()
 	// Generate a random population of samples
 	samples := NSamples(mimic.samples, env.NewF(mimic.length, mimic.baseValue))
 	// Get the median fitness of the sample set
 	// fitnesses := SampleFitnesses(mimic, samples)
 	// This seems useless so it is commented out
+	mimic.Indices = make([]int, mimic.length)
 	mimic.UpdateFromSamples(samples)
 	return mimic, err
 }
@@ -73,6 +97,7 @@ func (mimic *MIMIC) UpdateFromSamples(samples []*env.F) {
 	// Find the element in the population with the lowest entropy
 	minEntropyIndex, minF := MinEntropy(samples)
 	*(*mimic.F)[minEntropyIndex] = minF
+	mimic.Indices[0] = minEntropyIndex
 
 	// Remaining indicies
 	available := make([]int, mimic.length)
@@ -84,95 +109,12 @@ func (mimic *MIMIC) UpdateFromSamples(samples []*env.F) {
 	// For each following element, find the element in the population
 	// where the entropy of the element is minimized, given the previous
 	// element.
-	prevIndex := minEntropyIndex
 	for i := 1; i < mimic.length; i++ {
-		index, f := MinConditionalEntropy(samples, prevIndex, &available)
-		*(*mimic.F)[index] = f
-		prevIndex = index
+		index := MinConditionalEntropy(samples, mimic.Indices[i-1], &available)
+		ptt, ptf := BitStringBivariate(samples, index, mimic.Indices[i-1])
+		*(*mimic.F)[index] = ptt
+		*(*mimic.PTF)[index] = ptf
+		mimic.Indices[i] = index
 	}
-}
-
-func MinConditionalEntropy(samples []*env.F, prev int, available *[]int) (int, float64) {
-	min := 0
-	minV := math.MaxFloat64
-	minF := 0.0
-	minIndex := 0
-	for j, i := range *available {
-		hf, f := ConditionalEntropy(samples, i, prev)
-		if hf < minV {
-			minV = hf
-			min = i
-			minF = f
-			minIndex = j
-		}
-	}
-	// Remove the chosen index from the available list
-	*available = append((*available)[:minIndex], (*available)[minIndex+1:]...)
-	return min, minF
-}
-
-func MinEntropy(samples []*env.F) (int, float64) {
-	min := 0
-	minV := math.MaxFloat64
-	minF := 0.0
-	for i := 0; i < len(*samples[0]); i++ {
-		f := 0.0
-		for _, s := range samples {
-			f += *(*s)[i]
-		}
-		f /= float64(len(samples))
-		hf := Entropy(f)
-		if hf < minV {
-			minV = hf
-			min = i
-			minF = f
-		}
-	}
-	return min, minF
-}
-
-func Entropy(f float64) float64 {
-	if f == 0 || f == 1 {
-		return 0
-	}
-	return -1 * ((f * math.Log2(f)) + ((1 - f) * math.Log2(1-f)))
-}
-
-func ConditionalEntropy(samples []*env.F, a, b int) (float64, float64) {
-	// Assume bitstrings, assumption can be removed later
-	h := 0.0
-	patb := 0.0
-	// Iterate over all potential values for env[a] and env[b]
-	for acheck := 0.0; acheck <= 1.0; acheck++ {
-		for bcheck := 0.0; bcheck <= 1.0; bcheck++ {
-			// Find the total number of times in the samples where a and b are
-			// the expected value pair
-			// and where b is the expected value
-			totab := 0
-			totb := 0
-			for _, s := range samples {
-				af := *(*s)[a]
-				bf := *(*s)[b]
-				if bf == bcheck {
-					if af == acheck {
-						totab++
-					}
-					totb++
-				}
-			}
-			// Divide by total samples to get probabilities
-			pab := float64(totab) / float64(len(samples))
-			pb := float64(totb) / float64(len(samples))
-			if acheck == 1.0 {
-				patb += pab
-			}
-			// Avoid impossible math
-			if pab == 0.0 || pb == 0.0 {
-				continue
-			}
-			h += pab * math.Log2(pb/pab)
-		}
-	}
-	// Also need to return P(a=T|b)
-	return h, patb
+	//fmt.Println(mimic.PTF)
 }

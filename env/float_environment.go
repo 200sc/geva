@@ -83,6 +83,35 @@ func (env *F) Copy() *F {
 	return &newEnv
 }
 
+// The syntax to set and get from a pointer to a list
+// of pointers is sometimes annoying
+
+func (env *F) SetP(i int, f *float64) {
+	(*env)[i] = f
+}
+
+func (env *F) Set(i int, f float64) {
+	*(*env)[i] = f
+}
+
+func (env *F) GetP(i int) *float64 {
+	return (*env)[i]
+}
+
+func (env *F) Get(i int) float64 {
+	return *(*env)[i]
+}
+
+func (env *F) GetBinary(i int) float64 {
+	fi := env.Get(i)
+	if rand.Float64() < fi {
+		fi = 1.0
+	} else {
+		fi = 0.0
+	}
+	return fi
+}
+
 // New creates a combined environment by the given envDiff inputs
 // and returns a new environment pointer
 func (env *F) New(envDiff []float64) *F {

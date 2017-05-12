@@ -18,7 +18,7 @@ func TestFourPeaksMIMIC(t *testing.T) {
 		FitnessFunc(FourPeaks(int(length/10))),
 		Length(int(length)),
 		LearningRate(0.1),
-		MutationRate(.03),
+		MutationRate(.2),
 		FMutator(
 			mut.And(
 				mut.Or(mut.Add(.1), mut.Add(-.1), .5),
