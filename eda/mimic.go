@@ -20,18 +20,18 @@ func (mimic *MIMIC) Adjust() Model {
 
 	// Filter the samples so that they are only those with a fitness under some
 	// percentile of fitness
-	// This is actually already done by the sort that we added to SampleFitnesses
 	thetaFitness := fitnesses[int(float64(mimic.samples)*mimic.learningRate)]
-	filtered := []*env.F{}
-	for _, s := range samples {
-		mimic.F = s
-		fitness := mimic.fitness(mimic)
-		if fitness <= thetaFitness {
-			filtered = append(filtered, s)
+	fi := len(samples)
+	for i, f := range fitnesses {
+		if f > thetaFitness {
+			fi = i
+			break
 		}
 	}
-	//fmt.Println("Length of filtered", len(filtered))
+	filtered := samples[0:fi]
 	// Recalculate mimic.F based on the filtered samples
+	// In other models we'd reset mimic.F here but we don't need to do that,
+	// as we trash our samples and our old F both
 	mimic.UpdateFromSamples(filtered)
 	mimic.PTF.Mutate(mimic.mutationRate, mimic.fmutator)
 	return mimic

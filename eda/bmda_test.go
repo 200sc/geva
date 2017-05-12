@@ -10,15 +10,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestFourPeaksBMDA(t *testing.T) {
+func TestOneMaxBMDA(t *testing.T) {
 	fmt.Println("FourPeakBMDA")
 	Seed()
-	length := 100.0
+	length := 1000.0
 	model, err := Loop(BMDAModel,
 		BenchTest,
-		FitnessFunc(FourPeaks(int(length/10))),
+		FitnessFunc(OnemaxABS),
 		Length(int(length)),
-		LearningRate(0.07),
 		SelectionMethod(selection.DeterministicTournament{2, 1}),
 		MutationRate(.15),
 		FMutator(
@@ -33,14 +32,15 @@ func TestFourPeaksBMDA(t *testing.T) {
 	assert.NotNil(t, model)
 }
 
-func TestOneMaxBMDA(t *testing.T) {
+func TestFourPeaksBMDA(t *testing.T) {
 	fmt.Println("FourPeakBMDA")
 	Seed()
 	length := 100.0
 	model, err := Loop(BMDAModel,
 		BenchTest,
-		FitnessFunc(OnemaxABS),
+		FitnessFunc(FourPeaks(int(length/10))),
 		Length(int(length)),
+		LearningRate(0.07),
 		SelectionMethod(selection.DeterministicTournament{2, 1}),
 		MutationRate(.15),
 		FMutator(
