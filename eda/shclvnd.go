@@ -18,7 +18,7 @@ func (shc *SHCLVND) SigmaSample() *env.F {
 	env := env.NewF(shc.length, 0.0)
 	for i := 0; i < shc.length; i++ {
 		norm := BoxMueller(floatrange.NewLinear(0, 1))
-		*(*env)[i] = (norm * shc.Sigma) + *(*shc.F)[i]
+		env.Set(i, shc.F.Get(i)+(norm*shc.Sigma))
 	}
 	return env
 }
@@ -28,32 +28,12 @@ func (shc *SHCLVND) SigmaSample() *env.F {
 // the SHCLVND is reinforced closer to the average candidate, and the standard
 // deviation used to generate the samples is reduced.
 func (shc *SHCLVND) Adjust() Model {
+	bcs := NewBestCandidates(shc, shc.learningSamples, shc.SigmaSample)
+	mid := env.AverageF(bcs.Slice()...)
 
-	bcs := NewBestCandidates(shc.learningSamples)
-	eCopy := shc.F.Copy()
-	for i := 0; i < shc.samples; i++ {
-		// We set the sample to pbil.F right now
-		// as our fitness function takes in a model
-		// this might change
-		shc.F = shc.SigmaSample()
-		bcs.Add(shc.fitness(shc), shc.F)
-	}
-	shc.F = eCopy
-	bcsList := bcs.Slice()
-
-	// Get average of bcsList
-	mid := bcsList[0]
-	for i := 1; i < len(bcsList); i++ {
-		mid.AddF(bcsList[i])
-	}
-	mid.Divide(float64(len(bcsList)))
-
-	mid.SubF(shc.F)
-	mid.Mult(shc.learningRate)
+	mid.SubF(shc.F).Mult(shc.learningRate)
 	shc.F.AddF(mid)
 	shc.Sigma = shc.lmutator(shc.Sigma)
-
-	shc.F.Mutate(shc.mutationRate, shc.fmutator)
 	return shc
 }
 

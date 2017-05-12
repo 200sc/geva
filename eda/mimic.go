@@ -30,9 +30,7 @@ func (mimic *MIMIC) Adjust() Model {
 	//fmt.Println("Length of filtered", len(filtered))
 	// Recalculate mimic.F based on the filtered samples
 	mimic.UpdateFromSamples(filtered)
-	mimic.F.Mutate(mimic.mutationRate, mimic.fmutator)
 	mimic.PTF.Mutate(mimic.mutationRate, mimic.fmutator)
-	mimic.learningRate = mimic.lmutator(mimic.learningRate)
 	return mimic
 }
 
@@ -80,7 +78,10 @@ func MIMICModel(opts ...Option) (Model, error) {
 	var err error
 	mimic := new(MIMIC)
 	mimic.Base, err = DefaultBase(opts...)
-	mimic.PTF = mimic.F.Copy()
+	// We initialize with -1 so that if something doesn't get replaced
+	// due to an issue with the algorithm we will crash sooner, or can
+	// potentially notice it.
+	mimic.PTF = env.NewF(mimic.length, -1.0)
 	// Generate a random population of samples
 	samples := NSamples(mimic.samples, env.NewF(mimic.length, mimic.baseValue))
 	// Get the median fitness of the sample set
@@ -97,6 +98,7 @@ func (mimic *MIMIC) UpdateFromSamples(samples []*env.F) {
 	// Find the element in the population with the lowest entropy
 	minEntropyIndex, minF := MinEntropy(samples)
 	*(*mimic.F)[minEntropyIndex] = minF
+	*(*mimic.PTF)[minEntropyIndex] = minF
 	mimic.Indices[0] = minEntropyIndex
 
 	// Remaining indicies
@@ -117,4 +119,5 @@ func (mimic *MIMIC) UpdateFromSamples(samples []*env.F) {
 		mimic.Indices[i] = index
 	}
 	//fmt.Println(mimic.PTF)
+	//time.Sleep(1 * time.Second)
 }

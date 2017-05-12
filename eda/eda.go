@@ -42,6 +42,8 @@ func Loop(eda EDA, opts ...Option) (Model, error) {
 				bm.bestFitnessEvals = bm.fitnessEvals
 			}
 		}
+		bm.F.Mutate(bm.mutationRate, bm.fmutator)
+		bm.learningRate = bm.lmutator(bm.learningRate)
 		bm.iterations++
 	}
 	bm := model.BaseModel()

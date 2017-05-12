@@ -30,14 +30,13 @@ func (umda *UMDA) Adjust() Model {
 	newenv := env.NewF(umda.length, 0.0)
 	for _, ind := range subPop {
 		for j, f := range *(ind.(*UMDAIndividual).F) {
-			*(*newenv)[j] = *(*newenv)[j] + *f
+			newenv.Set(j, newenv.Get(j)+*f)
 		}
 	}
 	// divide the resulting sums by the total number of samples
 	// to obtain a new umda
 	newenv.Divide(float64(len(subPop)))
 	umda.F = newenv
-	umda.F.Mutate(umda.mutationRate, umda.fmutator)
 
 	return umda
 }

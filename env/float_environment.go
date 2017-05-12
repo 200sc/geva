@@ -19,52 +19,68 @@ func (env *F) ToEnv() *F {
 	return env
 }
 
-func (env *F) Divide(s float64) {
+func (env *F) Divide(s float64) *F {
 	for _, f := range *env {
 		*f = *f / s
 	}
+	return env
 }
 
-func (env *F) Mult(s float64) {
+func (env *F) Mult(s float64) *F {
 	for _, f := range *env {
 		*f = *f * s
 	}
+	return env
 }
 
-func (env *F) Add(s float64) {
+func (env *F) Add(s float64) *F {
 	for _, f := range *env {
 		*f = *f + s
 	}
+	return env
 }
 
-func (env *F) Sub(s float64) {
+func (env *F) Sub(s float64) *F {
 	for _, f := range *env {
 		*f = *f - s
 	}
+	return env
 }
 
-func (env *F) DivideF(env2 *F) {
-	for i, f := range *env {
-		*f = *f / *(*env2)[i]
+func (env *F) DivideF(envs ...*F) *F {
+	for _, env2 := range envs {
+		for i, f := range *env {
+			*f = *f / *(*env2)[i]
+		}
 	}
+	return env
 }
 
-func (env *F) MultF(env2 *F) {
-	for i, f := range *env {
-		*f = *f * *(*env2)[i]
+func (env *F) MultF(envs ...*F) *F {
+	for _, env2 := range envs {
+		for i, f := range *env {
+			*f = *f * *(*env2)[i]
+		}
 	}
+	return env
 }
 
-func (env *F) AddF(env2 *F) {
-	for i, f := range *env {
-		*f = *f + *(*env2)[i]
+func (env *F) AddF(envs ...*F) *F {
+	for _, env2 := range envs {
+		for i, f := range *env {
+			*f = *f + *(*env2)[i]
+		}
 	}
+	return env
 }
 
-func (env *F) SubF(env2 *F) {
-	for i, f := range *env {
-		*f = *f - *(*env2)[i]
+func (env *F) SubF(envs ...*F) *F {
+	for _, env2 := range envs {
+		for i, f := range *env {
+			*f = *f - *(*env2)[i]
+		}
 	}
+	return env
 }
 
 // Copy returns a copy of F.
@@ -190,20 +206,24 @@ func (env *F) ToIntRandom() *I {
 }
 
 // Reinforce updates each value in env to be learningRate closer to env2.
-func (env *F) Reinforce(env2 *F, learningRate float64) {
+func (env *F) Reinforce(learningRate float64, envs ...*F) *F {
 	learningRate = floatrange.NewLinear(0, 1).EnforceRange(learningRate)
 	negRate := 1.0 - learningRate
-	for i, f := range *env {
-		*f = (*f * negRate) + (*(*env2)[i] * learningRate)
+	for _, env2 := range envs {
+		for i, f := range *env {
+			*f = (*f * negRate) + (*(*env2)[i] * learningRate)
+		}
 	}
+	return env
 }
 
-func (env *F) Mutate(chance float64, mutator mut.FloatMutator) {
+func (env *F) Mutate(chance float64, mutator mut.FloatMutator) *F {
 	for _, f := range *env {
 		if rand.Float64() < chance {
 			*f = mutator(*f)
 		}
 	}
+	return env
 }
 
 // NewF creates an environment
@@ -224,4 +244,15 @@ func (env *F) String() string {
 	}
 	str += "]"
 	return str
+}
+
+// AverageF returns an F that holds the average
+// of the input Fs
+func AverageF(envs ...*F) *F {
+	mid := NewF(len(*envs[0]), 0.0)
+	for _, env := range envs {
+		mid.AddF(env)
+	}
+	mid.Divide(float64(len(envs)))
+	return mid
 }

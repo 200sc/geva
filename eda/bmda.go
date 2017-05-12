@@ -12,8 +12,13 @@ type BMDA struct {
 }
 
 func (bmda *BMDA) Adjust() Model {
+	// ??????????
 	// Create dependency forest
 	// Generate new population from forest and frequencies
+	// ??????????
+	// How do you sample a 2D bivariate array
+	// Do you just do it randomly
+	// ??????????????
 	// Combine previous population and new population
 	// by direct replacement
 	// Select parents

@@ -17,11 +17,13 @@ func TestFourPeaksMIMIC(t *testing.T) {
 		BenchTest,
 		FitnessFunc(FourPeaks(int(length/10))),
 		Length(int(length)),
-		LearningRate(0.1),
-		MutationRate(.2),
+		LearningRate(0.07),
+		MutationRate(.15),
 		FMutator(
 			mut.And(
-				mut.Or(mut.Add(.1), mut.Add(-.1), .5),
+				mut.Or(
+					mut.Or(mut.Add(.1), mut.Add(-.1), .5),
+					mut.DropOut(0.5), .99),
 				EnforceRange(floatrange.NewLinear(0.0, 1.0))),
 		),
 	)

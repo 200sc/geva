@@ -12,18 +12,18 @@ import (
 func TestOneMaxSHCLVND(t *testing.T) {
 	fmt.Println("OneMaxSCHLVND")
 	Seed()
-	length := 1000
+	length := 100
 	model, err := Loop(SHCLVNDModel,
 		BenchTest,
 		FitnessFunc(OnemaxABS),
 		Length(int(length)),
 		LearningRate(0.05),
-		// MutationRate(3.0/(length/10.0)),
-		// FMutator(
-		// 	mut.And(
-		// 		mut.Or(mut.Add(.1), mut.Add(-.1), .5),
-		// 		EnforceRange(floatrange.NewLinear(0.0, 1.0))),
-		// ),
+		MutationRate(0.03),
+		FMutator(
+			mut.And(
+				mut.Or(mut.Add(.1), mut.Add(-.1), .5),
+				EnforceRange(floatrange.NewLinear(0.0, 1.0))),
+		),
 		LMutator(
 			mut.And(
 				mut.Scale(0.997),

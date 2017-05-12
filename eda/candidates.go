@@ -24,10 +24,29 @@ type Candidate struct {
 }
 
 // NewBestCandidates creates a default BestCandidates
-func NewBestCandidates(l int) *BestCandidates {
-	bc := new(BestCandidates)
-	bc.Limit = l
-	return bc
+// with model.samples samples added to the candidate list.
+// if sFunc is not supplied, GetSample on a copy of the model's
+// initial environment will be used.
+func NewBestCandidates(m Model, bcsLimit int, sFunc func() *env.F) *BestCandidates {
+	bm := m.BaseModel()
+
+	bcs := new(BestCandidates)
+	bcs.Limit = bcsLimit
+	eCopy := bm.F.Copy()
+	for i := 0; i < bm.samples; i++ {
+		// We set the sample to cga.F right now
+		// as our fitness function takes in a model
+		// this might change
+		if sFunc == nil {
+			bm.F = GetSample(eCopy)
+		} else {
+			bm.F = sFunc()
+		}
+		bcs.Add(bm.fitness(bm), bm.F)
+	}
+
+	bm.F = eCopy
+	return bcs
 }
 
 // Slice converts BestCandidates from a linked list to a slice
