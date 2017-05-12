@@ -1,7 +1,6 @@
 package eda
 
 import (
-	"fmt"
 	"math"
 	"math/rand"
 
@@ -79,7 +78,7 @@ func (bmda *BMDA) Adjust() Model {
 	available := bmda.GenIndices()
 	used := []int{}
 	chi2Memo := make(map[int]map[int]float64)
-	fmt.Println("Starting forest generation")
+	//fmt.Println("Starting forest generation")
 	for {
 		// choose a random index
 		i := rand.Intn(len(available))
@@ -122,12 +121,12 @@ func (bmda *BMDA) Adjust() Model {
 			children[parent] = append(children[parent], chosen)
 			//fmt.Println("Length of available:", len(available))
 		}
-		fmt.Println("Length of available:", len(available))
+		//fmt.Println("Length of available:", len(available))
 		if len(available) == 0 {
 			break
 		}
 	}
-	fmt.Println("End forest")
+	//fmt.Println("End forest")
 	// fmt.Println(roots, children)
 	// Generate new population from forest and frequencies
 	newPop := bmda.BMDAPop(roots, children)

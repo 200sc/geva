@@ -11,7 +11,7 @@ import (
 )
 
 func TestOneMaxBMDA(t *testing.T) {
-	fmt.Println("FourPeakBMDA")
+	fmt.Println("OneMaxBMDA")
 	Seed()
 	length := 1000.0
 	model, err := Loop(BMDAModel,
@@ -40,9 +40,8 @@ func TestFourPeaksBMDA(t *testing.T) {
 		BenchTest,
 		FitnessFunc(FourPeaks(int(length/10))),
 		Length(int(length)),
-		LearningRate(0.07),
-		SelectionMethod(selection.DeterministicTournament{2, 1}),
-		MutationRate(.15),
+		SelectionMethod(selection.DeterministicTournament{4, 1}),
+		MutationRate(.25),
 		FMutator(
 			mut.And(
 				mut.Or(
