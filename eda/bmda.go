@@ -1,6 +1,7 @@
 package eda
 
 import (
+	"fmt"
 	"math"
 	"math/rand"
 
@@ -77,7 +78,8 @@ func (bmda *BMDA) Adjust() Model {
 	}
 	available := bmda.GenIndices()
 	used := []int{}
-	//fmt.Println("Starting forest generation")
+	chi2Memo := make(map[int]map[int]float64)
+	fmt.Println("Starting forest generation")
 	for {
 		// choose a random index
 		i := rand.Intn(len(available))
@@ -98,9 +100,14 @@ func (bmda *BMDA) Adjust() Model {
 			// ahead of time
 			for j, v := range available {
 				for _, v2 := range used {
-					chi2 := bmda.ChiSquared(v, v2)
-					if chi2 > maxChi2 {
-						maxChi2 = chi2
+					if _, ok := chi2Memo[v]; !ok {
+						chi2Memo[v] = make(map[int]float64)
+					}
+					if _, ok := chi2Memo[v][v2]; !ok {
+						chi2Memo[v][v2] = bmda.ChiSquared(v, v2)
+					}
+					if chi2Memo[v][v2] > maxChi2 {
+						maxChi2 = chi2Memo[v][v2]
 						chosen = v
 						i = j
 						parent = v2
@@ -113,12 +120,14 @@ func (bmda *BMDA) Adjust() Model {
 				break
 			}
 			children[parent] = append(children[parent], chosen)
+			//fmt.Println("Length of available:", len(available))
 		}
-		//fmt.Println("Length of available:", len(available))
+		fmt.Println("Length of available:", len(available))
 		if len(available) == 0 {
 			break
 		}
 	}
+	fmt.Println("End forest")
 	// fmt.Println(roots, children)
 	// Generate new population from forest and frequencies
 	newPop := bmda.BMDAPop(roots, children)
