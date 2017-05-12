@@ -44,25 +44,27 @@ func (bmda *BMDA) ChiSquared(a, b int) float64 {
 	fsamp := float64(bmda.samples)
 
 	xptd1 := fsamp * at * bt
-	chi2 += math.Pow((fsamp*atbt)-xptd1, 2) / xptd1
+	if xptd1 != 0 {
+		chi2 += math.Pow((fsamp*atbt)-xptd1, 2) / xptd1
+	}
 
 	xptd2 := fsamp * at * bf
-	chi2 += math.Pow((fsamp*atbf)-xptd2, 2) / xptd2
+	if xptd2 != 0 {
+		chi2 += math.Pow((fsamp*atbf)-xptd2, 2) / xptd2
+	}
 
 	xptd3 := fsamp * af * bt
-	chi2 += math.Pow((fsamp*afbt)-xptd3, 2) / xptd3
+	if xptd3 != 0 {
+		chi2 += math.Pow((fsamp*afbt)-xptd3, 2) / xptd3
+	}
 
 	xptd4 := fsamp * af * bf
-	chi2 += math.Pow((fsamp*afbf)-xptd4, 2) / xptd4
+	if xptd4 != 0 {
+		chi2 += math.Pow((fsamp*afbf)-xptd4, 2) / xptd4
+	}
 
+	//fmt.Println("Chi2", chi2, a, b)
 	return chi2
-}
-
-// Dependant uses bmda.ChiSquared to determine whether a is dependant on b.
-// This uses a constant taken from the paper "The Bivariate Marginal Distribution
-// Algorithm".
-func (bmda *BMDA) Dependant(a, b int) bool {
-	return bmda.ChiSquared(a, b) > 3.84
 }
 
 // Adjust on a BMDA is incomplete
@@ -129,10 +131,12 @@ func (bmda *BMDA) Adjust() Model {
 		samples[i] = mem.(*UMDAIndividual).F
 	}
 
-	//fmt.Println(len(newPop), len(samples))
+	//fmt.Println(bmda.LastPop.Members)
+	//fmt.Println(samples)
+	//time.Sleep(1 * time.Second)
 
 	// Sort the samples by their fitnesses
-	SampleFitnesses(bmda, samples)
+	_, samples = SampleFitnesses(bmda, samples)
 	// Replace the end samples (with the worst fitness) with the new population
 	for i, e := range newPop {
 		samples[len(samples)-(i+1)] = e
@@ -142,6 +146,7 @@ func (bmda *BMDA) Adjust() Model {
 	for i := range bmda.LastPop.Members {
 		bmda.LastPop.Members[i] = &UMDAIndividual{samples[i]}
 	}
+	//fmt.Println(bmda.LastPop.Members)
 
 	bmda.UpdateFromPop()
 	return bmda
@@ -154,6 +159,7 @@ func BMDAModel(opts ...Option) (Model, error) {
 	bmda.Base, err = DefaultBase(opts...)
 	// Generate initial population
 	bmda.LastPop = bmda.Pop()
+	//fmt.Println(bmda.LastPop.Members)
 	bmda.UpdateFromPop()
 	return bmda, err
 }

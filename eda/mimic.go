@@ -16,11 +16,11 @@ type MIMIC struct {
 // selection? (the paper doesn't refer to this selection algorithm as a selection
 // algorithm but it totally is)
 func (mimic *MIMIC) Adjust() Model {
-	samples := mimic.NSamples()
-	fitnesses := SampleFitnesses(mimic, samples)
+	fitnesses, samples := SampleFitnesses(mimic, mimic.NSamples())
 
 	// Filter the samples so that they are only those with a fitness under some
 	// percentile of fitness
+	// This is actually already done by the sort that we added to SampleFitnesses
 	thetaFitness := fitnesses[int(float64(mimic.samples)*mimic.learningRate)]
 	filtered := []*env.F{}
 	for _, s := range samples {
