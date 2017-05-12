@@ -1,10 +1,6 @@
 package eda
 
-import (
-	"sort"
-
-	"bitbucket.org/StephenPatrick/goevo/env"
-)
+import "bitbucket.org/StephenPatrick/goevo/env"
 
 // MIMIC is an EDA of the Mutual information maximizing input clustering algorithm
 type MIMIC struct {
@@ -47,16 +43,13 @@ func (mimic *MIMIC) Adjust() Model {
 func (mimic *MIMIC) GetSample() *env.F {
 	// A mimic sample goes through mimic.Indices
 	s := env.NewF(mimic.length, 0.0)
+
 	// Index zero is univariate, stored in the PTT environment
 	s.Set(mimic.Indices[0], mimic.F.GetBinary(mimic.Indices[0]))
+
 	// Each following index is based on whatever exists in the previous index
 	for i := 1; i < len(mimic.Indices); i++ {
-		var e *env.F
-		if s.Get(mimic.Indices[i-1]) == 0.0 {
-			e = mimic.PTF
-		} else {
-			e = mimic.F
-		}
+		e := ConditionedBSEnv(s, mimic.F, mimic.PTF, mimic.Indices[i-1])
 		s.Set(mimic.Indices[i], e.GetBinary(mimic.Indices[i]))
 	}
 	return s
@@ -69,22 +62,6 @@ func (mimic *MIMIC) NSamples() []*env.F {
 		samples[i] = mimic.GetSample()
 	}
 	return samples
-}
-
-// SampleFitnesses returns a sorted list of fitnesses for the given
-// samples in model m
-func SampleFitnesses(m Model, samples []*env.F) []int {
-	bm := m.BaseModel()
-	initF := bm.F.Copy()
-	fitnesses := make([]int, len(samples))
-	for i, s := range samples {
-		bm.F = s
-		fitnesses[i] = bm.fitness(m)
-	}
-	sort.Slice(fitnesses, func(i, j int) bool { return fitnesses[i] < fitnesses[j] })
-	bm.F = initF
-	//fmt.Println(fitnesses)
-	return fitnesses
 }
 
 // MIMICModel returns an initialized MIMIC EDA

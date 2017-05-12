@@ -11,10 +11,8 @@ import (
 // BMDA represents the Bivariate Marginal Distribution Algorithm
 type BMDA struct {
 	UMDA
-	BF       FullBivariateEnv
-	LastPop  *pop.Population
-	Roots    []int
-	Children [][]int
+	BF      FullBivariateEnv
+	LastPop *pop.Population
 }
 
 // ChiSquared on a bmda calculates a chi^2 value
@@ -69,23 +67,22 @@ func (bmda *BMDA) Dependant(a, b int) bool {
 
 // Adjust on a BMDA is incomplete
 func (bmda *BMDA) Adjust() Model {
-	// ??????????
 	// Create dependency forest
-	// Reset the previous forest
-	bmda.Roots = []int{}
-	bmda.Children = make([][]int, bmda.length)
+	roots := []int{}
+	children := make([][]int, bmda.length)
 	for i := 0; i < bmda.length; i++ {
-		bmda.Children[i] = []int{}
+		children[i] = []int{}
 	}
 	available := bmda.GenIndices()
 	used := []int{}
+	//fmt.Println("Starting forest generation")
 	for {
 		// choose a random index
 		i := rand.Intn(len(available))
 		chosen := available[i]
 		// create a new tree in the forest starting at chosen
-		bmda.Roots = append(bmda.Roots, chosen)
-		for len(available) > 1 {
+		roots = append(roots, chosen)
+		for len(available) > 0 {
 			// remove the chosen index from available
 			available = append(available[:i], available[i+1:]...)
 			used = append(used, chosen)
@@ -94,12 +91,16 @@ func (bmda *BMDA) Adjust() Model {
 			// and available indices
 			maxChi2 := 0.0
 			var parent int
-			for _, v := range available {
+			// This loop is incredibly expensive
+			// It is probably faster to calculate all n^2 chiSquared values
+			// ahead of time
+			for j, v := range available {
 				for _, v2 := range used {
 					chi2 := bmda.ChiSquared(v, v2)
 					if chi2 > maxChi2 {
 						maxChi2 = chi2
 						chosen = v
+						i = j
 						parent = v2
 					}
 				}
@@ -109,21 +110,39 @@ func (bmda *BMDA) Adjust() Model {
 			if maxChi2 < 3.84 {
 				break
 			}
-			bmda.Children[parent] = append(bmda.Children[parent], chosen)
+			children[parent] = append(children[parent], chosen)
 		}
+		//fmt.Println("Length of available:", len(available))
 		if len(available) == 0 {
 			break
 		}
 	}
+	// fmt.Println(roots, children)
 	// Generate new population from forest and frequencies
-
-	// How do you sample a 2D bivariate array
-	// No you use the foest we just spent way too long making
-	// So we pick random (all) roots and go down through all of their children
-	// using their parents as the elements they are dependant on
-
+	newPop := bmda.BMDAPop(roots, children)
 	// Combine previous population and new population by direct replacement
-	// of I guess arbitrary elements
+	// of the worst elements
+
+	// Get the samples from the population
+	samples := make([]*env.F, len(bmda.LastPop.Members))
+	for i, mem := range bmda.LastPop.Members {
+		samples[i] = mem.(*UMDAIndividual).F
+	}
+
+	//fmt.Println(len(newPop), len(samples))
+
+	// Sort the samples by their fitnesses
+	SampleFitnesses(bmda, samples)
+	// Replace the end samples (with the worst fitness) with the new population
+	for i, e := range newPop {
+		samples[len(samples)-(i+1)] = e
+	}
+
+	// Reassign samples to the population
+	for i := range bmda.LastPop.Members {
+		bmda.LastPop.Members[i] = &UMDAIndividual{samples[i]}
+	}
+
 	bmda.UpdateFromPop()
 	return bmda
 }
@@ -135,12 +154,70 @@ func BMDAModel(opts ...Option) (Model, error) {
 	bmda.Base, err = DefaultBase(opts...)
 	// Generate initial population
 	bmda.LastPop = bmda.Pop()
-	bmda.LastPop.Size = bmda.learningSamples
 	bmda.UpdateFromPop()
 	return bmda, err
 }
 
+// How do you sample a 2D bivariate array
+// No you use the foest we just spent way too long making
+// So we pick random (all) roots and go down through all of their children
+// using their parents as the elements they are dependant on
+func (bmda *BMDA) BMDAPop(roots []int, children [][]int) []*env.F {
+
+	// Create environments to sample from
+	tenv := env.NewF(bmda.length, 0.0)
+	fenv := env.NewF(bmda.length, 0.0)
+
+	// Get the samples from the population
+	samples := make([]*env.F, len(bmda.LastPop.Members))
+	for i, mem := range bmda.LastPop.Members {
+		samples[i] = mem.(*UMDAIndividual).F
+	}
+
+	for _, root := range roots {
+		// Roots just use the univariate probability
+		tenv.Set(root, UnivariateFromSamples(samples, root))
+		bmda.SetChildren(samples, tenv, fenv, children, root)
+	}
+
+	return bmda.NSamples(bmda.learningSamples, tenv, fenv, roots, children)
+}
+
+func (bmda *BMDA) NSamples(n int, tenv, fenv *env.F, roots []int, children [][]int) []*env.F {
+	samples := make([]*env.F, n)
+	for i := 0; i < n; i++ {
+		samples[i] = bmda.GetSample(tenv, fenv, roots, children)
+	}
+	return samples
+}
+
+func (bmda *BMDA) GetSample(tenv, fenv *env.F, roots []int, children [][]int) *env.F {
+	senv := env.NewF(bmda.length, 0.0)
+	for _, root := range roots {
+		senv.Set(root, tenv.GetBinary(root))
+		bmda.SetChildSample(senv, tenv, fenv, children, root)
+	}
+	return senv
+}
+func (bmda *BMDA) SetChildSample(senv, tenv, fenv *env.F, children [][]int, parent int) {
+	for _, child := range children[parent] {
+		e := ConditionedBSEnv(senv, tenv, fenv, parent)
+		senv.Set(child, e.GetBinary(child))
+		bmda.SetChildSample(senv, tenv, fenv, children, child)
+	}
+}
+func (bmda *BMDA) SetChildren(samples []*env.F, tenv, fenv *env.F, children [][]int, parent int) {
+	// If parent has no children, this is a NOP
+	for _, child := range children[parent] {
+		ptt, ptf := BitStringBivariate(samples, child, parent)
+		tenv.Set(child, ptt)
+		fenv.Set(child, ptf)
+		bmda.SetChildren(samples, tenv, fenv, children, child)
+	}
+}
+
 func (bmda *BMDA) UpdateFromPop() {
+	bmda.LastPop.Size = bmda.learningSamples
 	// Select parents?
 	// I do not know why these are called parents in the pseudocode for the
 	// BMDA paper, they're just the better members of the population
@@ -151,11 +228,11 @@ func (bmda *BMDA) UpdateFromPop() {
 	}
 	// Calculate univariate and bivariate frequencies
 	// Univariate
-	for _, e := range envs {
-		bmda.F.AddF(e)
-	}
+	bmda.F.SetAll(0.0)
+	bmda.F.AddF(envs...)
 	bmda.F.Divide(float64(len(subPop)))
 	// At this point bmda.F holds the univariate frequencies
 	// BF is the conditional bivariate frequencies
 	bmda.BF = NewFullBSBivariateEnv(envs)
+	bmda.LastPop.Size = bmda.samples
 }

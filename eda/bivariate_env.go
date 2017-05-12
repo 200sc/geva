@@ -85,3 +85,10 @@ func BitStringBivariate(samples []*env.F, a, b int) (float64, float64) {
 	//fmt.Println(ptt, ptf)
 	return ptt, ptf
 }
+
+func ConditionedBSEnv(senv, tenv, fenv *env.F, a int) *env.F {
+	if senv.Get(a) == 0.0 {
+		return fenv
+	}
+	return tenv
+}
