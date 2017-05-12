@@ -120,10 +120,7 @@ func (mimic *MIMIC) UpdateFromSamples(samples []*env.F) {
 	mimic.Indices[0] = minEntropyIndex
 
 	// Remaining indicies
-	available := make([]int, mimic.length)
-	for i := range available {
-		available[i] = i
-	}
+	available := mimic.GenIndices()
 	// Remove the initial index from the available list of indices
 	available = append(available[:minEntropyIndex], available[minEntropyIndex+1:]...)
 	// For each following element, find the element in the population

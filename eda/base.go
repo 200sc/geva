@@ -128,3 +128,12 @@ func (b *Base) Continue() bool {
 func (b *Base) Adjust() Model {
 	return b
 }
+
+// GenIndices is a utility function to generate a list of ints 0 ... b.length
+func (b *Base) GenIndices() []int {
+	available := make([]int, b.length)
+	for i := range available {
+		available[i] = i
+	}
+	return available
+}
