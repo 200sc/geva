@@ -22,10 +22,6 @@ PBIL [23]
 
 To do
 
-Bivariate
-
-Dependency Trees (https://www.cs.ubc.ca/~hutter/EARG.shtml/earg/stack/baluja_shumeet_1997_2.pdf)
-
 Multivariate
 
 • BOA [8]
