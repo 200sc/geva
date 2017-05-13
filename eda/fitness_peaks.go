@@ -10,9 +10,8 @@ import (
 // FourPeaks represents a problem where there are four explicit
 // maxima in the search space and two of the maxima can hide the
 // other two.
-func FourPeaks(t int) func(m Model) int {
-	return func(m Model) int {
-		e := m.ToEnv()
+func FourPeaks(t int) func(e *env.F) int {
+	return func(e *env.F) int {
 		leadingOnes := 0
 		for _, f := range *e {
 			if rand.Float64() < *f {
@@ -38,9 +37,8 @@ func FourPeaks(t int) func(m Model) int {
 	}
 }
 
-func SixPeaks(t int) func(m Model) int {
-	return func(m Model) int {
-		e := m.ToEnv()
+func SixPeaks(t int) func(e *env.F) int {
+	return func(e *env.F) int {
 		leadingOnes, leadingZeroes, trailingOnes, trailingZeroes := bsEndlengths(e)
 		base := int(math.Max(float64(leadingOnes), float64(trailingZeroes)))
 		if (trailingZeroes > t && leadingOnes > t) ||

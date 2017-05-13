@@ -3,6 +3,8 @@ package eda
 import (
 	"math"
 	"math/rand"
+
+	"bitbucket.org/StephenPatrick/goevo/env"
 )
 
 // I'm not sure how we want to model failure in the onemax problem.
@@ -15,9 +17,8 @@ import (
 
 // MaxABS is an abstracted form of Onemax for targetting any
 // floating point value
-func MaxABS(t float64) func(m Model) int {
-	return func(m Model) int {
-		e := m.ToEnv()
+func MaxABS(t float64) func(e *env.F) int {
+	return func(e *env.F) int {
 		diff := 0.0
 		for _, f := range *e {
 			diff += math.Abs(*f - t)
@@ -33,8 +34,7 @@ var OnemaxABS = MaxABS(1)
 // OnemaxChance is a fitness function which rolls rng on every value in
 // an environment and returns the number of values which were not rolled
 // under.
-func OnemaxChance(m Model) int {
-	e := m.ToEnv()
+func OnemaxChance(e *env.F) int {
 	diff := 0
 	for _, f := range *e {
 		if rand.Float64() > *f {

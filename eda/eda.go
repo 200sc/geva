@@ -15,13 +15,12 @@ type Model interface {
 	BaseModel() *Base
 	Continue() bool
 	Adjust() Model
-	// Should be generalized
 	ToEnv() *env.F
 }
 
 // A Fitness function for EDAs return an integer
-// from a given model
-type Fitness func(m Model) int
+// from a given vector of floats
+type Fitness func(e *env.F) int
 
 // Loop is the main EDA loop
 func Loop(eda EDA, opts ...Option) (Model, error) {
@@ -34,12 +33,14 @@ func Loop(eda EDA, opts ...Option) (Model, error) {
 		model = model.Adjust()
 		bm := model.BaseModel()
 		if bm.trackBest {
-			fitness := bm.fitness(model)
+			fitness := bm.Fitness()
 			if fitness < bestFitness {
 				bm.best = bm.F.Copy()
 				bestFitness = fitness
 				bm.bestIteration = bm.iterations
-				bm.bestFitnessEvals = bm.fitnessEvals
+				if bm.fitnessEvals != nil {
+					bm.bestFitnessEvals = *bm.fitnessEvals
+				}
 			}
 		}
 		bm.F.Mutate(bm.mutationRate, bm.fmutator)

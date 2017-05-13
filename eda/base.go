@@ -36,7 +36,7 @@ type Base struct {
 	selection         selection.Method
 	cont              func(Model) bool
 	report            func(Model)
-	fitnessEvals      int
+	fitnessEvals      *int
 	bestFitnessEvals  int
 	bestIteration     int
 	attemptsAfterBest int
@@ -77,9 +77,10 @@ func DefaultBase(opts ...Option) (Base, error) {
 	}
 	if b.trackFitness {
 		ofitness := b.fitness
-		b.fitness = func(m Model) int {
-			m.BaseModel().fitnessEvals++
-			return ofitness(m)
+		fevals := b.fitnessEvals
+		b.fitness = func(e *env.F) int {
+			(*fevals)++
+			return ofitness(e)
 		}
 	}
 	b.F = env.NewF(b.length, b.baseValue)
@@ -95,18 +96,21 @@ func (b *Base) BaseModel() *Base {
 	return b
 }
 
+func (b *Base) Fitness() int {
+	return b.fitness(b.ToEnv())
+}
+
 // DefReport is the Default Report function
 func DefReport(m Model) {
 	bm := m.BaseModel()
 	fmt.Println("Iterations taken:", bm.iterations)
 	if bm.best != nil {
 		fmt.Println("Best Model:", bm.best)
-		bm.F = bm.best
-		fmt.Println("Best Fitness:", bm.fitness(bm))
+		fmt.Println("Best Fitness:", bm.fitness(bm.best))
 		fmt.Println("Iteration of best model:", bm.bestIteration)
 	}
-	if bm.fitnessEvals != 0 {
-		fmt.Println("Fitness Evaluations:", bm.fitnessEvals)
+	if bm.fitnessEvals != nil {
+		fmt.Println("Fitness Evaluations:", *bm.fitnessEvals)
 		fmt.Println("Fitness Evals at best model iteration:", bm.bestFitnessEvals)
 	}
 }
@@ -114,8 +118,8 @@ func DefReport(m Model) {
 // DefContinue is the Default Continue function
 func DefContinue(m Model) bool {
 	b := m.BaseModel()
-	fitness := b.fitness(b)
-	fmt.Println(fitness, b.goalFitness)
+	fitness := b.Fitness()
+	fmt.Println("Iteration", b.iterations, "Fitness:", fitness)
 	return fitness > b.goalFitness && b.iterations < b.maxIterations
 }
 

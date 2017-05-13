@@ -49,11 +49,9 @@ func UnivariateFromSamples(samples []*env.F, a int) float64 {
 // in fitnesses[i]
 func SampleFitnesses(m Model, samples []*env.F) ([]int, []*env.F) {
 	bm := m.BaseModel()
-	initF := bm.F.Copy()
 	fitSamples := make([]FitSample, len(samples))
 	for i, s := range samples {
-		bm.F = s
-		fitSamples[i] = FitSample{s, bm.fitness(m)}
+		fitSamples[i] = FitSample{s, bm.fitness(s)}
 	}
 	sort.Slice(fitSamples, func(i, j int) bool {
 		return fitSamples[i].fitness < fitSamples[j].fitness
@@ -63,7 +61,6 @@ func SampleFitnesses(m Model, samples []*env.F) ([]int, []*env.F) {
 		fitnesses[i] = fitSamples[i].fitness
 		samples[i] = fitSamples[i].sample
 	}
-	bm.F = initF
 	return fitnesses, samples
 }
 

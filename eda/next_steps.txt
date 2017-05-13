@@ -15,9 +15,7 @@ BMDA [7]
 
 Similar to done
 
-• Adaptive
-Gaussian
-PBIL [23]
+• Adaptive Gaussian PBIL [23]
 • ECGA [5]
 
 To do
@@ -25,12 +23,12 @@ To do
 Multivariate
 
 • BOA [8]
-• hierarchical
-BOA [9]
-• mixed-BOA
-[10]
-• real-coded
-BOA [11]
+• hierarchical BOA [9]
+• mixed-BOA [10]
+• real-coded BOA [11]
+
+ECGA (above)
+AGPBIL (above)
 
 • EBNA [12]
 
@@ -50,6 +48,3 @@ BOA [11]
 
 • IDEA [22]
 • mIDEA [10]
-
-ECGA (above)
-AGPBIL (above)

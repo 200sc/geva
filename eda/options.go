@@ -134,6 +134,7 @@ func AttemptsAfterBest(i int) func(Model) {
 func TrackFitnessRuns(b bool) func(Model) {
 	return func(m Model) {
 		m.BaseModel().trackFitness = b
+		m.BaseModel().fitnessEvals = new(int)
 	}
 }
 

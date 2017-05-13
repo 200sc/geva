@@ -59,8 +59,6 @@ func (umda *UMDA) Pop() *pop.Population {
 	// in that there should be some lower tiered struct that can't do
 	// NextGeneration but can be selected on and crossovered on, etc.
 
-	initF := umda.F.Copy()
-
 	// Generate a population of size samples by sampling umda
 	p := new(pop.Population)
 	p.Members = make([]pop.Individual, umda.samples)
@@ -71,11 +69,9 @@ func (umda *UMDA) Pop() *pop.Population {
 	// Generate fitnesses for the population
 	p.Fitnesses = make([]int, umda.samples)
 	for i := 0; i < umda.samples; i++ {
-		umda.F = p.Members[i].(*UMDAIndividual).F
-		p.Fitnesses[i] = umda.fitness(umda)
+		p.Fitnesses[i] = umda.fitness(p.Members[i].(*UMDAIndividual).F)
 	}
 
 	p.Size = umda.samples
-	umda.F = initF
 	return p
 }

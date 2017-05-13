@@ -13,7 +13,7 @@ import (
 func TestOneMaxBMDA(t *testing.T) {
 	fmt.Println("OneMaxBMDA")
 	Seed()
-	length := 1000.0
+	length := 100.0
 	model, err := Loop(BMDAModel,
 		BenchTest,
 		FitnessFunc(OnemaxABS),
@@ -79,3 +79,4 @@ func TestQuadraticBMDA(t *testing.T) {
 // BMDA tests:
 // Deceptive n^3
 // NK
+// we are avoiding both of these because we're just looking at bitstrings

@@ -32,20 +32,15 @@ func NewBestCandidates(m Model, bcsLimit int, sFunc func() *env.F) *BestCandidat
 
 	bcs := new(BestCandidates)
 	bcs.Limit = bcsLimit
-	eCopy := bm.F.Copy()
 	for i := 0; i < bm.samples; i++ {
-		// We set the sample to cga.F right now
-		// as our fitness function takes in a model
-		// this might change
+		var e *env.F
 		if sFunc == nil {
-			bm.F = GetSample(eCopy)
+			e = GetSample(bm.F)
 		} else {
-			bm.F = sFunc()
+			e = sFunc()
 		}
-		bcs.Add(bm.fitness(bm), bm.F)
+		bcs.Add(bm.fitness(e), e)
 	}
-
-	bm.F = eCopy
 	return bcs
 }
 

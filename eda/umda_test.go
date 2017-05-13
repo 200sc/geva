@@ -19,8 +19,8 @@ func TestOneMaxUMDA(t *testing.T) {
 		BenchTest,
 		FitnessFunc(OnemaxABS),
 		Length(int(length)),
-		SelectionMethod(selection.DeterministicTournament{2, 1}),
-		MutationRate(3.0/(length/10.0)),
+		SelectionMethod(selection.DeterministicTournament{5, 1}),
+		MutationRate(0.03),
 		FMutator(
 			mut.And(
 				mut.Or(mut.Add(.1), mut.Add(-.1), .5),
