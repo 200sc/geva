@@ -55,7 +55,6 @@ Get like three multivariate methods done
 Get a couple of univariate tests
 Get a couple of multivariate tests
 Actually write all of the nine-ish tests for each of the nine-ish methods
-Standardize mutation into BenchTest
 Write paper
 Meta-Evolutionary
 Add meta to paper
