@@ -1,4 +1,4 @@
-package eda
+package stat
 
 import (
 	"math"

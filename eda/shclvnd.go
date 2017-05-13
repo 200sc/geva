@@ -1,6 +1,7 @@
 package eda
 
 import (
+	"bitbucket.org/StephenPatrick/goevo/eda/stat"
 	"bitbucket.org/StephenPatrick/goevo/env"
 	"github.com/200sc/go-dist/floatrange"
 )
@@ -17,7 +18,7 @@ type SHCLVND struct {
 func (shc *SHCLVND) SigmaSample() *env.F {
 	env := env.NewF(shc.length, 0.0)
 	for i := 0; i < shc.length; i++ {
-		norm := BoxMueller(floatrange.NewLinear(0, 1))
+		norm := stat.BoxMueller(floatrange.NewLinear(0, 1))
 		env.Set(i, shc.F.Get(i)+(norm*shc.Sigma))
 	}
 	return env

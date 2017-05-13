@@ -1,6 +1,9 @@
 package eda
 
-import "bitbucket.org/StephenPatrick/goevo/env"
+import (
+	"bitbucket.org/StephenPatrick/goevo/eda/stat"
+	"bitbucket.org/StephenPatrick/goevo/env"
+)
 
 // MIMIC is an EDA of the Mutual information maximizing input clustering algorithm
 type MIMIC struct {
@@ -91,7 +94,7 @@ func (mimic *MIMIC) UpdateFromSamples(samples []*env.F) {
 	// Let mimic.F be the density estimator of the median fitness
 	//
 	// Find the element in the population with the lowest entropy
-	minEntropyIndex, minF := MinEntropy(samples)
+	minEntropyIndex, minF := stat.MinEntropy(samples)
 	*(*mimic.F)[minEntropyIndex] = minF
 	*(*mimic.PTF)[minEntropyIndex] = minF
 	mimic.Indices[0] = minEntropyIndex
@@ -104,7 +107,7 @@ func (mimic *MIMIC) UpdateFromSamples(samples []*env.F) {
 	// where the entropy of the element is minimized, given the previous
 	// element.
 	for i := 1; i < mimic.length; i++ {
-		index := MinConditionalEntropy(samples, mimic.Indices[i-1], &available)
+		index := stat.MinConditionalEntropy(samples, mimic.Indices[i-1], &available)
 		ptt, ptf := BitStringBivariate(samples, index, mimic.Indices[i-1])
 		*(*mimic.F)[index] = ptt
 		*(*mimic.PTF)[index] = ptf
