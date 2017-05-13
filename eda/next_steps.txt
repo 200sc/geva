@@ -75,6 +75,9 @@ SixPeaks
 Quadratic 
 
 Multivariate:
+Trap
 ___________
 ___________
-___________
+
+Survey papers: http://citeseerx.ist.psu.edu/viewdoc/download;jsessionid=41E37E8691835E95DFD2C704753D653A?doi=10.1.1.309.4621&rep=rep1&type=pdf
+https://pdfs.semanticscholar.org/63c6/c3877530bb91fe94beba6093d1bf1c28f360.pdf
