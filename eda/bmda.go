@@ -157,6 +157,10 @@ func (bmda *BMDA) Adjust() Model {
 	//fmt.Println(bmda.LastPop.Members)
 
 	bmda.UpdateFromPop()
+	for _, be := range bmda.BF {
+		be.bf[0].Mutate(bmda.mutationRate, bmda.fmutator)
+		be.bf[1].Mutate(bmda.mutationRate, bmda.fmutator)
+	}
 	return bmda
 }
 

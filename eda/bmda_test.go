@@ -53,3 +53,29 @@ func TestFourPeaksBMDA(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, model)
 }
+
+func TestQuadraticBMDA(t *testing.T) {
+	fmt.Println("QuadraticBMDA")
+	Seed()
+	length := 100.0
+	model, err := Loop(BMDAModel,
+		BenchTest,
+		FitnessFunc(Quadratic),
+		Length(int(length)),
+		SelectionMethod(selection.DeterministicTournament{4, 1}),
+		MutationRate(.25),
+		FMutator(
+			mut.And(
+				mut.Or(
+					mut.Or(mut.Add(.1), mut.Add(-.1), .5),
+					mut.DropOut(0.5), .99),
+				EnforceRange(floatrange.NewLinear(0.0, 1.0))),
+		),
+	)
+	assert.Nil(t, err)
+	assert.NotNil(t, model)
+}
+
+// BMDA tests:
+// Deceptive n^3
+// NK
