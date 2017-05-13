@@ -32,6 +32,7 @@ AGPBIL (above)
 
 • EBNA [12]
 
+(FDA)
 • LFDA [13]
 
 • MOA [14]
@@ -52,7 +53,6 @@ AGPBIL (above)
 Real list:
 
 Get like three multivariate methods done
-Get a couple of univariate tests
 Get a couple of multivariate tests
 Actually write all of the nine-ish tests for each of the nine-ish methods
 Write paper
@@ -65,10 +65,9 @@ Add efficiency stuff to paper
 
 tests now:
 
-Univariate:
+Univariate: (check)
 OneMax(A/B)
 Alternating
-___________
 
 Bivariate: (check)
 FourPeaks
