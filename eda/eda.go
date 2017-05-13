@@ -1,6 +1,7 @@
 package eda
 
 import (
+	"fmt"
 	"math"
 
 	"bitbucket.org/StephenPatrick/goevo/env"
@@ -26,6 +27,8 @@ type Fitness func(e *env.F) int
 func Loop(eda EDA, opts ...Option) (Model, error) {
 	model, err := eda(opts...)
 	if err != nil {
+		// Should remove after testing is done
+		fmt.Println("Error", err)
 		return nil, err
 	}
 	bestFitness := math.MaxInt32

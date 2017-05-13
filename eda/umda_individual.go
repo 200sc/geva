@@ -15,8 +15,7 @@ type UMDAIndividual struct {
 
 // NewUMDAIndividual initializes a UMDAIndividual to be a sampling of an env
 func NewUMDAIndividual(e *env.F) *UMDAIndividual {
-	sample := GetSample(e)
-	return &UMDAIndividual{sample}
+	return &UMDAIndividual{GetSample(e)}
 }
 
 // Fitness is a dummy function on a UMDAIndividual

@@ -12,6 +12,7 @@ import (
 // guarantee that different methods are compared to eachother fairly. It
 // may get more complex as time goes on.
 var BenchTest = And(
+	func(m Model) { Seed() },
 	MaxIterations(2000),
 	TrackBest(true),
 	Samples(100),

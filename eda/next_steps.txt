@@ -67,7 +67,7 @@ tests now:
 
 Univariate:
 OneMax(A/B)
-___________
+Alternating
 ___________
 
 Bivariate: (check)
@@ -76,6 +76,6 @@ SixPeaks
 Quadratic 
 
 Multivariate:
-____________
-____________
-____________
+___________
+___________
+___________
