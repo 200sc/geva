@@ -1,12 +1,13 @@
 package goevo
 
 import (
-	"bitbucket.org/StephenPatrick/goevo/alg"
+	"testing"
+
 	"bitbucket.org/StephenPatrick/goevo/neural"
 	"bitbucket.org/StephenPatrick/goevo/pairing"
 	"bitbucket.org/StephenPatrick/goevo/pop"
 	"bitbucket.org/StephenPatrick/goevo/selection"
-	"testing"
+	"github.com/200sc/go-dist/intrange"
 )
 
 func TestNNRun(t *testing.T) {
@@ -70,7 +71,7 @@ func TestNNRun(t *testing.T) {
 		[]pop.SMethod{selection.Probabilistic{3, 1.7}},
 		[]pop.PMethod{pairing.Random{}},
 		2.0,
-		alg.LinearIntRange{2, 3},
+		intrange.NewLinear(2, 3),
 		0.1,
 		"ENN",
 	)

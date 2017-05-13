@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"bitbucket.org/StephenPatrick/goevo/alg"
+	"github.com/200sc/go-dist/intrange"
+
 	"bitbucket.org/StephenPatrick/goevo/env"
 	"bitbucket.org/StephenPatrick/goevo/gp"
 	"bitbucket.org/StephenPatrick/goevo/lgp"
@@ -48,7 +49,7 @@ func TestGPPowSum(t *testing.T) {
 		[]pop.SMethod{selection.DeterministicTournament{2, 3}},
 		[]pop.PMethod{pairing.Random{}},
 		1,
-		alg.LinearIntRange{1, 10},
+		intrange.NewLinear(1, 10),
 		0.05,
 		"TGP")
 }
@@ -94,7 +95,7 @@ func TestVSMPowSum(t *testing.T) {
 		[]pop.SMethod{selection.DeterministicTournament{2, 3}},
 		[]pop.PMethod{pairing.Random{}},
 		1,
-		alg.LinearIntRange{1, 2},
+		intrange.NewLinear(1, 2),
 		0.05,
 		"LGP")
 }
@@ -150,7 +151,7 @@ func TestNNPowSum(t *testing.T) {
 		[]pop.SMethod{selection.DeterministicTournament{3, 3}},
 		[]pop.PMethod{pairing.Random{}},
 		2.0,
-		alg.LinearIntRange{1, 4},
+		intrange.NewLinear(1, 4),
 		0.1,
 		"ENN",
 	)

@@ -2,15 +2,16 @@ package goevo
 
 import (
 	"fmt"
-	"bitbucket.org/StephenPatrick/goevo/alg"
+	"math/rand"
+	"testing"
+
 	"bitbucket.org/StephenPatrick/goevo/env"
 	"bitbucket.org/StephenPatrick/goevo/gp"
 	"bitbucket.org/StephenPatrick/goevo/lgp"
 	"bitbucket.org/StephenPatrick/goevo/pairing"
 	"bitbucket.org/StephenPatrick/goevo/pop"
 	"bitbucket.org/StephenPatrick/goevo/selection"
-	"math/rand"
-	"testing"
+	"github.com/200sc/go-dist/intrange"
 )
 
 const (
@@ -241,7 +242,7 @@ func TestGPTartarus(t *testing.T) {
 		out,
 		4,
 		2,
-		alg.LinearIntRange{1, 3},
+		intrange.NewLinear(1, 3),
 		0.05)
 
 	RunDemeGroup(dg, 500)
@@ -336,7 +337,7 @@ func TestLGPTartarus(t *testing.T) {
 			out,
 			4,
 			2,
-			alg.LinearIntRange{1, 3},
+			intrange.NewLinear(1, 3),
 			0.05),
 		500)
 }

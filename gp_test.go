@@ -1,14 +1,15 @@
 package goevo
 
 import (
-	"bitbucket.org/StephenPatrick/goevo/alg"
+	"math"
+	"testing"
+
 	"bitbucket.org/StephenPatrick/goevo/env"
 	"bitbucket.org/StephenPatrick/goevo/gp"
 	"bitbucket.org/StephenPatrick/goevo/pairing"
 	"bitbucket.org/StephenPatrick/goevo/pop"
 	"bitbucket.org/StephenPatrick/goevo/selection"
-	"math"
-	"testing"
+	"github.com/200sc/go-dist/intrange"
 )
 
 func TestGPRun(t *testing.T) {
@@ -55,7 +56,7 @@ func TestGPRun(t *testing.T) {
 			out,
 			len(in),
 			1,
-			alg.LinearIntRange{1, 2},
+			intrange.NewLinear(1, 2),
 			0.05,
 		),
 		10000)

@@ -5,13 +5,14 @@ import (
 	"math/rand"
 	"time"
 
-	"bitbucket.org/StephenPatrick/goevo/alg"
+	"github.com/200sc/go-dist/intrange"
+
 	"bitbucket.org/StephenPatrick/goevo/pop"
 )
 
 func MakeDemes(demeCount int, members []pop.Individual,
 	s []pop.SMethod, pair []pop.PMethod,
-	in, out [][]float64, tests, goal int, elites alg.IntRange, migration float64) pop.DemeGroup {
+	in, out [][]float64, tests, goal int, elites intrange.Range, migration float64) pop.DemeGroup {
 
 	demeSize := len(members) / demeCount
 

@@ -3,7 +3,8 @@ package goevo
 import (
 	"testing"
 
-	"bitbucket.org/StephenPatrick/goevo/alg"
+	"github.com/200sc/go-dist/intrange"
+
 	"bitbucket.org/StephenPatrick/goevo/env"
 	"bitbucket.org/StephenPatrick/goevo/lgp"
 	"bitbucket.org/StephenPatrick/goevo/pairing"
@@ -55,7 +56,7 @@ func TestLGPRun(t *testing.T) {
 		out,
 		1,
 		1,
-		alg.LinearIntRange{2, 4},
+		intrange.NewLinear(2, 4),
 		0.05)
 
 	RunDemeGroup(dg, 10000)

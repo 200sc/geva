@@ -2,7 +2,8 @@ package goevo
 
 import (
 	"fmt"
-	"bitbucket.org/StephenPatrick/goevo/alg"
+	"testing"
+
 	"bitbucket.org/StephenPatrick/goevo/env"
 	"bitbucket.org/StephenPatrick/goevo/gp"
 	"bitbucket.org/StephenPatrick/goevo/lgp"
@@ -10,7 +11,7 @@ import (
 	"bitbucket.org/StephenPatrick/goevo/pairing"
 	"bitbucket.org/StephenPatrick/goevo/pop"
 	"bitbucket.org/StephenPatrick/goevo/selection"
-	"testing"
+	"github.com/200sc/go-dist/intrange"
 )
 
 func TestGPTransposeMatrix(t *testing.T) {
@@ -47,7 +48,7 @@ func TestGPTransposeMatrix(t *testing.T) {
 		[]pop.SMethod{selection.DeterministicTournament{2, 3}},
 		[]pop.PMethod{pairing.Random{}},
 		1,
-		alg.LinearIntRange{4, 6},
+		intrange.NewLinear(4, 6),
 		0.05,
 		"TGP")
 }
@@ -102,7 +103,7 @@ func TestVSMTransposeMatrix(t *testing.T) {
 		},
 		[]pop.PMethod{pairing.Random{}},
 		1,
-		alg.LinearIntRange{1, 10},
+		intrange.NewLinear(1, 10),
 		0.10,
 		"LGP")
 }
@@ -160,7 +161,7 @@ func TestNNTransposeMatrix(t *testing.T) {
 		[]pop.SMethod{selection.DeterministicTournament{3, 3}},
 		[]pop.PMethod{pairing.Random{}},
 		2.0,
-		alg.LinearIntRange{1, 4},
+		intrange.NewLinear(1, 4),
 		0.1,
 		"ENN",
 	)

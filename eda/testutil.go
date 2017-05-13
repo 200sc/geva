@@ -12,7 +12,7 @@ import (
 // guarantee that different methods are compared to eachother fairly. It
 // may get more complex as time goes on.
 var BenchTest = And(
-	func(m Model) { Seed() },
+	func(m Model) { seed() },
 	MaxIterations(2000),
 	TrackBest(true),
 	Samples(100),
@@ -27,6 +27,6 @@ var BenchTest = And(
 				mut.DropOut(0.5), .99),
 			floatrange.NewLinear(0.0, 1.0).EnforceRange)))
 
-func Seed() {
+func seed() {
 	rand.Seed(time.Now().UTC().UnixNano())
 }

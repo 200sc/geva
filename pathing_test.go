@@ -3,6 +3,8 @@ package goevo
 import (
 	"testing"
 
+	"github.com/200sc/go-dist/intrange"
+
 	"bitbucket.org/StephenPatrick/goevo/alg"
 	"bitbucket.org/StephenPatrick/goevo/env"
 	"bitbucket.org/StephenPatrick/goevo/gp"
@@ -106,7 +108,7 @@ func TestGPPathing(t *testing.T) {
 		[]pop.SMethod{selection.Probabilistic{4, 2}},
 		[]pop.PMethod{pairing.Random{}},
 		30,
-		alg.LinearIntRange{1, 6},
+		intrange.NewLinear(1, 6),
 		0.05,
 		"TGP")
 }
@@ -167,7 +169,7 @@ func TestLGPPathing(t *testing.T) {
 		[]pop.SMethod{selection.Probabilistic{4, 2}},
 		[]pop.PMethod{pairing.Random{}},
 		30,
-		alg.LinearIntRange{1, 6},
+		intrange.NewLinear(1, 6),
 		0.05,
 		"LGP")
 }

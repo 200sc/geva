@@ -3,13 +3,15 @@ package goevo
 import (
 	"encoding/csv"
 	"fmt"
-	"bitbucket.org/StephenPatrick/goevo/alg"
-	"bitbucket.org/StephenPatrick/goevo/pop"
 	"math"
 	"os"
 	"sort"
 	"strconv"
 	"time"
+
+	"github.com/200sc/go-dist/intrange"
+
+	"bitbucket.org/StephenPatrick/goevo/pop"
 )
 
 type TestSuite struct {
@@ -22,7 +24,7 @@ type TestSuite struct {
 	selection                           []pop.SMethod
 	pairing                             []pop.PMethod
 	goal                                int
-	elites                              alg.IntRange
+	elites                              intrange.Range
 	migration                           float64
 	titleSuffix                         string
 }
@@ -69,7 +71,7 @@ func SuiteWriter() *csv.Writer {
 
 func RunSuite(testCases []TestCase, demeCount, popSize, testGenerations int, options interface{},
 	suiteFunc SuiteFunc, selection []pop.SMethod,
-	pairing []pop.PMethod, goal int, elites alg.IntRange, migration float64, titleSuffix string) {
+	pairing []pop.PMethod, goal int, elites intrange.Range, migration float64, titleSuffix string) {
 
 	writer := SuiteWriter()
 
