@@ -48,3 +48,35 @@ AGPBIL (above)
 
 • IDEA [22]
 • mIDEA [10]
+
+Real list:
+
+Get like three multivariate methods done
+Get a couple of univariate tests
+Get a couple of multivariate tests
+Actually write all of the nine-ish tests for each of the nine-ish methods
+Standardize mutation into BenchTest
+Write paper
+Meta-Evolutionary
+Add meta to paper
+Visualization work
+Add viz to paper
+Efficiency stuff
+Add efficiency stuff to paper
+
+tests now:
+
+Univariate:
+OneMax(A/B)
+___________
+___________
+
+Bivariate: (check)
+FourPeaks
+SixPeaks
+Quadratic 
+
+Multivariate:
+____________
+____________
+____________

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"bitbucket.org/StephenPatrick/goevo/eda/fitness"
 	"bitbucket.org/StephenPatrick/goevo/mut"
 	"bitbucket.org/StephenPatrick/goevo/selection"
 	"github.com/200sc/go-dist/floatrange"
@@ -16,7 +17,7 @@ func TestOneMaxBMDA(t *testing.T) {
 	length := 100.0
 	model, err := Loop(BMDAModel,
 		BenchTest,
-		FitnessFunc(OnemaxABS),
+		FitnessFunc(fitness.OnemaxABS),
 		Length(int(length)),
 		SelectionMethod(selection.DeterministicTournament{2, 1}),
 		MutationRate(.15),
@@ -38,7 +39,7 @@ func TestFourPeaksBMDA(t *testing.T) {
 	length := 100.0
 	model, err := Loop(BMDAModel,
 		BenchTest,
-		FitnessFunc(FourPeaks(int(length/10))),
+		FitnessFunc(fitness.FourPeaks(int(length/10))),
 		Length(int(length)),
 		SelectionMethod(selection.DeterministicTournament{4, 1}),
 		MutationRate(.25),
@@ -60,7 +61,7 @@ func TestQuadraticBMDA(t *testing.T) {
 	length := 100.0
 	model, err := Loop(BMDAModel,
 		BenchTest,
-		FitnessFunc(Quadratic),
+		FitnessFunc(fitness.Quadratic),
 		Length(int(length)),
 		SelectionMethod(selection.DeterministicTournament{4, 1}),
 		MutationRate(.25),

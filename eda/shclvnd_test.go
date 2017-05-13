@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"bitbucket.org/StephenPatrick/goevo/eda/fitness"
 	"bitbucket.org/StephenPatrick/goevo/mut"
 	"github.com/200sc/go-dist/floatrange"
 	"github.com/stretchr/testify/assert"
@@ -15,7 +16,7 @@ func TestOneMaxSHCLVND(t *testing.T) {
 	length := 100
 	model, err := Loop(SHCLVNDModel,
 		BenchTest,
-		FitnessFunc(OnemaxABS),
+		FitnessFunc(fitness.OnemaxABS),
 		Length(int(length)),
 		LearningRate(0.05),
 		MutationRate(0.03),

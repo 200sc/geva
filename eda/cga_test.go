@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"bitbucket.org/StephenPatrick/goevo/eda/fitness"
 	"bitbucket.org/StephenPatrick/goevo/mut"
 
 	"github.com/200sc/go-dist/floatrange"
@@ -16,7 +17,7 @@ func TestOneMaxCGA(t *testing.T) {
 	length := 1000.0
 	model, err := Loop(CGAModel,
 		BenchTest,
-		FitnessFunc(OnemaxABS),
+		FitnessFunc(fitness.OnemaxABS),
 		Length(int(length)),
 		LearningRate(0.1),
 		MutationRate(3.0/(length/10.0)),
@@ -36,7 +37,7 @@ func TestFourPeaksCGA(t *testing.T) {
 	length := 100.0
 	model, err := Loop(CGAModel,
 		BenchTest,
-		FitnessFunc(FourPeaks(int(length/10))),
+		FitnessFunc(fitness.FourPeaks(int(length/10))),
 		Length(int(length)),
 		LearningRate(0.1),
 		MutationRate(.03),

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"bitbucket.org/StephenPatrick/goevo/eda/fitness"
 	"bitbucket.org/StephenPatrick/goevo/mut"
 	"bitbucket.org/StephenPatrick/goevo/selection"
 
@@ -17,7 +18,7 @@ func TestOneMaxUMDA(t *testing.T) {
 	length := 1000.0
 	model, err := Loop(UMDAModel,
 		BenchTest,
-		FitnessFunc(OnemaxABS),
+		FitnessFunc(fitness.OnemaxABS),
 		Length(int(length)),
 		SelectionMethod(selection.DeterministicTournament{5, 1}),
 		MutationRate(0.03),

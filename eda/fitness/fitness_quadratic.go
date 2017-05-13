@@ -1,4 +1,4 @@
-package eda
+package fitness
 
 import "bitbucket.org/StephenPatrick/goevo/env"
 

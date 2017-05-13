@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"bitbucket.org/StephenPatrick/goevo/eda/fitness"
 	"bitbucket.org/StephenPatrick/goevo/mut"
 	"github.com/200sc/go-dist/floatrange"
 	"github.com/stretchr/testify/assert"
@@ -15,7 +16,7 @@ func TestFourPeaksMIMIC(t *testing.T) {
 	length := 100.0
 	model, err := Loop(MIMICModel,
 		BenchTest,
-		FitnessFunc(FourPeaks(int(length/10))),
+		FitnessFunc(fitness.FourPeaks(int(length/10))),
 		Length(int(length)),
 		LearningRate(0.07),
 		MutationRate(.15),
@@ -37,7 +38,7 @@ func TestSixPeaksMIMIC(t *testing.T) {
 	length := 100.0
 	model, err := Loop(MIMICModel,
 		BenchTest,
-		FitnessFunc(SixPeaks(int(length/10))),
+		FitnessFunc(fitness.SixPeaks(int(length/10))),
 		Length(int(length)),
 		LearningRate(0.07),
 		MutationRate(.15),
