@@ -86,6 +86,7 @@ func BitStringBivariate(samples []*env.F, a, b int) (float64, float64) {
 	return ptt, ptf
 }
 
+// ConditionedBSEnv returns either tenv or fenv depending on the value at senv[a]
 func ConditionedBSEnv(senv, tenv, fenv *env.F, a int) *env.F {
 	if senv.Get(a) == 0.0 {
 		return fenv

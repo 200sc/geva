@@ -96,6 +96,7 @@ func (b *Base) BaseModel() *Base {
 	return b
 }
 
+// Fitness is shorthand for fitness(b.F)
 func (b *Base) Fitness() int {
 	return b.fitness(b.ToEnv())
 }

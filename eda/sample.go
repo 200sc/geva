@@ -64,6 +64,7 @@ func SampleFitnesses(m Model, samples []*env.F) ([]int, []*env.F) {
 	return fitnesses, samples
 }
 
+// FitSample is a tuple of a sample and its fitness
 type FitSample struct {
 	sample  *env.F
 	fitness int
