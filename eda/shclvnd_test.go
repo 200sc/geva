@@ -19,12 +19,6 @@ func TestOneMaxSHCLVND(t *testing.T) {
 		FitnessFunc(fitness.OnemaxABS),
 		Length(int(length)),
 		LearningRate(0.05),
-		MutationRate(0.03),
-		FMutator(
-			mut.And(
-				mut.Or(mut.Add(.1), mut.Add(-.1), .5),
-				EnforceRange(floatrange.NewLinear(0.0, 1.0))),
-		),
 		LMutator(
 			mut.And(
 				mut.Scale(0.997),

@@ -20,12 +20,7 @@ func TestOneMaxCGA(t *testing.T) {
 		FitnessFunc(fitness.OnemaxABS),
 		Length(int(length)),
 		LearningRate(0.1),
-		MutationRate(3.0/(length/10.0)),
-		FMutator(
-			mut.And(
-				mut.Or(mut.Add(.1), mut.Add(-.1), .5),
-				EnforceRange(floatrange.NewLinear(0.0, 1.0))),
-		),
+		MutationRate(.03),
 	)
 	assert.Nil(t, err)
 	assert.NotNil(t, model)
@@ -41,11 +36,6 @@ func TestFourPeaksCGA(t *testing.T) {
 		Length(int(length)),
 		LearningRate(0.1),
 		MutationRate(.03),
-		FMutator(
-			mut.And(
-				mut.Or(mut.Add(.1), mut.Add(-.1), .5),
-				EnforceRange(floatrange.NewLinear(0.0, 1.0))),
-		),
 	)
 	assert.Nil(t, err)
 	assert.NotNil(t, model)
