@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"bitbucket.org/StephenPatrick/goevo/eda/fitness"
-	"bitbucket.org/StephenPatrick/goevo/selection"
 )
 
 func TestOneMaxBMDA(t *testing.T) {
@@ -15,7 +14,6 @@ func TestOneMaxBMDA(t *testing.T) {
 		BenchTest,
 		FitnessFunc(fitness.OnemaxABS),
 		Length(int(length)),
-		SelectionMethod(selection.DeterministicTournament{5, 1}),
 	)
 }
 
@@ -26,7 +24,6 @@ func TestFourPeaksBMDA(t *testing.T) {
 		BenchTest,
 		FitnessFunc(fitness.FourPeaks(int(length/10))),
 		Length(int(length)),
-		SelectionMethod(selection.DeterministicTournament{5, 1}),
 		MutationRate(.35),
 	)
 }
@@ -38,7 +35,6 @@ func TestQuadraticBMDA(t *testing.T) {
 		BenchTest,
 		FitnessFunc(fitness.Quadratic),
 		Length(int(length)),
-		SelectionMethod(selection.DeterministicTournament{5, 1}),
 		MutationRate(.25),
 	)
 }

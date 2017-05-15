@@ -1,9 +1,6 @@
 package eda
 
-import (
-	"bitbucket.org/StephenPatrick/goevo/env"
-	"bitbucket.org/StephenPatrick/goevo/pop"
-)
+import "bitbucket.org/StephenPatrick/goevo/env"
 
 // UMDA represents the Univariate Marginal Distribution Algorithm
 type UMDA struct {
@@ -29,7 +26,7 @@ func (umda *UMDA) Adjust() Model {
 	// Sum over all values in the learningSamples for each index and
 	newenv := env.NewF(umda.length, 0.0)
 	for _, ind := range subPop {
-		for j, f := range *(ind.(*UMDAIndividual).F) {
+		for j, f := range *(ind.(*EnvInd).F) {
 			newenv.Set(j, newenv.Get(j)+*f)
 		}
 	}
@@ -47,31 +44,4 @@ func UMDAModel(opts ...Option) (Model, error) {
 	umda := new(UMDA)
 	umda.Base, err = DefaultBase(opts...)
 	return umda, err
-}
-
-// Pop generates a population of UMDAIndividuals from sampling umda
-func (umda *UMDA) Pop() *pop.Population {
-	// This is a bastardization of the evolutionary population model
-	// because the evolutionary population model assumes you will follow its
-	// rules and don't replace its elements and call its NextGeneration function
-	// and we are breaking all of its rules,
-	// which implies there are problems with the evolutionary population model
-	// in that there should be some lower tiered struct that can't do
-	// NextGeneration but can be selected on and crossovered on, etc.
-
-	// Generate a population of size samples by sampling umda
-	p := new(pop.Population)
-	p.Members = make([]pop.Individual, umda.samples)
-	for i := 0; i < umda.samples; i++ {
-		p.Members[i] = NewUMDAIndividual(umda.F)
-	}
-
-	// Generate fitnesses for the population
-	p.Fitnesses = make([]int, umda.samples)
-	for i := 0; i < umda.samples; i++ {
-		p.Fitnesses[i] = umda.fitness(p.Members[i].(*UMDAIndividual).F)
-	}
-
-	p.Size = umda.samples
-	return p
 }

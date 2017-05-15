@@ -10,7 +10,7 @@ import (
 
 // BMDA represents the Bivariate Marginal Distribution Algorithm
 type BMDA struct {
-	UMDA
+	Base
 	BF      FullBivariateEnv
 	LastPop *pop.Population
 }
@@ -136,7 +136,7 @@ func (bmda *BMDA) Adjust() Model {
 	// Get the samples from the population
 	samples := make([]*env.F, len(bmda.LastPop.Members))
 	for i, mem := range bmda.LastPop.Members {
-		samples[i] = mem.(*UMDAIndividual).F
+		samples[i] = mem.(*EnvInd).F
 	}
 
 	//fmt.Println(bmda.LastPop.Members)
@@ -152,7 +152,7 @@ func (bmda *BMDA) Adjust() Model {
 
 	// Reassign samples to the population
 	for i := range bmda.LastPop.Members {
-		bmda.LastPop.Members[i] = &UMDAIndividual{samples[i]}
+		bmda.LastPop.Members[i] = &EnvInd{samples[i]}
 	}
 	//fmt.Println(bmda.LastPop.Members)
 
@@ -188,7 +188,7 @@ func (bmda *BMDA) BMDAPop(roots []int, children [][]int) []*env.F {
 	// Get the samples from the population
 	samples := make([]*env.F, len(bmda.LastPop.Members))
 	for i, mem := range bmda.LastPop.Members {
-		samples[i] = mem.(*UMDAIndividual).F
+		samples[i] = mem.(*EnvInd).F
 	}
 
 	for _, root := range roots {
@@ -248,7 +248,7 @@ func (bmda *BMDA) UpdateFromPop() {
 	subPop := bmda.selection.Select(bmda.LastPop)
 	envs := make([]*env.F, len(subPop))
 	for i, mem := range subPop {
-		envs[i] = mem.(*UMDAIndividual).F
+		envs[i] = mem.(*EnvInd).F
 	}
 	// Calculate univariate and bivariate frequencies
 	// Univariate

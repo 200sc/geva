@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"bitbucket.org/StephenPatrick/goevo/mut"
+	"bitbucket.org/StephenPatrick/goevo/selection"
 	"github.com/200sc/go-dist/floatrange"
 )
 
@@ -18,6 +19,7 @@ var BenchTest = And(
 	Samples(100),
 	LearningSamples(10),
 	BaseValue(0.5),
+	SelectionMethod(selection.DeterministicTournament{5, 1}),
 	TrackFitnessRuns(true),
 	MutationRate(.15),
 	FMutator(

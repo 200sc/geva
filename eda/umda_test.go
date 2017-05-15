@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"bitbucket.org/StephenPatrick/goevo/eda/fitness"
-	"bitbucket.org/StephenPatrick/goevo/selection"
 )
 
 func TestOneMaxUMDA(t *testing.T) {
@@ -15,7 +14,6 @@ func TestOneMaxUMDA(t *testing.T) {
 		BenchTest,
 		FitnessFunc(fitness.OnemaxABS),
 		Length(int(length)),
-		SelectionMethod(selection.DeterministicTournament{5, 1}),
 		MutationRate(0.03),
 	)
 }

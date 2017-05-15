@@ -16,13 +16,11 @@ func PointCrossover(a []interface{}, b []interface{}, numPoints int) []interface
 		i++
 	}
 
-	var short []interface{}
+	short := b
 	if len(a) < len(b) {
 		short = a
-	} else {
-		short = b
 	}
-	activeFlag := 0
+	activeFlag := false
 	active := a
 	start := 0
 	end := 0
@@ -37,13 +35,12 @@ func PointCrossover(a []interface{}, b []interface{}, numPoints int) []interface
 
 		c = append(c, active[start:end]...)
 
-		if activeFlag == 0 {
+		if !activeFlag {
 			active = b
-			activeFlag = 1
 		} else {
 			active = a
-			activeFlag = 0
 		}
+		activeFlag = !activeFlag
 		start = end
 	}
 

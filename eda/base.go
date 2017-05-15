@@ -7,6 +7,7 @@ import (
 	"bitbucket.org/StephenPatrick/goevo/env"
 	"bitbucket.org/StephenPatrick/goevo/evoerr"
 	"bitbucket.org/StephenPatrick/goevo/mut"
+	"bitbucket.org/StephenPatrick/goevo/pop"
 	"bitbucket.org/StephenPatrick/goevo/selection"
 
 	"github.com/200sc/go-dist/floatrange"
@@ -141,4 +142,32 @@ func (b *Base) GenIndices() []int {
 		available[i] = i
 	}
 	return available
+}
+
+// Pop generates a population of EnvInds from sampling base.F
+func (b *Base) Pop() *pop.Population {
+
+	// Generate a population of size samples by sampling umda
+	p := new(pop.Population)
+	p.Members = make([]pop.Individual, b.samples)
+	for i := 0; i < b.samples; i++ {
+		p.Members[i] = NewEnvInd(b.F)
+	}
+
+	// Generate fitnesses for the population
+	p.Fitnesses = make([]int, b.samples)
+	for i := 0; i < b.samples; i++ {
+		p.Fitnesses[i] = b.fitness(p.Members[i].(*EnvInd).F)
+	}
+
+	p.Size = b.samples
+	return p
+}
+
+func (b *Base) SelectLearning(p *pop.Population) []pop.Individual {
+	oldSize := p.Size
+	p.Size = b.learningSamples
+	selected := b.selection.Select(p)
+	p.Size = oldSize
+	return selected
 }
