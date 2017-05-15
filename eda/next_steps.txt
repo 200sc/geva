@@ -13,6 +13,7 @@ SHCLVND [20]
 MIMIC
 BMDA [7]
 ECGA [5]
+BOA [8]
 
 Similar to done
 
@@ -22,7 +23,6 @@ To do
 
 Multivariate
 
-• BOA [8]
 • hierarchical BOA [9]
 • mixed-BOA [10]
 • real-coded BOA [11]
@@ -51,9 +51,6 @@ AGPBIL (above)
 
 Real list:
 
-Get like three multivariate methods done
-Get a couple of multivariate tests
-Actually write all of the nine-ish tests for each of the nine-ish methods
 Write paper
 Meta-Evolutionary
 Add meta to paper

@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"bitbucket.org/StephenPatrick/goevo/eda/fitness"
-	"bitbucket.org/StephenPatrick/goevo/selection"
 )
 
 func TestFourPeaksECGA(t *testing.T) {
@@ -17,7 +16,6 @@ func TestFourPeaksECGA(t *testing.T) {
 		Length(int(length)),
 		LearningRate(0.3),
 		MutationRate(0.01),
-		SelectionMethod(selection.DeterministicTournament{3, 1}),
 	)
 }
 
@@ -30,6 +28,5 @@ func TestTrap3ECGA(t *testing.T) {
 		Length(int(length)),
 		LearningRate(0.2),
 		MutationRate(0.001),
-		//SelectionMethod(selection.DeterministicTournament{5, 1}),
 	)
 }

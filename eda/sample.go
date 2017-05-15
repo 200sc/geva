@@ -71,10 +71,12 @@ type FitSample struct {
 	fitness int
 }
 
+// PopEnvs converts a population of EnvInd members to a sample array
 func PopEnvs(p *pop.Population) []*env.F {
 	return MemberEnvs(p.Members)
 }
 
+// MemberEnvs converts a set of EnvInd members to a smaple array
 func MemberEnvs(mem []pop.Individual) []*env.F {
 	envs := make([]*env.F, len(mem))
 	for i, s := range mem {
@@ -83,6 +85,8 @@ func MemberEnvs(mem []pop.Individual) []*env.F {
 	return envs
 }
 
+// ReplaceLowFitnesses sorts the given population members by fitness
+// and replaces the lowest members of those with the newMembers.
 func (b *Base) ReplaceLowFitnesses(p *pop.Population, newMembers []*env.F) {
 	envs := PopEnvs(p)
 

@@ -12,10 +12,23 @@ import (
 // changing the output model.
 type Option func(Model)
 
+// Name sets the name of the model / test being run, for reporting
+func Name(s string) func(Model) {
+	return func(m Model) {
+		m.BaseModel().name = s
+	}
+}
+
 // FitnessFunc is an option which sets the fitness function
 func FitnessFunc(f Fitness) func(Model) {
 	return func(m Model) {
 		m.BaseModel().fitness = f
+	}
+}
+
+func ReportFunc(r func(Model)) func(Model) {
+	return func(m Model) {
+		m.BaseModel().report = r
 	}
 }
 
@@ -134,6 +147,10 @@ func TrackFitnessRuns(b bool) func(Model) {
 		m.BaseModel().trackFitness = b
 		m.BaseModel().fitnessEvals = new(int)
 	}
+}
+
+func TrackTime(m Model) {
+	m.BaseModel().trackTime = true
 }
 
 // MaxIterations sets the maximum number of iterations the algorithm

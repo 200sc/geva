@@ -3,6 +3,7 @@ package eda
 import (
 	"fmt"
 	"math"
+	"time"
 
 	"bitbucket.org/StephenPatrick/goevo/env"
 	"bitbucket.org/StephenPatrick/goevo/evoerr"
@@ -21,6 +22,7 @@ import (
 // wasted memory in their structs.
 type Base struct {
 	*env.F
+	name              string
 	iterations        *int
 	maxIterations     int
 	fitness           Fitness
@@ -43,11 +45,13 @@ type Base struct {
 	bestFitness       *int
 	attemptsAfterBest int
 	best              *env.F
+	startTime         time.Time
 	// Ensure booleans are kept at the end (or in groups of 8)
 	// for memory efficiency
 	randomize    bool
 	trackBest    bool
 	trackFitness bool
+	trackTime    bool
 }
 
 // DefaultBase initializes some base fields to non-automatic zero values
@@ -117,6 +121,9 @@ func DefaultBase(opts ...Option) (Base, error) {
 	if b.randomize {
 		b.F.RandomizeSingle(0.0, 1.0)
 	}
+	if b.trackTime {
+		b.startTime = time.Now()
+	}
 	return *b, nil
 }
 
@@ -134,6 +141,7 @@ func (b *Base) Fitness() int {
 // DefReport is the Default Report function
 func DefReport(m Model) {
 	bm := m.BaseModel()
+	fmt.Println("Test", bm.name)
 	fmt.Println("Iterations taken:", *bm.iterations)
 	if bm.best != nil {
 		fmt.Println("Best Model:", bm.best)
@@ -144,13 +152,16 @@ func DefReport(m Model) {
 		fmt.Println("Fitness Evaluations:", *bm.fitnessEvals)
 		fmt.Println("Fitness Evals at best model iteration:", *bm.bestFitnessEvals)
 	}
+	if bm.trackTime {
+		fmt.Println("Time taken:", time.Since(bm.startTime))
+	}
 }
 
 // DefContinue is the Default Continue function
 func DefContinue(m Model) bool {
 	b := m.BaseModel()
 	fitness := b.Fitness()
-	fmt.Println("Iteration", *b.iterations, "Fitness:", fitness)
+	//fmt.Println("Iteration", *b.iterations, "Fitness:", fitness)
 	return fitness > b.goalFitness && *b.iterations < b.maxIterations
 }
 
@@ -199,6 +210,7 @@ func (b *Base) Pop() *pop.Population {
 	return p
 }
 
+// SelectLearning selects b.learningSamples members from the given population
 func (b *Base) SelectLearning(p *pop.Population) []pop.Individual {
 	oldSize := p.Size
 	p.Size = b.learningSamples

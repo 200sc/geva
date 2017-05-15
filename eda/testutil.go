@@ -19,8 +19,9 @@ var BenchTest = And(
 	Samples(100),
 	LearningSamples(10),
 	BaseValue(0.5),
-	SelectionMethod(selection.DeterministicTournament{5, 1}),
+	SelectionMethod(selection.DeterministicTournament{4, 1}),
 	TrackFitnessRuns(true),
+	TrackTime,
 	MutationRate(.15),
 	FMutator(
 		mut.And(

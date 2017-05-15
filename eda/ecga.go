@@ -10,12 +10,16 @@ import (
 	"bitbucket.org/StephenPatrick/goevo/pop"
 )
 
+// ECGA represents the Extended Compact Genetic Algorithm
 type ECGA struct {
 	Base
 	P      *pop.Population
 	Blocks [][]int
 }
 
+// Adjust for an ecga creates an ecga population based on the ecga's
+// understanding of its building blocks and then refreshes those
+// building blocks
 func (ecga *ECGA) Adjust() Model {
 	// Generate pop from mpm model
 	ecga.P = ecga.ECGAPop()
@@ -24,12 +28,14 @@ func (ecga *ECGA) Adjust() Model {
 	return ecga
 }
 
+// Mutate on an ecga mutates each element of the ecga population
 func (ecga *ECGA) Mutate() {
 	for _, m := range ecga.P.Members {
 		m.(*EnvInd).F.Mutate(ecga.mutationRate, ecga.fmutator)
 	}
 }
 
+// UpdateMDM updates the building blocks and environment of an ecga
 func (ecga *ECGA) UpdateMDM() {
 	// Selection
 	selected := ecga.SelectLearning(ecga.P)
@@ -43,6 +49,7 @@ func (ecga *ECGA) UpdateMDM() {
 	ecga.MDMModel(selected)
 }
 
+// ECGAModel returns an initialized ECGA EDA
 func ECGAModel(opts ...Option) (Model, error) {
 	var err error
 	ecga := new(ECGA)
@@ -53,6 +60,9 @@ func ECGAModel(opts ...Option) (Model, error) {
 	return ecga, err
 }
 
+// ECGAPop returns a population where some members are from ecga.P
+// and some are sampled from ecga.Blocks and ecga.P at random. The
+// proportion of new to old members is based on learningRate.
 func (ecga *ECGA) ECGAPop() *pop.Population {
 	newMemberCt := int(float64(len(ecga.P.Members)) * ecga.learningRate)
 	// Sample from the existing population to generate new
@@ -76,6 +86,7 @@ func (ecga *ECGA) ECGAPop() *pop.Population {
 	return ecga.P
 }
 
+// MDMModel refreshes the ecga's building blocks
 func (ecga *ECGA) MDMModel(selected []pop.Individual) {
 	// Cast selected to Environments
 	envs := make([]*env.F, len(selected))
@@ -147,7 +158,7 @@ func (ecga *ECGA) MDMModel(selected []pop.Individual) {
 	}
 	// Filter out all merged blocks (whose indices were not used by the resulting
 	// merger)
-	outBlocks := make([][]int, 0)
+	var outBlocks [][]int
 	for i, b := range blocks {
 		if _, ok := merged[i]; !ok {
 			outBlocks = append(outBlocks, b)
@@ -156,59 +167,24 @@ func (ecga *ECGA) MDMModel(selected []pop.Individual) {
 	ecga.Blocks = outBlocks
 }
 
+// BlockComplexity returns the complexity of a given block definition
 func (ecga *ECGA) BlockComplexity(envs []*env.F, b []int) float64 {
-	return (math.Log2(float64(ecga.samples)) * ecga.BlockModelComplexity(b)) +
-		(float64(ecga.samples) * ecga.BlockCombinedComplexity(envs, b))
+	return (math.Log2(float64(ecga.samples)) * ecga.ModelComplexity(b)) +
+		(float64(ecga.samples) * ecga.CombinedComplexity(envs, b))
 }
 
-func (ecga *ECGA) EvalMPM(envs []*env.F, blocks [][]int) float64 {
-	return ecga.ModelComplexity(blocks) + ecga.CompressedComplexity(envs, blocks)
-}
-
-func (ecga *ECGA) ModelComplexity(blocks [][]int) float64 {
-	// There's a good risk of this overflowing for large building blocks
-	freqTotal := 0.0
-	for _, b := range blocks {
-		// catch incremental overflow
-		inc := ecga.BlockModelComplexity(b)
-		if inc < 0 {
-			return math.MaxFloat64
-		}
-		freqTotal += inc
-		// catch sum overflow
-		if freqTotal < 0 {
-			return math.MaxFloat64
-		}
-	}
-	return math.Log2(float64(ecga.samples)) * freqTotal
-}
-
-func (ecga *ECGA) BlockModelComplexity(b []int) float64 {
+// ModelComplexity punishes blocks exponentially for being long
+// in effect, this means ecgas can't develop building blocks longer than
+// maybe four or five indices.
+func (ecga *ECGA) ModelComplexity(b []int) float64 {
 	return math.Pow(2, float64(len(b)))
 }
 
-func (ecga *ECGA) BlockCombinedComplexity(envs []*env.F, b []int) float64 {
+// CombinedComplexity returns the sum marginal complexity of the
+// block's indices in the sample set
+func (ecga *ECGA) CombinedComplexity(envs []*env.F, b []int) float64 {
 	return stat.MarginalEntropy(envs, b)
 }
 
-func (ecga *ECGA) CompressedComplexity(envs []*env.F, blocks [][]int) float64 {
-	eTotal := 0.0
-	for _, b := range blocks {
-		eTotal += ecga.BlockCombinedComplexity(envs, b)
-	}
-	return float64(ecga.samples) * eTotal
-}
-
-// ECGA isn't terribly hard to do-- we already have crossover and selection
-// covered, and elitism is fine but we should probably give the other models
-// who use populations elitism if we give ECGA elitism. The one hard thing
-// is the MPM model which in itself isn't hard but requires that we split
-// the problem space up into building blocks, and requires that we learn these
-// building blocks, I guess, although I'm not certain on that
-//
-// Yes, according to paper 1 we begin the MDM model with the assumption that
-// every index is its own building block, and sees if merging all pairs is
-// helpful.
-//
 // Papers : https://pdfs.semanticscholar.org/eeee/a9fdade929cb3fc9a99631d3541ef7005079.pdf
 // http://www.kumarasastry.com/wp-content/files/2000026.pdf
