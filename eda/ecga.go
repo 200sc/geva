@@ -72,26 +72,7 @@ func (ecga *ECGA) ECGAPop() *pop.Population {
 	// replace the low fitness members in the original population
 
 	// Cast members to Environments
-	envs := make([]*env.F, len(ecga.P.Members))
-	for i, s := range ecga.P.Members {
-		envs[i] = s.(*EnvInd).F
-	}
-
-	// Sort envs by fitness
-	_, envs = SampleFitnesses(ecga, envs)
-	i := 0
-	for j := len(envs) - 1; j >= 0; j-- {
-		envs[j] = newMembers[i]
-		i++
-		if i >= len(newMembers) {
-			break
-		}
-	}
-
-	// set the population to be envs cast back to members
-	for i := range ecga.P.Members {
-		ecga.P.Members[i] = &EnvInd{envs[i]}
-	}
+	ecga.ReplaceLowFitnesses(ecga.P, newMembers)
 	return ecga.P
 }
 
