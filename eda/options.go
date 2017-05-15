@@ -108,10 +108,8 @@ func StopCondition(c func(m Model) bool) func(Model) {
 
 // TrackBest sets whether or not the algorithm should keep track of
 // the best model it has found so far
-func TrackBest(b bool) func(Model) {
-	return func(m Model) {
-		m.BaseModel().trackBest = b
-	}
+func TrackBest(m Model) {
+	m.BaseModel().trackBest = true
 }
 
 // AttemptsAfterBest terminates an EDA if it fails to improve on its best
@@ -124,7 +122,7 @@ func AttemptsAfterBest(i int) func(Model) {
 		oldCont := bm.cont
 		bm.cont = func(m Model) bool {
 			bm := m.BaseModel()
-			return oldCont(m) && (bm.bestIteration+bm.attemptsAfterBest) > bm.iterations
+			return oldCont(m) && (*bm.bestIteration+bm.attemptsAfterBest) > *bm.iterations
 		}
 	}
 }

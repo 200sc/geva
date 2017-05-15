@@ -101,6 +101,9 @@ func MarginalEntropy(samples []*env.F, indices []int) float64 {
 	h := 0.0
 	for _, c := range combs {
 		occurrences := combOccurrences(samples, c, indices)
+		if occurrences == 0 {
+			continue
+		}
 		chance := float64(occurrences) / float64(len(samples))
 		// It's not clear to me what we should be dividing chance by.
 		// The first paper does not go into detail, and just says to obtain

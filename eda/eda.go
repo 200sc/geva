@@ -2,7 +2,6 @@ package eda
 
 import (
 	"fmt"
-	"math"
 
 	"bitbucket.org/StephenPatrick/goevo/env"
 )
@@ -17,6 +16,7 @@ type Model interface {
 	Continue() bool
 	Adjust() Model
 	ToEnv() *env.F
+	Mutate()
 }
 
 // A Fitness function for EDAs return an integer
@@ -31,24 +31,11 @@ func Loop(eda EDA, opts ...Option) (Model, error) {
 		fmt.Println("Error", err)
 		return nil, err
 	}
-	bestFitness := math.MaxInt32
 	for model.Continue() {
 		model = model.Adjust()
 		bm := model.BaseModel()
-		if bm.trackBest {
-			fitness := bm.Fitness()
-			if fitness < bestFitness {
-				bm.best = bm.F.Copy()
-				bestFitness = fitness
-				bm.bestIteration = bm.iterations
-				if bm.fitnessEvals != nil {
-					bm.bestFitnessEvals = *bm.fitnessEvals
-				}
-			}
-		}
-		bm.F.Mutate(bm.mutationRate, bm.fmutator)
-		bm.learningRate = bm.lmutator(bm.learningRate)
-		bm.iterations++
+		model.Mutate()
+		(*bm.iterations)++
 	}
 	bm := model.BaseModel()
 	if bm.report != nil {

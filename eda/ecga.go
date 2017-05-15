@@ -12,16 +12,22 @@ import (
 
 type ECGA struct {
 	Base
-	P                *pop.Population
-	Blocks           [][]int
-	ParentProportion float64
+	P      *pop.Population
+	Blocks [][]int
 }
 
 func (ecga *ECGA) Adjust() Model {
 	// Generate pop from mpm model
 	ecga.P = ecga.ECGAPop()
 	ecga.UpdateMDM()
+	//fmt.Println(ecga.Blocks)
 	return ecga
+}
+
+func (ecga *ECGA) Mutate() {
+	for _, m := range ecga.P.Members {
+		m.(*EnvInd).F.Mutate(ecga.mutationRate, ecga.fmutator)
+	}
 }
 
 func (ecga *ECGA) UpdateMDM() {
@@ -40,7 +46,6 @@ func (ecga *ECGA) UpdateMDM() {
 func ECGAModel(opts ...Option) (Model, error) {
 	var err error
 	ecga := new(ECGA)
-	ecga.ParentProportion = 0.5
 	ecga.Base, err = DefaultBase(opts...)
 	// Random Pop
 	ecga.P = ecga.Pop()
@@ -49,7 +54,7 @@ func ECGAModel(opts ...Option) (Model, error) {
 }
 
 func (ecga *ECGA) ECGAPop() *pop.Population {
-	newMemberCt := int(float64(len(ecga.P.Members)) * (1 - ecga.ParentProportion))
+	newMemberCt := int(float64(len(ecga.P.Members)) * ecga.learningRate)
 	// Sample from the existing population to generate new
 	// members, but sample in blocks.
 	// Paper 2 suggests that random sampling of the existing

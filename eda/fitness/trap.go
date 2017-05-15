@@ -23,7 +23,7 @@ import (
 func TrapABS(t int) func(e *env.F) int {
 	return func(e *env.F) int {
 		diff := 0
-		for i := 0; i < len(*e); i += t {
+		for i := 0; (i + t) < len(*e); i += t {
 			ones := 0
 			for j := i; j < i+t; j++ {
 				if rand.Float64() < e.Get(j) {

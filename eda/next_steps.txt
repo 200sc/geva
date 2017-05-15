@@ -12,11 +12,11 @@ cGA [4]
 SHCLVND [20]
 MIMIC
 BMDA [7]
+ECGA [5]
 
 Similar to done
 
 • Adaptive Gaussian PBIL [23]
-• ECGA [5]
 
 To do
 
@@ -27,7 +27,6 @@ Multivariate
 • mixed-BOA [10]
 • real-coded BOA [11]
 
-ECGA (above)
 AGPBIL (above)
 
 • EBNA [12]

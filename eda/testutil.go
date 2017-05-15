@@ -15,7 +15,7 @@ import (
 var BenchTest = And(
 	func(m Model) { seed() },
 	MaxIterations(2000),
-	TrackBest(true),
+	TrackBest,
 	Samples(100),
 	LearningSamples(10),
 	BaseValue(0.5),

@@ -21,7 +21,7 @@ import (
 // wasted memory in their structs.
 type Base struct {
 	*env.F
-	iterations        int
+	iterations        *int
 	maxIterations     int
 	fitness           Fitness
 	goalFitness       int
@@ -38,8 +38,9 @@ type Base struct {
 	cont              func(Model) bool
 	report            func(Model)
 	fitnessEvals      *int
-	bestFitnessEvals  int
-	bestIteration     int
+	bestFitnessEvals  *int
+	bestIteration     *int
+	bestFitness       *int
 	attemptsAfterBest int
 	best              *env.F
 	// Ensure booleans are kept at the end (or in groups of 8)
@@ -55,6 +56,7 @@ func DefaultBase(opts ...Option) (Base, error) {
 	b.fmutator = mut.None()
 	b.lmutator = mut.None()
 	b.length = 1
+	b.iterations = new(int)
 	b.samples = 1
 	b.learningSamples = 1
 	b.maxIterations = math.MaxInt32
@@ -84,6 +86,33 @@ func DefaultBase(opts ...Option) (Base, error) {
 			return ofitness(e)
 		}
 	}
+	if b.trackBest {
+		b.bestFitness = new(int)
+		b.bestFitnessEvals = new(int)
+		b.bestIteration = new(int)
+		b.best = env.NewF(1, 0.0)
+		*b.bestFitness = math.MaxInt32
+		ofitness := b.fitness
+		b.fitness = func(e *env.F) int {
+			// These are pointers because the function closure that is
+			// generated doesn't keep track of b, it looks like an
+			// optimization method means that when you write b.best
+			// the referred to value is not (look through b and find best)
+			// but a environment local version of b.best. An alternative
+			// approach would be to write these functions in a way that they
+			// obtain b at the beginning to force re-looking for b.best, etc
+			f := ofitness(e)
+			if f < *b.bestFitness {
+				*b.best = *e
+				*b.bestFitness = f
+				*b.bestIteration = *b.iterations
+				if b.fitnessEvals != nil {
+					*b.bestFitnessEvals = *b.fitnessEvals
+				}
+			}
+			return f
+		}
+	}
 	b.F = env.NewF(b.length, b.baseValue)
 	if b.randomize {
 		b.F.RandomizeSingle(0.0, 1.0)
@@ -105,15 +134,15 @@ func (b *Base) Fitness() int {
 // DefReport is the Default Report function
 func DefReport(m Model) {
 	bm := m.BaseModel()
-	fmt.Println("Iterations taken:", bm.iterations)
+	fmt.Println("Iterations taken:", *bm.iterations)
 	if bm.best != nil {
 		fmt.Println("Best Model:", bm.best)
-		fmt.Println("Best Fitness:", bm.fitness(bm.best))
-		fmt.Println("Iteration of best model:", bm.bestIteration)
+		fmt.Println("Best Fitness:", *bm.bestFitness)
+		fmt.Println("Iteration of best model:", *bm.bestIteration)
 	}
 	if bm.fitnessEvals != nil {
 		fmt.Println("Fitness Evaluations:", *bm.fitnessEvals)
-		fmt.Println("Fitness Evals at best model iteration:", bm.bestFitnessEvals)
+		fmt.Println("Fitness Evals at best model iteration:", *bm.bestFitnessEvals)
 	}
 }
 
@@ -121,8 +150,8 @@ func DefReport(m Model) {
 func DefContinue(m Model) bool {
 	b := m.BaseModel()
 	fitness := b.Fitness()
-	fmt.Println("Iteration", b.iterations, "Fitness:", fitness)
-	return fitness > b.goalFitness && b.iterations < b.maxIterations
+	fmt.Println("Iteration", *b.iterations, "Fitness:", fitness)
+	return fitness > b.goalFitness && *b.iterations < b.maxIterations
 }
 
 // Continue is a wrapper around b.cont
@@ -133,6 +162,12 @@ func (b *Base) Continue() bool {
 // Adjust is the default Adjust method, which is expected to be overwritten
 func (b *Base) Adjust() Model {
 	return b
+}
+
+// Mutate is the default mutation function
+func (b *Base) Mutate() {
+	b.F.Mutate(b.mutationRate, b.fmutator)
+	b.learningRate = b.lmutator(b.learningRate)
 }
 
 // GenIndices is a utility function to generate a list of ints 0 ... b.length
