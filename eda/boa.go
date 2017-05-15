@@ -13,8 +13,21 @@ type BOA struct {
 	P *pop.Population
 }
 
+func (boa *BOA) Mutate() {
+	for _, m := range boa.P.Members {
+		m.(*EnvInd).F.Mutate(boa.mutationRate, boa.fmutator)
+	}
+}
+
 func (boa *BOA) Adjust() Model {
 	selected := boa.SelectLearning(boa.P)
+	// Update boa.F to represent selected (Perhaps not needed if we changed
+	// the fitness method)
+	boa.F.SetAll(0.0)
+	for _, s := range selected {
+		boa.F.AddF(s.(*EnvInd).F)
+	}
+	boa.F.Divide(float64(len(selected)))
 	// Construct a network based on selected
 	envs := MemberEnvs(selected)
 	bn := NewBayesNet(envs)
@@ -100,7 +113,7 @@ func k2(i int, candidates []int, samples []*env.F) float64 {
 }
 
 func factorial(n int) int {
-	if n == 1 {
+	if n <= 1 {
 		return 1
 	}
 	return n * factorial(n-1)
