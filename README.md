@@ -1,19 +1,11 @@
 # GoEvo #
-# Version 0.0.2#
+# Version 0.0.3#
 
-This can build and evolve gps and neural networks.
+Usage: see test files
 
-Usage: see test files, helper functions for usage don't exist yet really.
+# New since 0.0.2#
 
-Neural Crossover Methods: 3
-
-GP Crossover Methods: 1
-
-LGP Crossover Methods: 2
-
-Selection Methods: 5
-
-Pairing Methods: 2
+Added the EDA subpackage, with a much better API model than that used by everything else, so much that everything else is going to be shifted to use that model soon.
 
 # Next Steps #
 
