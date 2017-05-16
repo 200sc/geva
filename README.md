@@ -3,6 +3,8 @@
 
 Usage: see test files
 
+Run "go get -u "bitbucket.org/StephenPatrick/goevo"" to pull this project into your GOPATH.
+
 # New since 0.0.2#
 
 Added the EDA subpackage, with a much better API model than that used by everything else, so much that everything else is going to be shifted to use that model soon.
