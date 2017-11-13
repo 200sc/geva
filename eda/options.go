@@ -1,8 +1,8 @@
 package eda
 
 import (
-	"bitbucket.org/StephenPatrick/goevo/mut"
-	"bitbucket.org/StephenPatrick/goevo/selection"
+	"github.com/200sc/geva/mut"
+	"github.com/200sc/geva/selection"
 )
 
 // Option is a functional option type to be passed in variadically to model

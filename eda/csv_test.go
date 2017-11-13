@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"bitbucket.org/StephenPatrick/goevo/eda/fitness"
-	"bitbucket.org/StephenPatrick/goevo/mut"
+	"github.com/200sc/geva/eda/fitness"
+	"github.com/200sc/geva/mut"
 
 	"github.com/200sc/go-compgeo/printutil"
 	"github.com/200sc/go-dist/floatrange"

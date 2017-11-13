@@ -4,7 +4,7 @@ import (
 	"math"
 	"math/rand"
 
-	"bitbucket.org/StephenPatrick/goevo/env"
+	"github.com/200sc/geva/env"
 )
 
 // FourPeaks represents a problem where there are four explicit

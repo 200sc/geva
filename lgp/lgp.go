@@ -2,8 +2,8 @@ package lgp
 
 import (
 	"fmt"
-	"bitbucket.org/StephenPatrick/goevo/env"
-	"bitbucket.org/StephenPatrick/goevo/pop"
+	"github.com/200sc/geva/env"
+	"github.com/200sc/geva/pop"
 	"math/rand"
 )
 

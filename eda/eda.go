@@ -3,7 +3,7 @@ package eda
 import (
 	"fmt"
 
-	"bitbucket.org/StephenPatrick/goevo/env"
+	"github.com/200sc/geva/env"
 )
 
 // An EDA is a function which constructs an

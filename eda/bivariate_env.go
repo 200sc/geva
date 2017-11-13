@@ -1,6 +1,6 @@
 package eda
 
-import "bitbucket.org/StephenPatrick/goevo/env"
+import "github.com/200sc/geva/env"
 
 // A FullBivariateEnv represents a 2d array of Bivariate environments
 // where each potential pairing of (a|b) is represented at index [a][b]

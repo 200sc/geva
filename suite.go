@@ -11,7 +11,7 @@ import (
 
 	"github.com/200sc/go-dist/intrange"
 
-	"bitbucket.org/StephenPatrick/goevo/pop"
+	"github.com/200sc/geva/pop"
 )
 
 type TestSuite struct {

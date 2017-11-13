@@ -1,6 +1,6 @@
 package fitness
 
-import "bitbucket.org/StephenPatrick/goevo/env"
+import "github.com/200sc/geva/env"
 
 // Quadratic is similar to Onemax, but specifically wants pairs of digits to be
 // the same, and offers similar but not optimal fitness for pairs of 0s over

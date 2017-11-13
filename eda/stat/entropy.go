@@ -3,7 +3,7 @@ package stat
 import (
 	"math"
 
-	"bitbucket.org/StephenPatrick/goevo/env"
+	"github.com/200sc/geva/env"
 )
 
 // MinConditionalEntropy finds the index of the given samples with the

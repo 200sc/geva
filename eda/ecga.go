@@ -5,9 +5,9 @@ import (
 	"math"
 	"math/rand"
 
-	"bitbucket.org/StephenPatrick/goevo/eda/stat"
-	"bitbucket.org/StephenPatrick/goevo/env"
-	"bitbucket.org/StephenPatrick/goevo/pop"
+	"github.com/200sc/geva/eda/stat"
+	"github.com/200sc/geva/env"
+	"github.com/200sc/geva/pop"
 )
 
 // ECGA represents the Extended Compact Genetic Algorithm

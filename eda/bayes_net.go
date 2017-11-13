@@ -4,7 +4,7 @@ import (
 	"math"
 	"math/rand"
 
-	"bitbucket.org/StephenPatrick/goevo/env"
+	"github.com/200sc/geva/env"
 )
 
 // This bayes net construction code is based on http://www.cleveralgorithms.com/nature-inspired/probabilistic/boa.html

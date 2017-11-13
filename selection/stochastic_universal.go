@@ -1,7 +1,7 @@
 package selection
 
 import (
-	"bitbucket.org/StephenPatrick/goevo/pop"
+	"github.com/200sc/geva/pop"
 )
 
 type StochasticUniversal struct {

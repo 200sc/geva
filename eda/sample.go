@@ -4,8 +4,8 @@ import (
 	"math/rand"
 	"sort"
 
-	"bitbucket.org/StephenPatrick/goevo/env"
-	"bitbucket.org/StephenPatrick/goevo/pop"
+	"github.com/200sc/geva/env"
+	"github.com/200sc/geva/pop"
 )
 
 // GetSample and NSamples both are univariate

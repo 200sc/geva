@@ -3,7 +3,7 @@ package fitness
 import (
 	"math/rand"
 
-	"bitbucket.org/StephenPatrick/goevo/env"
+	"github.com/200sc/geva/env"
 )
 
 // TrapABS takes in the bitlength t of the trap

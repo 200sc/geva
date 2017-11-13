@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"bitbucket.org/StephenPatrick/goevo/eda/fitness"
+	"github.com/200sc/geva/eda/fitness"
 )
 
 func TestFourPeaksECGA(t *testing.T) {

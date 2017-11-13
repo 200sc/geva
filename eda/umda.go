@@ -1,6 +1,6 @@
 package eda
 
-import "bitbucket.org/StephenPatrick/goevo/env"
+import "github.com/200sc/geva/env"
 
 // UMDA represents the Univariate Marginal Distribution Algorithm
 type UMDA struct {

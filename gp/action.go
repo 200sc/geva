@@ -1,8 +1,8 @@
 package gp
 
 import (
-	"bitbucket.org/StephenPatrick/goevo/alg"
-	"bitbucket.org/StephenPatrick/goevo/env"
+	"github.com/200sc/geva/alg"
+	"github.com/200sc/geva/env"
 	"strconv"
 )
 

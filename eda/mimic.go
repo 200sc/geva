@@ -1,8 +1,8 @@
 package eda
 
 import (
-	"bitbucket.org/StephenPatrick/goevo/eda/stat"
-	"bitbucket.org/StephenPatrick/goevo/env"
+	"github.com/200sc/geva/eda/stat"
+	"github.com/200sc/geva/env"
 )
 
 // MIMIC is an EDA of the Mutual information maximizing input clustering algorithm

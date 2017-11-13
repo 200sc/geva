@@ -5,11 +5,11 @@ import (
 
 	"github.com/200sc/go-dist/intrange"
 
-	"bitbucket.org/StephenPatrick/goevo/env"
-	"bitbucket.org/StephenPatrick/goevo/lgp"
-	"bitbucket.org/StephenPatrick/goevo/pairing"
-	"bitbucket.org/StephenPatrick/goevo/pop"
-	"bitbucket.org/StephenPatrick/goevo/selection"
+	"github.com/200sc/geva/env"
+	"github.com/200sc/geva/lgp"
+	"github.com/200sc/geva/pairing"
+	"github.com/200sc/geva/pop"
+	"github.com/200sc/geva/selection"
 )
 
 func TestLGPRun(t *testing.T) {

@@ -3,8 +3,8 @@ package eda
 import (
 	"fmt"
 
-	"bitbucket.org/StephenPatrick/goevo/env"
-	"bitbucket.org/StephenPatrick/goevo/pop"
+	"github.com/200sc/geva/env"
+	"github.com/200sc/geva/pop"
 )
 
 // EnvInd is a wrapper around an environment and serves as the basis

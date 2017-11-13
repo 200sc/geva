@@ -4,8 +4,8 @@ import (
 	"math"
 	"math/rand"
 
-	"bitbucket.org/StephenPatrick/goevo/env"
-	"bitbucket.org/StephenPatrick/goevo/pop"
+	"github.com/200sc/geva/env"
+	"github.com/200sc/geva/pop"
 )
 
 // BMDA represents the Bivariate Marginal Distribution Algorithm

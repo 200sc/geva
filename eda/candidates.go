@@ -1,7 +1,7 @@
 package eda
 
 import (
-	"bitbucket.org/StephenPatrick/goevo/env"
+	"github.com/200sc/geva/env"
 )
 
 // BestCandidates represents the top N candidates sampled

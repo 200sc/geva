@@ -7,7 +7,7 @@ import (
 
 	"github.com/200sc/go-dist/intrange"
 
-	"bitbucket.org/StephenPatrick/goevo/pop"
+	"github.com/200sc/geva/pop"
 )
 
 func MakeDemes(demeCount int, members []pop.Individual,

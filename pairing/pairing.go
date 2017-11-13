@@ -2,7 +2,7 @@ package pairing
 
 import (
 	"container/heap"
-	"bitbucket.org/StephenPatrick/goevo/pop"
+	"github.com/200sc/geva/pop"
 	"math/rand"
 )
 

@@ -3,7 +3,7 @@ package fitness
 import (
 	"math"
 
-	"bitbucket.org/StephenPatrick/goevo/env"
+	"github.com/200sc/geva/env"
 )
 
 // AlternatingABS is a fitness function which returns the

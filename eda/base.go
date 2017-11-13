@@ -5,11 +5,11 @@ import (
 	"math"
 	"time"
 
-	"bitbucket.org/StephenPatrick/goevo/env"
-	"bitbucket.org/StephenPatrick/goevo/evoerr"
-	"bitbucket.org/StephenPatrick/goevo/mut"
-	"bitbucket.org/StephenPatrick/goevo/pop"
-	"bitbucket.org/StephenPatrick/goevo/selection"
+	"github.com/200sc/geva/env"
+	"github.com/200sc/geva/evoerr"
+	"github.com/200sc/geva/mut"
+	"github.com/200sc/geva/pop"
+	"github.com/200sc/geva/selection"
 
 	"github.com/200sc/go-dist/floatrange"
 )

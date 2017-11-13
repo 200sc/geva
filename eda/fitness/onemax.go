@@ -4,7 +4,7 @@ import (
 	"math"
 	"math/rand"
 
-	"bitbucket.org/StephenPatrick/goevo/env"
+	"github.com/200sc/geva/env"
 )
 
 // I'm not sure how we want to model failure in the onemax problem.

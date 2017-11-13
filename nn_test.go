@@ -3,10 +3,10 @@ package goevo
 import (
 	"testing"
 
-	"bitbucket.org/StephenPatrick/goevo/neural"
-	"bitbucket.org/StephenPatrick/goevo/pairing"
-	"bitbucket.org/StephenPatrick/goevo/pop"
-	"bitbucket.org/StephenPatrick/goevo/selection"
+	"github.com/200sc/geva/neural"
+	"github.com/200sc/geva/pairing"
+	"github.com/200sc/geva/pop"
+	"github.com/200sc/geva/selection"
 	"github.com/200sc/go-dist/intrange"
 )
 
