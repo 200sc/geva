@@ -19,6 +19,10 @@ func (env *F) ToEnv() *F {
 	return env
 }
 
+func (env *F) Len() int {
+	return len(*env)
+}
+
 func (env *F) Divide(s float64) *F {
 	for _, f := range *env {
 		*f = *f / s
@@ -168,6 +172,13 @@ func (env *F) DiffSingle(f float64) int {
 func (env *F) SetAll(f float64) {
 	for i := range *env {
 		*(*env)[i] = f
+	}
+}
+
+// SetMap sets values behind the environment according to index:value pairs
+func (env *F) SetMap(m map[int]float64) {
+	for k, v := range m {
+		*(*env)[k] = v
 	}
 }
 

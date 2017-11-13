@@ -32,6 +32,16 @@ func Scale(s float64) FloatMutator {
 	}
 }
 
+// Div divides the input float by d
+func Div(d float64) FloatMutator {
+	return func(f float64) float64 {
+		if f == 0 {
+			return 0
+		}
+		return f / d
+	}
+}
+
 // Add combines a and f through addition
 func Add(a float64) FloatMutator {
 	return func(f float64) float64 {
