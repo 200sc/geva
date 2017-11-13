@@ -81,6 +81,10 @@ func (p_p *Population) GenerateFitness() {
 			}
 			in := make([][]float64, tests)
 			out := make([][]float64, tests)
+			if len(inputs) == 0 || len(expected) != len(inputs) {
+				ch <- n.Fitness(in, out)
+				return
+			}
 			for i := 0; i < tests; i++ {
 				j := rand.Intn(len(inputs))
 				in[i] = inputs[j]

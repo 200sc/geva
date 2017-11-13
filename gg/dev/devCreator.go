@@ -27,6 +27,7 @@ type LinearCreator struct {
 	ActionCountTop       floatrange.Range
 	ActionTypeCount      intrange.Range
 	ActionTypeChoices    []ActionType
+	ActionTypeWeights    floatrange.Range
 	ActionStrengthBottom floatrange.Range
 	ActionStrengthTop    floatrange.Range
 	CrossoverOptions     []Crossover
@@ -52,6 +53,10 @@ func newDevFromRanges(ldc *LinearCreator, rngFn func(float64, float64) floatrang
 
 	actTypes := make([]ActionType, actTypeCt)
 	actStrengths := make([]floatrange.Range, actTypeCt)
+	actWeights := make([]float64, actTypeCt)
+	for i := 0; i < actTypeCt; i++ {
+		actWeights[i] = ldc.ActionTypeWeights.Poll()
+	}
 
 	weights := make([]float64, len(ldc.ActionTypeChoices))
 	for i := 0; i < len(weights); i++ {
@@ -64,16 +69,17 @@ func newDevFromRanges(ldc *LinearCreator, rngFn func(float64, float64) floatrang
 	}
 
 	return &Base{
-		InitSize:        roundRange(rngFn(ldc.InitSizeBottom.Poll(), ldc.InitSizeTop.Poll())),
-		GoalSize:        roundRange(rngFn(ldc.GoalSizeBottom.Poll(), ldc.GoalSizeTop.Poll())),
-		GoalDistance:    roundRange(rngFn(ldc.GoalDistanceBottom.Poll(), ldc.GoalDistanceTop.Poll())),
-		EnvSize:         roundRange(rngFn(ldc.EnvSizeBottom.Poll(), ldc.EnvSizeTop.Poll())),
-		EnvVal:          rngFn(ldc.EnvValBottom.Poll(), ldc.EnvValTop.Poll()),
-		ActionCount:     roundRange(rngFn(ldc.ActionCountBottom.Poll(), ldc.ActionCountTop.Poll())),
-		ActionTypes:     actTypes,
-		ActionStrengths: actStrengths,
-		Cross:           ldc.CrossoverOptions[rand.Intn(len(ldc.CrossoverOptions))],
-		DevMutation:     ldc.MutationOptions[rand.Intn(len(ldc.MutationOptions))],
+		InitSize:          roundRange(rngFn(ldc.InitSizeBottom.Poll(), ldc.InitSizeTop.Poll())),
+		GoalSize:          roundRange(rngFn(ldc.GoalSizeBottom.Poll(), ldc.GoalSizeTop.Poll())),
+		GoalDistance:      roundRange(rngFn(ldc.GoalDistanceBottom.Poll(), ldc.GoalDistanceTop.Poll())),
+		EnvSize:           roundRange(rngFn(ldc.EnvSizeBottom.Poll(), ldc.EnvSizeTop.Poll())),
+		EnvVal:            rngFn(ldc.EnvValBottom.Poll(), ldc.EnvValTop.Poll()),
+		ActionCount:       roundRange(rngFn(ldc.ActionCountBottom.Poll(), ldc.ActionCountTop.Poll())),
+		ActionTypes:       actTypes,
+		ActionStrengths:   actStrengths,
+		ActionTypeWeights: actWeights,
+		Cross:             ldc.CrossoverOptions[rand.Intn(len(ldc.CrossoverOptions))],
+		DevMutation:       ldc.MutationOptions[rand.Intn(len(ldc.MutationOptions))],
 	}
 }
 

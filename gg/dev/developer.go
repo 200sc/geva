@@ -3,6 +3,7 @@ package dev
 import (
 	"fmt"
 	"math/rand"
+	"strconv"
 
 	"github.com/200sc/geva/env"
 	"github.com/200sc/geva/pop"
@@ -37,6 +38,27 @@ type Base struct {
 	Cross Crossover
 }
 
+func (d *Base) String() string {
+	s := "Base\n"
+	s += "InitSize:" + iRangeString(d.InitSize)
+	s += "GoalSize:" + iRangeString(d.GoalSize)
+	s += "GoalDistance:" + iRangeString(d.GoalDistance)
+	s += "EnvSize:" + iRangeString(d.EnvSize)
+	s += "EnvVal:" + fRangeString(d.EnvVal)
+	s += "ActionCount:" + iRangeString(d.ActionCount)
+	return s
+}
+
+func iRangeString(ir intrange.Range) string {
+	return "Range: " + strconv.Itoa(ir.Percentile(0)) + ", " + strconv.Itoa(ir.Percentile(1))
+}
+
+func fRangeString(fr floatrange.Range) string {
+	f1 := strconv.FormatFloat(fr.Percentile(0), 'E', -1, 64)
+	f2 := strconv.FormatFloat(fr.Percentile(1), 'E', -1, 64)
+	return "Range: " + f1 + ", " + f2 + "\n"
+}
+
 func (d *Base) SetFitness(f int) {
 	d.fitness = f
 }
@@ -46,6 +68,12 @@ func (d *Base) Fitness(input, expected [][]float64) int {
 }
 
 func (d *Base) Mutate() {
+	if d == nil {
+		fmt.Println("d is nil")
+	}
+	if d.DevMutation == nil {
+		fmt.Println("d's mutation is nil")
+	}
 	d.DevMutation.Mutate(d)
 }
 
@@ -106,6 +134,12 @@ func (d *Base) Mechanic() *Mechanic {
 	// 	actions[i], actions[j] = actions[j], actions[i]
 	// }
 	gg.Actions = actions
+
+	if len(gg.Actions) == 0 {
+		fmt.Println("No actions")
+		fmt.Println("Environment length:", len(*e), d.EnvSize.Percentile(0))
+		fmt.Println("ActionCount min:", d.ActionCount.Percentile(0))
+	}
 
 	// splitIndex := int(math.Ceil(float64(len(actions)) * d.PassiveRatio))
 

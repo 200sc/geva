@@ -14,3 +14,10 @@ func OnAll(f mut.FloatMutator) I {
 		}
 	}
 }
+
+func And(f1, f2 I) I {
+	return func(e *env.I) {
+		f1(e)
+		f2(e)
+	}
+}

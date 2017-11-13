@@ -38,6 +38,23 @@ func Add(a float64) Mutator {
 	}
 }
 
+func EnforceMin(mn float64) Mutator {
+	return func(f floatrange.Range) floatrange.Range {
+		min := f.Percentile(0)
+		max := f.Percentile(1)
+		if min < mn {
+			if max < mn {
+				max = mn + 1
+			}
+			return floatrange.NewLinear(mn, max)
+		}
+		if max < mn {
+			return floatrange.NewLinear(min, min+1)
+		}
+		return f
+	}
+}
+
 // None performs no mutation on f
 func None() Mutator {
 	return func(f floatrange.Range) floatrange.Range {

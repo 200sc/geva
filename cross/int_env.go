@@ -12,17 +12,17 @@ type I interface {
 }
 
 type IPointCrossover struct {
-	numPoints int
+	NumPoints int
 }
 
 func (ipc IPointCrossover) Crossover(a *env.I, b *env.I) *env.I {
-	inc := 1.0 / float64(ipc.numPoints)
-	points := make([]float64, ipc.numPoints)
+	inc := 1.0 / float64(ipc.NumPoints)
+	points := make([]float64, ipc.NumPoints)
 
 	// Generate a series of random points to split on
 	i := 0
 	for pointRange := 0.0; pointRange < 1.0; pointRange += inc {
-		points[i] = (rand.Float64() / float64(ipc.numPoints)) + pointRange
+		points[i] = (rand.Float64() / float64(ipc.NumPoints)) + pointRange
 		i++
 	}
 

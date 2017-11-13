@@ -38,6 +38,24 @@ func Add(a int) Mutator {
 	}
 }
 
+func EnforceMin(mn int) Mutator {
+	return func(f intrange.Range) intrange.Range {
+		min := f.Percentile(0)
+		max := f.Percentile(1)
+		if min < mn {
+			min = mn
+			if max < mn {
+				max = mn + 1
+			}
+			return intrange.NewLinear(mn, max)
+		}
+		if max < mn {
+			return intrange.NewLinear(min, min+1)
+		}
+		return f
+	}
+}
+
 // None performs no mutation on f
 func None() Mutator {
 	return func(f intrange.Range) intrange.Range {

@@ -1,6 +1,8 @@
 package dev
 
 import (
+	"math/rand"
+
 	"github.com/200sc/geva/cross"
 	"github.com/200sc/geva/mut/frange"
 	"github.com/200sc/go-dist/floatrange"
@@ -83,6 +85,14 @@ func (ldc *LinearDevCrossover) Crossover(a, b *Base) *Base {
 	c.ActionCount = cross.LinearIntRange(a.ActionCount, b.ActionCount)
 
 	c.ActionTypes, c.ActionTypeWeights, c.ActionStrengths = ldc.ActionTypeCrossover.Crossover(a, b)
+
+	if rand.Float64() < .5 {
+		c.DevMutation = a.DevMutation
+		c.Cross = a.Cross
+	} else {
+		c.DevMutation = b.DevMutation
+		c.Cross = b.Cross
+	}
 
 	return c
 }

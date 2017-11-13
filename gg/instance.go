@@ -1,6 +1,7 @@
 package gg
 
 import (
+	"fmt"
 	"math/rand"
 	"sort"
 
@@ -49,6 +50,7 @@ func (in *Instance) Loop() {
 
 	// Loop for dev iterations
 	for i := 0; i < in.DevIterations; i++ {
+		fmt.Println("Iteration", i)
 		// Create players
 		in.players = make([]player.Player, in.PlayerCt)
 		for j := 0; j < in.PlayerCt; j++ {
@@ -86,6 +88,7 @@ func (in *Instance) Loop() {
 			}
 			assignment = nextAssignment
 		}
+		fmt.Println("Evaluating fitness")
 		// Evaluate fitness of devs by how many players they have
 		// Right now, linear-- dev with most players has fitness 1,
 		// second most fitness 2, etc
@@ -104,9 +107,12 @@ func (in *Instance) Loop() {
 			in.pop.Members[j].(dev.Dev).SetFitness(nextFitness)
 			in.pop.Fitnesses[j] = nextFitness
 		}
+		fmt.Println("Worst fitness of generation", nextFitness)
 
 		// Evolve dev population
 		in.pop.NextGeneration()
 	}
 	// Evaluate results
+	best, _ := in.pop.BestMember()
+	fmt.Println(best.(*dev.Base))
 }

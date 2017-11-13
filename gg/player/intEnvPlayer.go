@@ -2,7 +2,10 @@ package player
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
+
+	"github.com/200sc/go-dist/floatrange"
 
 	"github.com/200sc/geva/cross"
 	"github.com/200sc/geva/env"
@@ -30,6 +33,15 @@ type IntEnvPlayer struct {
 func (iip *IntEnvPlayer) Play(mch *dev.Mechanic, playTime int) float64 {
 	iip.mch = mch
 
+	oldMutator := iip.Mutator
+	// Enforce that mutation doesn't give us invalid actions
+	iip.Mutator = mutenv.And(
+		iip.Mutator,
+		mutenv.OnAll(
+			floatrange.NewLinear(0, float64(len(mch.Actions)-1)).EnforceRange,
+		),
+	)
+
 	iip.pop.Size = iip.popSize.Poll()
 	iip.pop.Members = make([]pop.Individual, iip.pop.Size)
 	iip.pop.Fitnesses = make([]int, iip.pop.Size)
@@ -50,19 +62,23 @@ func (iip *IntEnvPlayer) Play(mch *dev.Mechanic, playTime int) float64 {
 			break
 		}
 	}
+
+	iip.Mutator = oldMutator
+
 	expectedGeneration := int(float64(playTime) * iip.expectedTime)
 	_, bestFitness := iip.pop.BestMember()
 	if bestFitness >= iip.expectedFitness {
-		if i <= expectedGeneration {
-			// All expectations met
-			return 1.0
-		}
-		// todo: work on these hardcoded values
-		// game beaten, but not as fast as desired
-		return 0.5
+		diff := math.Abs(float64(i) - float64(expectedGeneration))
+		diffPct := diff / float64(playTime)
+		fmt.Println("Diff:", diff, diffPct, "Off after victory")
+		return 1 - (diffPct * diffPct)
 	}
-	// game not beaten
-	return 0.1
+	diff := math.Abs(float64(bestFitness) - float64(iip.expectedFitness))
+	fmt.Println("Diff:", diff, "Away after loss")
+	if diff > 9 {
+		return 0.1
+	}
+	return 1 - (diff / 10)
 }
 
 func (iip *IntEnvPlayer) Fitness(e *env.I) int {
