@@ -1,4 +1,4 @@
-package goevo
+package geva
 
 // TGPs need the ability to use an arbitrary number count as nodes
 // to be able to easily access all elements of this environment

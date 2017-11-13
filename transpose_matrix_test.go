@@ -1,4 +1,4 @@
-package goevo
+package geva
 
 import (
 	"fmt"
