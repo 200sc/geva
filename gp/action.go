@@ -1,7 +1,7 @@
 package gp
 
 import (
-	"github.com/200sc/geva/alg"
+	"github.com/oakmound/oak/alg"
 	"github.com/200sc/geva/env"
 	"strconv"
 )

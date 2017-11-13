@@ -47,7 +47,12 @@ func mod(val *float64, strength float64) Action {
 		if strength == 0 {
 			*val = 0
 		} else {
-			*val %= strength
+			for *val > strength {
+				*val -= strength
+			}
+			for *val < strength {
+				*val += strength
+			}
 		}
 		return *val
 	}

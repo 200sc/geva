@@ -1,13 +1,13 @@
 package gg
 
+import "github.com/200sc/go-dist/floatrange"
+
 type GGCrossover interface {
 	Crossover(a, b *GG) *GG
 }
 
 var (
-	acRange = Range{
-		0, 3,
-	}
+	acRange = floatrange.NewLinear(0, 3)
 )
 
 // Crossover Concept 1
@@ -33,8 +33,8 @@ func CrossoverOne(a, b *GG) *GG {
 	c.Environment = a.Environment
 	c.Init = a.Init
 
-	actionCount = ((len(a.Actions) + len(b.Actions)) / 2) + acRange.Poll()
-	passiveCount = ((len(a.Passives) + len(b.Passives)) / 2) + acRange.Poll()
+	actionCount := ((len(a.Actions) + len(b.Actions)) / 2) + acRange.Poll()
+	passiveCount := ((len(a.Passives) + len(b.Passives)) / 2) + acRange.Poll()
 
 	// Hypothetically, the passive and action lists
 	// for a and b are already shuffled. We shuffle the

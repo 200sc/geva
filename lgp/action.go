@@ -1,9 +1,10 @@
 package lgp
 
 import (
-	"github.com/200sc/geva/alg"
 	"math/rand"
 	"strconv"
+
+	"github.com/oakmound/oak/alg"
 )
 
 type Instruction struct {

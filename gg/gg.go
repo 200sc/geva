@@ -1,5 +1,13 @@
 package gg
 
+import (
+	"math"
+	"math/rand"
+
+	"github.com/200sc/geva/env"
+	"github.com/200sc/go-dist/floatrange"
+)
+
 //Genetic Game
 
 //Get Generation Settings
@@ -9,7 +17,7 @@ package gg
 ////Generate Dialogues from keywords
 //Generate Environment Variables from settings
 //Generate Passive Environment and Agent effects from settings
-//Generate Agents from Passive Agent Effects, Images, Audio, and Dialogue.
+////Generate Agents from Passive Agent Effects, Images, Audio, and Dialogue.
 //Generate Actions from settings
 //Bind Actions to inputs, agents, and environment states
 //Determine Initial State
@@ -20,15 +28,6 @@ package gg
 
 //Evolve an agent AI (briefly), attempting to have the fewest number of actions taken, and take it's lowest number of actions taken
 //Limit the agent AI to some settings number of actions from settings
-
-type Range struct {
-	Base float64
-	Rand float64
-}
-
-func (r Range) Poll() float64 {
-	return r.Base + (rand.Float64()*r.Rand*2 - r.Rand)
-}
 
 type GG struct {
 	Actions  []Action
@@ -64,26 +63,47 @@ func (gg *GG) Fitness(inputs, expected [][]float64) int {
 
 }
 
-type GGOptions struct {
-	InitSize          Range
-	GoalSize          Range
-	GoalDistance      Range
-	EnvSize           Range
-	EnvVal            Range
-	ActionCount       Range
+type Developer struct {
+	InitSize          floatrange.Range
+	GoalSize          floatrange.Range
+	GoalDistance      floatrange.Range
+	EnvSize           floatrange.Range
+	EnvVal            floatrange.Range
+	ActionCount       floatrange.Range
 	ActionTypes       []ActionType
 	ActionTypeWeights []float64
-	ActionStrengths   []Range
-	PassiveRatio      float64
+	ActionStrengths   []floatrange.Range
+	//PassiveRatio      float64
+}
+
+type Mechanic struct {
+	Actions []Action
+	//Passives []Action
+	//Continuous bool
+	// For crossover
+	ActionTypes      []ActionType
+	ActionStrengths  []float64
+	PassiveTypes     []ActionType
+	PassiveStrengths []float64
+	//
+	Environment env.F
+	Init        map[int]float64
+	Goal        map[int]float64
 }
 
 func CumulativeWeights(weights []float64) []float64 {
 	cum := make([]float64, len(weights))
 	cum[0] = weights[0]
-	for i := i; i < len(weights); i++ {
+	for i := 1; i < len(weights); i++ {
 		cum[i] = cum[i-1] + weights[i]
 	}
 	return cum
+}
+
+func BaseDev() *Developer {
+	gg := new(GG)
+	gg.InitSize = 1
+	gg.GoalSize = 1
 }
 
 func GenerateGG(opt GGOptions) *GG {
@@ -130,7 +150,7 @@ func GenerateGG(opt GGOptions) *GG {
 	gg.Goal = make(map[int]float64)
 
 	// Simulate some actions on the environment . . .
-	l := opt.GoalDistance.Poll()
+	l = opt.GoalDistance.Poll()
 	for i := 0; i < l; i++ {
 		//Perform some action
 		gg.Actions[rand.Intn(len(gg.Actions))]()
@@ -142,7 +162,7 @@ func GenerateGG(opt GGOptions) *GG {
 
 	// . . . and pull random elements from said environment
 	// to determine the goal state.
-	l := opt.GoalSize.Poll()
+	l = opt.GoalSize.Poll()
 	for i := 0; i < l; i++ {
 		j := rand.Intn(len(e))
 		gg.Goal[j] = *e[j]
