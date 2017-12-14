@@ -84,34 +84,7 @@ func main() {
 	for i, s := range sslides {
 		slides[i] = s
 	}
-	// shotIndex := 0
-	// oak.AddCommand("shot", func([]string) {
-	// 	rgba := oak.ScreenShot()
-	// 	f, err := os.Create("shot" + strconv.Itoa(shotIndex) + ".png")
-	// 	if err != nil {
-	// 		dlog.Error(err)
-	// 		return
-	// 	}
-	// 	png.Encode(f, rgba)
-	// 	dlog.ErrorCheck(f.Close())
-	// 	shotIndex++
-	// })
-	// oak.AddCommand("allShots", func([]string) {
-	// 	for i := 0; i <= len(slides); i++ {
-	// 		rgba := oak.ScreenShot()
-	// 		f, err := os.Create("slides/slide" + strconv.Itoa(shotIndex) + ".png")
-	// 		if err != nil {
-	// 			dlog.Error(err)
-	// 			return
-	// 		}
-	// 		png.Encode(f, rgba)
-	// 		dlog.ErrorCheck(f.Close())
-	// 		shotIndex++
-	// 		time.Sleep(300 * time.Millisecond)
-	// 		event.Trigger("KeyUpRightArrow", nil)
-	// 		time.Sleep(300 * time.Millisecond)
-	// 	}
-	// })
+
 	show.AddNumberShortcuts(len(slides))
 	show.Start(slides...)
 }
