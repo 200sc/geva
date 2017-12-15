@@ -2,8 +2,10 @@ package unique
 
 import (
 	"image/draw"
+	"math/rand"
 
-	"github.com/oakmound/oak/alg/floatgeom"
+	"github.com/200sc/geva/pop"
+	"github.com/200sc/geva/selection"
 
 	"github.com/oakmound/oak/render"
 )
@@ -28,15 +30,31 @@ func (r *Render) Draw(buff draw.Image) {
 }
 func (r *Render) DrawOffset(buff draw.Image, xOff, yOff float64) {
 	if !r.clean {
-
-		positions := make([]floatgeom.Point2, len(r.nodes))
-
 		// there's necessarily going to be error if the nodes
 		// represent more than two variables. We move elements to
 		// minimize error, up to some number of tries.
 		//
 		// Is this a genetic algorithm problem
 		// yes
+		p := pop.Population{}
+		p.Members = make([]pop.Individual, 100)
+		for i := 0; i < 100; i++ {
+			p.Members[i] = NewEnvInd(len(r.nodes)*2, rand.Float64()*100, r.Graph)
+		}
+		p.FitnessTests = 1
+		p.Elites = 4
+		p.Size = 100
+		p.Selection = selection.DeterministicTournament{
+			TournamentSize:   2,
+			ParentProportion: 2,
+		}
+		p.GoalFitness = 1
+		for i := 0; i < 50; i++ {
+			if p.NextGeneration() {
+				break
+			}
+		}
 
+		r.clean = true
 	}
 }

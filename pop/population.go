@@ -22,9 +22,9 @@ type Population struct {
 	GoalFitness  int
 }
 
-// This will change as more things take place
-// in a generation. Selection, Crossover, and Mutation
-// are granted.
+// NextGeneration selects, mutates, and crosses
+// the population over, returning whether the
+// population reached the goal fitness or not.
 func (p *Population) NextGeneration() bool {
 
 	// The number of parents in the next generation
