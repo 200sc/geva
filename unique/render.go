@@ -1,6 +1,7 @@
 package unique
 
 import (
+	"image"
 	"image/draw"
 	"math/rand"
 
@@ -17,6 +18,7 @@ var (
 type Render struct {
 	*Graph
 	render.LayeredPoint
+	img   *image.RGBA
 	clean bool
 }
 
@@ -55,6 +57,16 @@ func (r *Render) DrawOffset(buff draw.Image, xOff, yOff float64) {
 			}
 		}
 
+		// make r.img as large as need be
+
+		// first increase all positions so all nodes have their leftmost point
+		// greater than 0
+		// then find the furthest out node positions (x+w,y+h) and set that as
+		// the max bounds.
+
+		// draw to r.img each node centered at their position in the population
+
 		r.clean = true
 	}
+	// draw r.img to the buffer offset by xOff and yOff
 }
