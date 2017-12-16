@@ -17,10 +17,11 @@ var (
 )
 
 var (
-	MechanicNames  = map[int]*Mechanic{}
-	nextName       int
-	MechanicLookup = map[*Mechanic]*render.Composite{}
-	mechColorRange = colorrange.NewLinear(color.RGBA{0, 0, 0, 255}, color.RGBA{255, 255, 255, 255})
+	MechanicNames   = map[int]*Mechanic{}
+	nextName        int
+	MechanicLookup  = map[*Mechanic]*render.Composite{}
+	MechanicIndexes = map[*Mechanic]int{}
+	mechColorRange  = colorrange.NewLinear(color.RGBA{0, 0, 0, 255}, color.RGBA{255, 255, 255, 255})
 )
 
 func NextMechanicName() int {
@@ -39,11 +40,14 @@ func NewRenderMechanic(mch *Mechanic) *RenderMechanic {
 	if !ok {
 		sp := render.NewColorBox(10, 10, mechColorRange.Poll())
 
-		nm := "m" + strconv.Itoa(NextMechanicName())
+		idx := NextMechanicName()
+		nm := "m" + strconv.Itoa(idx)
 		str := render.DefFont().NewStrText(nm, 1, 1).ToSprite()
 
 		cmp = render.NewComposite([]render.Modifiable{sp, str})
 		MechanicLookup[mch] = cmp
+		MechanicIndexes[mch] = idx
+		MechanicNames[idx] = mch
 	}
 	return &RenderMechanic{
 		cmp,
@@ -53,6 +57,11 @@ func NewRenderMechanic(mch *Mechanic) *RenderMechanic {
 
 func (rmch *RenderMechanic) GetR() render.Renderable {
 	return rmch.Composite
+}
+
+func (rmch *RenderMechanic) String() string {
+	s := rmch.Mechanic.String()
+	return strconv.Itoa(MechanicIndexes[rmch.Mechanic]) + "::" + s
 }
 
 func (mch *Mechanic) MechanicDistance(mch2 *Mechanic) float64 {

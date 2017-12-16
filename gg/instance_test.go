@@ -21,7 +21,7 @@ import (
 func TestInstanceOne(t *testing.T) {
 	ins := &Instance{}
 	ins.DevCt = 50
-	ins.PlayerCt = 150
+	ins.PlayerCt = 300
 	ins.DevIterations = 15
 	ins.PlayIterations = 3
 	ins.PlayTime = 30

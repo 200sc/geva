@@ -156,6 +156,11 @@ func (in *Instance) Loop() {
 		in.pop.NextGeneration()
 	}
 	// Evaluate results
+	fmt.Println("Best developer:")
 	best, _ := in.pop.BestMember()
 	fmt.Println(best.(*dev.Base))
+	fmt.Println("Best mechanics:")
+	for i, m := range dev.MechanicNames {
+		fmt.Println(i, m.String())
+	}
 }

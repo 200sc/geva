@@ -1,7 +1,9 @@
 package dev
 
 import (
+	"fmt"
 	"math"
+	"strconv"
 
 	"github.com/200sc/geva/env"
 	"github.com/200sc/geva/unique"
@@ -63,6 +65,11 @@ func (mch *Mechanic) FitnessAbs() int {
 	return int(fitness) + 1
 }
 
-// func (mch *Mechanic) String() string {
-// 	return "Mechanic: " ++ strconv.Itoa(len(mch.Actions)) ++ ", " ++ mch.
-// }
+func (mch *Mechanic) String() string {
+	s := "Mechanic:\n"
+	s += "ActionCount: " + strconv.Itoa(len(mch.Actions))
+	s += " Environment: " + mch.Environment.String()
+	s += " Init: " + fmt.Sprint(mch.Init)
+	s += " Goal: " + fmt.Sprint(mch.Goal)
+	return s
+}

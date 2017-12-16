@@ -39,13 +39,13 @@ type Base struct {
 }
 
 func (d *Base) String() string {
-	s := "Base\n"
+	s := "Base Dev\n"
 	s += "InitSize:" + iRangeString(d.InitSize)
-	s += "GoalSize:" + iRangeString(d.GoalSize)
-	s += "GoalDistance:" + iRangeString(d.GoalDistance)
-	s += "EnvSize:" + iRangeString(d.EnvSize)
-	s += "EnvVal:" + fRangeString(d.EnvVal)
-	s += "ActionCount:" + iRangeString(d.ActionCount)
+	s += " GoalSize:" + iRangeString(d.GoalSize)
+	s += " GoalDistance:" + iRangeString(d.GoalDistance)
+	s += " EnvSize:" + iRangeString(d.EnvSize)
+	s += " EnvVal:" + fRangeString(d.EnvVal)
+	s += " ActionCount:" + iRangeString(d.ActionCount)
 	return s
 }
 
