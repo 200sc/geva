@@ -87,10 +87,10 @@ func (r *Render) SetGraph(g *Graph) {
 	}
 	minPt := floatgeom.Point2{0, 0}
 	if minX < 0 {
-		minPt.Add(floatgeom.Point2{-minX, 0})
+		minPt = minPt.Add(floatgeom.Point2{-minX, 0})
 	}
 	if minY < 0 {
-		minPt.Add(floatgeom.Point2{0, -minY})
+		minPt = minPt.Add(floatgeom.Point2{0, -minY})
 	}
 	if minX < 0 || minY < 0 {
 		for i, pt := range positions {

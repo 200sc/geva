@@ -128,15 +128,16 @@ func (in *Instance) Loop() {
 			if pc.playerCount != lastV {
 				nextFitness++
 			}
+			lastV = pc.playerCount
 			dv := in.pop.Members[j].(dev.Dev)
 			thisFitness := nextFitness
 			if !graph.CanAdd(dv.Mechanic()) {
-				thisFitness /= 2
+				thisFitness += 10
+				thisFitness *= 2
 			}
 			dv.SetFitness(thisFitness)
 			in.pop.Fitnesses[j] = thisFitness
 		}
-		fmt.Println("Worst fitness of generation", nextFitness)
 
 		//for i := 0; i < in.MechanicsPerGen; i++ {
 		best, _ := in.pop.BestMember()
