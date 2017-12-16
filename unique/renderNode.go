@@ -6,5 +6,5 @@ import "github.com/oakmound/oak/render"
 // a screen Renderable
 type RenderNode interface {
 	Node
-	render.Renderable
+	GetR() render.Renderable
 }

@@ -59,6 +59,10 @@ func (g *Graph) Distance(n Node) float64 {
 	return min
 }
 
+func (g *Graph) CanAdd(n Node) bool {
+	return g.Distance(n) > g.MinDistance
+}
+
 // Copy returns a copy of the receiver graph
 func (g *Graph) Copy() *Graph {
 	g2 := &Graph{}

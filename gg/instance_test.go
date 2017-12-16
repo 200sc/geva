@@ -20,11 +20,13 @@ import (
 
 func TestInstanceOne(t *testing.T) {
 	ins := &Instance{}
-	ins.DevCt = 100
-	ins.PlayerCt = 300
-	ins.DevIterations = 5
-	ins.PlayIterations = 5
+	ins.DevCt = 50
+	ins.PlayerCt = 150
+	ins.DevIterations = 15
+	ins.PlayIterations = 3
 	ins.PlayTime = 30
+	ins.Render = true
+	ins.MechanicsPerGen = 10
 
 	ins.Assignment = func(playerCt, devCt int) [][]int {
 		players := make([]int, playerCt)

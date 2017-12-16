@@ -4,6 +4,7 @@ import (
 	"math"
 
 	"github.com/200sc/geva/env"
+	"github.com/200sc/geva/unique"
 )
 
 type Mechanic struct {
@@ -20,7 +21,21 @@ type Mechanic struct {
 }
 
 func (mch *Mechanic) Reset() {
+	mch.Environment.SetAll(0)
+	for i, v := range mch.Init {
+		mch.Environment.Set(i, v)
+	}
+}
 
+type MechNode interface {
+	MechanicDistance(*Mechanic) float64
+}
+
+func (mch *Mechanic) Distance(n unique.Node) (float64, bool) {
+	if mch2, ok := n.(MechNode); ok {
+		return mch2.MechanicDistance(mch), true
+	}
+	return 0, false
 }
 
 type MechFitness func(*Mechanic) int
@@ -47,3 +62,7 @@ func (mch *Mechanic) FitnessAbs() int {
 	}
 	return int(fitness) + 1
 }
+
+// func (mch *Mechanic) String() string {
+// 	return "Mechanic: " ++ strconv.Itoa(len(mch.Actions)) ++ ", " ++ mch.
+// }

@@ -10,17 +10,21 @@ import (
 	"github.com/200sc/geva/pairing"
 	"github.com/200sc/geva/pop"
 	"github.com/200sc/geva/selection"
+	"github.com/200sc/geva/unique"
+	"github.com/oakmound/oak"
+	"github.com/oakmound/oak/render"
 )
 
 type Instance struct {
 	DevCreator    dev.Creator
 	PlayerCreator player.Creator
 
-	DevCt          int
-	PlayerCt       int
-	DevIterations  int
-	PlayIterations int
-	PlayTime       int
+	DevCt           int
+	PlayerCt        int
+	DevIterations   int
+	PlayIterations  int
+	PlayTime        int
+	MechanicsPerGen int
 
 	Assignment func(playerCt, devCt int) [][]int
 	// goal fitness?
@@ -30,7 +34,13 @@ type Instance struct {
 	fitnesses         []float64
 	players           []player.Player
 	playerAssignments [][]int
+
+	Render bool
 }
+
+var (
+	renderGraph = &unique.Render{}
+)
 
 func (in *Instance) Loop() {
 	// Create devs
@@ -43,10 +53,24 @@ func (in *Instance) Loop() {
 	in.pop.Selection = selection.DeterministicTournament{2, 2}
 	in.pop.Pairing = pairing.Random{}
 
+	if in.Render {
+		oak.AddScene(
+			"uniqueness",
+			func(string, interface{}) {},
+			func() bool { return true },
+			func() (string, *oak.SceneResult) {
+				return "uniqueness", nil
+			},
+		)
+		go oak.Init("uniqueness")
+	}
+
 	in.mechanics = make([]*dev.Mechanic, in.DevCt)
 	for i := 0; i < in.DevCt; i++ {
 		in.pop.Members[i] = in.DevCreator.NewDev()
 	}
+
+	graph := unique.NewGraph(unique.MinDistance(20))
 
 	// Loop for dev iterations
 	for i := 0; i < in.DevIterations; i++ {
@@ -104,11 +128,29 @@ func (in *Instance) Loop() {
 			if pc.playerCount != lastV {
 				nextFitness++
 			}
-			in.pop.Members[j].(dev.Dev).SetFitness(nextFitness)
-			in.pop.Fitnesses[j] = nextFitness
+			dv := in.pop.Members[j].(dev.Dev)
+			thisFitness := nextFitness
+			if !graph.CanAdd(dv.Mechanic()) {
+				thisFitness /= 2
+			}
+			dv.SetFitness(thisFitness)
+			in.pop.Fitnesses[j] = thisFitness
 		}
 		fmt.Println("Worst fitness of generation", nextFitness)
 
+		//for i := 0; i < in.MechanicsPerGen; i++ {
+		best, _ := in.pop.BestMember()
+		ok := graph.Add(dev.NewRenderMechanic(best.(dev.Dev).Mechanic()))
+		if !ok {
+			fmt.Println("Failed to add mechanic to uniqueness graph")
+		}
+		//}
+
+		if in.Render {
+			renderGraph.UnDraw()
+			renderGraph.SetGraph(graph)
+			render.Draw(renderGraph, 1)
+		}
 		// Evolve dev population
 		in.pop.NextGeneration()
 	}

@@ -32,18 +32,18 @@ var (
 func NewEnvInd(size int, baseVal float64, g *Graph) *EnvInd {
 	return &EnvInd{
 		F:         env.NewF(size, baseVal),
-		mutChance: .01,
+		mutChance: .1,
 		mutChanceMutator: mut.And(
 			mut.Or(
-				mut.DropOut(.01),
+				mut.DropOut(.1),
 				mut.Add(.01),
 				.05),
 			zeroToOne,
 		),
 		mutator: mut.Or(
-			mut.Or(mut.Add(.1), mut.Add(-.1), .5),
-			mut.Or(mut.Add(1), mut.Add(-1), .5),
-			.7),
+			mut.Or(mut.Add(.4), mut.Add(-.4), .5),
+			mut.Or(mut.Add(3), mut.Add(-3), .5),
+			.5),
 		crossover: cross.FPointCrossover{NumPoints: 2},
 		Graph:     g,
 	}
@@ -100,11 +100,17 @@ func (ei *EnvInd) Crossover(other pop.Individual) pop.Individual {
 		if rand.Float64() < .5 {
 			crossover = ei2.crossover
 		}
+		mutChanceMutator := ei.mutChanceMutator
+		if rand.Float64() < .5 {
+			mutChanceMutator = ei2.mutChanceMutator
+		}
 		return &EnvInd{
-			F:         f,
-			mutChance: ei.mutChance + ei2.mutChance/2,
-			mutator:   mutator,
-			crossover: crossover,
+			F:                f,
+			mutChance:        ei.mutChance + ei2.mutChance/2,
+			mutChanceMutator: mutChanceMutator,
+			mutator:          mutator,
+			crossover:        crossover,
+			Graph:            ei.Graph,
 		}
 	}
 	return ei
