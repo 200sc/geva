@@ -26,9 +26,8 @@ func NewGraph(opts ...Option) *Graph {
 // A Graph represents a set of nodes which
 // are sufficiently unique from one-another.
 type Graph struct {
-	nodes            []Node
-	MinDistance      float64
-	allPairsDistance float64
+	nodes       []Node
+	MinDistance float64
 }
 
 // Add may add the given node to the graph.
@@ -44,12 +43,6 @@ func (g *Graph) Add(n Node) (ok bool) {
 }
 
 func (g *Graph) add(n Node) {
-	for _, n2 := range g.nodes {
-		dist, ok := n2.Distance(n)
-		if ok {
-			g.allPairsDistance += dist
-		}
-	}
 	g.nodes = append(g.nodes, n)
 }
 
@@ -64,10 +57,6 @@ func (g *Graph) Distance(n Node) float64 {
 		}
 	}
 	return min
-}
-
-func (g *Graph) AllPairsDistance() float64 {
-	return g.allPairsDistance
 }
 
 // Copy returns a copy of the receiver graph

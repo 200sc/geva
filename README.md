@@ -1,9 +1,9 @@
-# GoEvo 
+# Geva
 # Version 0.0.3
 
 Usage: see test files
 
-Run "go get -u "github.com/200sc/geva"" to pull this project into your GOPATH.
+Run `go get -u github.com/200sc/geva` to pull this project into your GOPATH.
 
 # New since 0.0.2
 

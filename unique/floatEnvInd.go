@@ -52,19 +52,27 @@ func NewEnvInd(size int, baseVal float64, g *Graph) *EnvInd {
 func (ei *EnvInd) Fitness(input, expected [][]float64) int {
 	// calculate all pairs distance
 	// fitness is how different that is from the graph's all pairs distance
-	dist := 0.0
 	pts := make([]floatgeom.Point2, ei.F.Len()/2)
 	for i := 0; i < ei.F.Len(); i += 2 {
 		pts[i/2] = floatgeom.Point2{ei.Get(i), ei.Get(i + 1)}
 	}
+	distError := 0.0
 	for i := 0; i < len(pts); i++ {
 		pt1 := pts[i]
+		n1 := ei.Graph.nodes[i]
 		for j := i + 1; j < len(pts); j++ {
-			pt2 := pts[j]
-			dist += pt1.Distance(pt2)
+			n2 := ei.Graph.nodes[j]
+
+			realDist, ok := n1.Distance(n2)
+			if ok {
+				pt2 := pts[j]
+				dist := pt1.Distance(pt2)
+
+				distError += math.Abs(realDist - dist)
+			}
 		}
 	}
-	return int(math.Abs(ei.allPairsDistance-dist)) + 1
+	return int(distError) + 1
 }
 
 func (ei *EnvInd) Mutate() {
