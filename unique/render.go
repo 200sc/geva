@@ -2,6 +2,7 @@ package unique
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 
 	"github.com/oakmound/oak/alg/floatgeom"
@@ -71,38 +72,46 @@ func (r *Render) SetGraph(g *Graph) {
 	fmt.Println("Top member fitness", fitness)
 	topEnv := topMem.(*EnvInd)
 
-	minX := 0.0
-	minY := 0.0
-
 	for i := 0; i < topEnv.F.Len(); i += 2 {
 		pt := floatgeom.Point2{topEnv.Get(i), topEnv.Get(i + 1)}
-		fmt.Println("Renderable position", pt.X(), pt.Y())
-		if pt.X() < minX {
-			minX = pt.X()
-		}
-		if pt.Y() < minY {
-			minY = pt.Y()
-		}
 		positions[i/2] = pt
 	}
-	minPt := floatgeom.Point2{0, 0}
-	if minX < 0 {
-		minPt = minPt.Add(floatgeom.Point2{-minX, 0})
-	}
-	if minY < 0 {
-		minPt = minPt.Add(floatgeom.Point2{0, -minY})
-	}
-	if minX < 0 || minY < 0 {
-		for i, pt := range positions {
-			positions[i] = pt.Add(minPt)
-		}
-	}
+	positions = scaleToRect(floatgeom.NewRect2(0, 0, 600, 450), positions...)
 
 	for i, r := range rs {
 		pos := positions[i]
 		r.SetPos(pos.X(), pos.Y())
-		fmt.Println("Renderable position", pos.X(), pos.Y())
+		fmt.Println(pos.X(), pos.Y())
 	}
 
-	r.CompositeR = render.NewCompositeR(rs)
+	r.CompositeR = render.NewCompositeR(rs...)
+}
+
+func scaleToRect(rect floatgeom.Rect2, positions ...floatgeom.Point2) []floatgeom.Point2 {
+	minX := math.MaxFloat64
+	minY := math.MaxFloat64
+	maxX := -math.MaxFloat64
+	maxY := -math.MaxFloat64
+	for _, p := range positions {
+		if minX > p.X() {
+			minX = p.X()
+		}
+		if minY > p.Y() {
+			minY = p.Y()
+		}
+		if maxX < p.X() {
+			maxX = p.X()
+		}
+		if maxY < p.Y() {
+			maxY = p.Y()
+		}
+	}
+	shiftX := rect.Min.X() - minX
+	shiftY := rect.Min.Y() - minY
+	scaleX := rect.W() / (maxX - minX)
+	scaleY := rect.H() / (maxY - minY)
+	for i, p := range positions {
+		positions[i] = p.Add(floatgeom.Point2{shiftX, shiftY}).Mul(floatgeom.Point2{scaleX, scaleY})
+	}
+	return positions
 }

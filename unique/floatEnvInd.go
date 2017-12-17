@@ -88,7 +88,6 @@ func (ei *EnvInd) Mutate() {
 
 }
 
-// Crossover is  NOP on a EnvInd
 func (ei *EnvInd) Crossover(other pop.Individual) pop.Individual {
 	if ei2, ok := other.(*EnvInd); ok {
 		f := ei.F.Copy()

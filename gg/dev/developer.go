@@ -50,7 +50,12 @@ func (d *Base) String() string {
 }
 
 func iRangeString(ir intrange.Range) string {
-	return "Range: " + strconv.Itoa(ir.Percentile(0)) + ", " + strconv.Itoa(ir.Percentile(1))
+	i1 := ir.Percentile(0)
+	i2 := ir.Percentile(1)
+	if i2 < i1 {
+		i1, i2 = i2, i1
+	}
+	return "Range: " + strconv.Itoa(i1) + ", " + strconv.Itoa(i1)
 }
 
 func fRangeString(fr floatrange.Range) string {
@@ -121,7 +126,8 @@ func (d *Base) Mechanic() *Mechanic {
 	actions := make([]func(), 0)
 	cum := alg.CumulativeWeights(d.ActionTypeWeights)
 	for i := 0; i < len(*e); i++ {
-		for j := 0; j < d.ActionCount.Poll(); j++ {
+		actCt := d.ActionCount.Poll()
+		for j := 0; j < actCt; j++ {
 			k := alg.CumWeightedChooseOne(cum)
 			a := actionMut(d.ActionTypes[k](d.ActionStrengths[k].Poll()), e.GetP(i))
 			actions = append(actions, a)

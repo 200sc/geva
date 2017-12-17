@@ -3,6 +3,7 @@ package gg
 import (
 	"math/rand"
 	"testing"
+	"time"
 
 	"github.com/200sc/geva/cross"
 	"github.com/200sc/geva/mut"
@@ -19,14 +20,30 @@ import (
 )
 
 func TestInstanceOne(t *testing.T) {
+	rand.Seed(time.Now().UTC().UnixNano())
+
 	ins := &Instance{}
-	ins.DevCt = 50
-	ins.PlayerCt = 300
-	ins.DevIterations = 15
-	ins.PlayIterations = 3
-	ins.PlayTime = 30
+	// test 1
+	// ins.DevCt = 80
+	// ins.PlayerCt = 300
+	// ins.DevIterations = 20
+	// ins.PlayIterations = 8
+	// ins.PlayTime = 40
+
+	// test 2
+	// ins.DevCt = 40
+	// ins.PlayerCt = 600
+	// ins.DevIterations = 40
+	// ins.PlayIterations = 5
+	// ins.PlayTime = 20
+
+	// test 3
+	ins.DevCt = 150
+	ins.PlayerCt = 700
+	ins.DevIterations = 5
+	ins.PlayIterations = 10
+	ins.PlayTime = 20
 	ins.Render = true
-	ins.MechanicsPerGen = 10
 
 	ins.Assignment = func(playerCt, devCt int) [][]int {
 		players := make([]int, playerCt)
@@ -58,18 +75,12 @@ func TestInstanceOne(t *testing.T) {
 		return out
 	}
 
-	imut := irange.Or(
+	imut := irange.OrAny(
+		.25,
 		irange.Add(1),
-		irange.Or(
-			irange.Add(-1),
-			irange.Or(
-				irange.Scale(.5),
-				irange.Scale(2),
-				.5,
-			),
-			.5,
-		),
-		.5,
+		irange.Add(-1),
+		irange.Scale(.5),
+		irange.Scale(2),
 	)
 
 	fmut := frange.Or(
@@ -94,6 +105,16 @@ func TestInstanceOne(t *testing.T) {
 	imut1 := irange.And(
 		imut,
 		irange.EnforceMin(1),
+	)
+
+	imutlimit10 := irange.And(
+		imut1,
+		irange.EnforceMax(10),
+	)
+
+	imutlimit20 := irange.And(
+		imut1,
+		irange.EnforceMax(20),
 	)
 
 	fmut1 := frange.And(
@@ -138,9 +159,9 @@ func TestInstanceOne(t *testing.T) {
 				InitSize:     imut0,
 				GoalSize:     imut1,
 				GoalDistance: imut1,
-				EnvSize:      imut1,
+				EnvSize:      imutlimit20,
 				EnvVal:       fmut1,
-				ActionCount:  imut1,
+				ActionCount:  imutlimit10,
 				ActionTypeWeights: mut.Or(
 					mut.Or(mut.Add(.1), mut.Add(-.1), .5),
 					mut.DropOut(0.5), .99),

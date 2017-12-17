@@ -42,9 +42,9 @@ func NewRenderMechanic(mch *Mechanic) *RenderMechanic {
 
 		idx := NextMechanicName()
 		nm := "m" + strconv.Itoa(idx)
-		str := render.DefFont().NewStrText(nm, 1, 1).ToSprite()
+		str := render.DefFont().NewStrText(nm, 1, 9).ToSprite()
 
-		cmp = render.NewComposite([]render.Modifiable{sp, str})
+		cmp = render.NewComposite(sp, str)
 		MechanicLookup[mch] = cmp
 		MechanicIndexes[mch] = idx
 		MechanicNames[idx] = mch

@@ -2,7 +2,9 @@ package gg
 
 import (
 	"fmt"
+	"image/png"
 	"math/rand"
+	"os"
 	"sort"
 
 	"github.com/200sc/geva/gg/dev"
@@ -12,7 +14,9 @@ import (
 	"github.com/200sc/geva/selection"
 	"github.com/200sc/geva/unique"
 	"github.com/oakmound/oak"
+	"github.com/oakmound/oak/dlog"
 	"github.com/oakmound/oak/render"
+	"github.com/oakmound/oak/scene"
 )
 
 type Instance struct {
@@ -54,11 +58,11 @@ func (in *Instance) Loop() {
 	in.pop.Pairing = pairing.Random{}
 
 	if in.Render {
-		oak.AddScene(
+		oak.Add(
 			"uniqueness",
 			func(string, interface{}) {},
 			func() bool { return true },
-			func() (string, *oak.SceneResult) {
+			func() (string, *scene.Result) {
 				return "uniqueness", nil
 			},
 		)
@@ -84,6 +88,9 @@ func (in *Instance) Loop() {
 		// Assign players to devs
 		assignment := in.Assignment(in.PlayerCt, in.DevCt)
 
+		totalEnjoyment := 0.0
+		totalEnjoymentIt := 0.0
+
 		// Loop for play iterations
 		for j := 0; j < in.PlayIterations; j++ {
 
@@ -101,6 +108,8 @@ func (in *Instance) Loop() {
 				for l := 0; l < len(assignment[k]); l++ {
 					p := assignment[k][l]
 					enjy := in.players[p].Play(mch, in.PlayTime)
+					totalEnjoyment += enjy
+					totalEnjoymentIt++
 
 					toMove := k
 					// Move players if they didn't enjoy this mechanic
@@ -112,6 +121,7 @@ func (in *Instance) Loop() {
 			}
 			assignment = nextAssignment
 		}
+		fmt.Println("Total Enjoyment", totalEnjoyment, "Percentage", totalEnjoyment/totalEnjoymentIt)
 		fmt.Println("Evaluating fitness")
 		// Evaluate fitness of devs by how many players they have
 		// Right now, linear-- dev with most players has fitness 1,
@@ -162,5 +172,14 @@ func (in *Instance) Loop() {
 	fmt.Println("Best mechanics:")
 	for i, m := range dev.MechanicNames {
 		fmt.Println(i, m.String())
+	}
+	if in.Render {
+		rgba := oak.ScreenShot()
+		f, err := os.Create("screen.png")
+		if err != nil {
+			dlog.Error(err)
+			return
+		}
+		png.Encode(f, rgba)
 	}
 }

@@ -38,6 +38,24 @@ func Add(a int) Mutator {
 	}
 }
 
+func EnforceMax(mx int) Mutator {
+	return func(f intrange.Range) intrange.Range {
+		min := f.Percentile(0)
+		max := f.Percentile(1)
+		if max > mx {
+			max = mx
+			if max < min {
+				min = max - 1
+			}
+			return intrange.NewLinear(min, max)
+		}
+		if mx < min {
+			return intrange.NewLinear(mx-1, mx)
+		}
+		return f
+	}
+}
+
 func EnforceMin(mn int) Mutator {
 	return func(f intrange.Range) intrange.Range {
 		min := f.Percentile(0)
@@ -78,5 +96,21 @@ func Or(a, b Mutator, aChance float64) Mutator {
 			return a(f)
 		}
 		return b(f)
+	}
+}
+
+// OrAny will perform one of the given mutations, each
+// with an equal chance. It's anticipated that chance * len(muts) >= 1,
+// if this isn't the case occassionally the mutator will do nothing.
+func OrAny(chance float64, muts ...Mutator) Mutator {
+	return func(f intrange.Range) intrange.Range {
+		r := rand.Float64()
+		for _, m := range muts {
+			if r < chance {
+				return m(f)
+			}
+			r -= chance
+		}
+		return f
 	}
 }

@@ -26,7 +26,7 @@ type ActionModCrossover struct {
 }
 
 func (amc *ActionModCrossover) Crossover(a, b *Base) ([]ActionType, []float64, []floatrange.Range) {
-	actionTypeCount := len(a.ActionTypes) + len(b.ActionTypes)/2
+	actionTypeCount := (len(a.ActionTypes) + len(b.ActionTypes)) / 2
 	actionTypeCount += amc.TypeLengthMod.Poll()
 	aTypeCount := actionTypeCount / 2
 	bTypeCount := actionTypeCount - aTypeCount // In case of odd actionTypeCount

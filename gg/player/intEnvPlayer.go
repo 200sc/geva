@@ -70,11 +70,9 @@ func (iip *IntEnvPlayer) Play(mch *dev.Mechanic, playTime int) float64 {
 	if bestFitness >= iip.expectedFitness {
 		diff := math.Abs(float64(i) - float64(expectedGeneration))
 		diffPct := diff / float64(playTime)
-		fmt.Println("Diff:", diff, diffPct, "Off after victory")
 		return 1 - (diffPct * diffPct)
 	}
 	diff := math.Abs(float64(bestFitness) - float64(iip.expectedFitness))
-	fmt.Println("Diff:", diff, "Away after loss")
 	if diff > 9 {
 		return 0.1
 	}
