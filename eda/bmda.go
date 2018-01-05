@@ -18,7 +18,7 @@ type BMDA struct {
 // ChiSquared on a bmda calculates a chi^2 value
 // where the observed values are the unconditional bivariate
 // probabilities and the expected values are the univariate
-// probabilities multipled together.
+// probabilities multiplied together.
 func (bmda *BMDA) ChiSquared(a, b int) float64 {
 
 	// p(a=t)

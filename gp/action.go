@@ -17,7 +17,7 @@ type Action struct {
 	Name string
 }
 
-// I am dumb and this is severly limited so as to
+// This is severely limited so as to
 // weigh all actions the same. We want to be able
 // to give certain actions different weights for
 // being picked!

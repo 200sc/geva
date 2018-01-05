@@ -61,7 +61,7 @@ func (env *I) Diff(envDiff []float64) (diff int) {
 }
 
 // MatchDiff compares each element in envDiff and env and
-// retuns the number of elements which are not the same.
+// returns the number of elements which are not the same.
 func (env *I) MatchDiff(envDiff []float64) (diff int) {
 	//fmt.Println("Env diff length:", len(*env), len(envDiff))
 	for i, f := range envDiff {

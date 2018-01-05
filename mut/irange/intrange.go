@@ -101,7 +101,7 @@ func Or(a, b Mutator, aChance float64) Mutator {
 
 // OrAny will perform one of the given mutations, each
 // with an equal chance. It's anticipated that chance * len(muts) >= 1,
-// if this isn't the case occassionally the mutator will do nothing.
+// if this isn't the case occasionally the mutator will do nothing.
 func OrAny(chance float64, muts ...Mutator) Mutator {
 	return func(f intrange.Range) intrange.Range {
 		r := rand.Float64()

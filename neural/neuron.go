@@ -6,7 +6,7 @@ import (
 )
 
 // A Neuron is a list of weights.
-// Clasically, the weights on a neuron would normally
+// Classically, the weights on a neuron would normally
 // represent what that neuron would multiply its inputs
 // by to obtain it's value.
 //
@@ -34,7 +34,7 @@ import (
 type Neuron []float64
 
 /**
- * Obtain a string represenation of a neuron
+ * Obtain a string representation of a neuron
  **/
 func (n Neuron) String() string {
 	var buffer bytes.Buffer

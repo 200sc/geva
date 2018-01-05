@@ -15,7 +15,7 @@ import (
 //
 // These two ideas are represented here separately.
 
-// MaxABS is an abstracted form of Onemax for targetting any
+// MaxABS is an abstracted form of Onemax for targeting any
 // floating point value
 func MaxABS(t float64) func(e *env.F) int {
 	return func(e *env.F) int {

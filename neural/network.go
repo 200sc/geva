@@ -2,8 +2,9 @@ package neural
 
 import (
 	"fmt"
-	"github.com/200sc/geva/pop"
 	"math/rand"
+
+	"github.com/200sc/geva/pop"
 )
 
 var (
@@ -220,8 +221,8 @@ func (modNet_p *Network) Run(inputs []float64) []float64 {
 	// We need to wait here, on the last columns being populated
 	output := make([]float64, len(nn[len(nn)-1]))
 	for i := 0; i < len(nn[len(nn)-1]); i++ {
-		recieved := <-doneCh
-		output[recieved.index] = recieved.value
+		received := <-doneCh
+		output[received.index] = received.value
 	}
 	close(doneCh)
 

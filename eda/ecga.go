@@ -93,7 +93,7 @@ func (ecga *ECGA) MDMModel(selected []pop.Individual) {
 	for i, s := range selected {
 		envs[i] = s.(*EnvInd).F
 	}
-	// Blocks are initially all independant
+	// Blocks are initially all independent
 	blocks := make([][]int, ecga.length)
 	// At the first iteration, the blocks we should try to merge are all blocks
 	newBlocks := make([]int, len(blocks))
