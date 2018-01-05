@@ -2,7 +2,19 @@ language: go
 go:
 - 1.x
 install:
-- go get -t ./...
+- go get -t .
+- go get -t ./cross
+- go get -t ./eda/...
+- go get -t ./env
+- go get -t ./gg/...
+- go get -t ./gp
+- go get -t ./lgp
+- go get -t ./mut/...
+- go get -t ./neural
+- go get -t ./pairing
+- go get -t ./pop
+- go get -t ./selection
+- go get -t ./unique
 script: ./cover.sh
 after_success:
  - bash <(curl -s https://codecov.io/bash)
