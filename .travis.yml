@@ -2,7 +2,6 @@ language: go
 go:
 - 1.x
 install:
-- go get -t .
 - go get -t ./cross
 - go get -t ./eda/...
 - go get -t ./env
