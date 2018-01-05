@@ -1,6 +1,8 @@
 language: go
 go:
 - 1.x
+before_install:
+  - chmod +x cover.sh
 install:
 - go get -t ./cross
 - go get -t ./eda/...
