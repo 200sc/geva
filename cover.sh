@@ -56,21 +56,22 @@ if [ -f profile.out ]; then
     cat profile.out >> coverage.txt
     rm profile.out
 fi
-go test -coverprofile=profile.out -covermode=atomic ./gg
-if [ -f profile.out ]; then
-    cat profile.out >> coverage.txt
-    rm profile.out
-fi
-go test -coverprofile=profile.out -covermode=atomic ./gg/dev
-if [ -f profile.out ]; then
-    cat profile.out >> coverage.txt
-    rm profile.out
-fi
-go test -coverprofile=profile.out -covermode=atomic ./gg/player
-if [ -f profile.out ]; then
-    cat profile.out >> coverage.txt
-    rm profile.out
-fi
+# waiting on oak v2.0.0
+# go test -coverprofile=profile.out -covermode=atomic ./gg
+# if [ -f profile.out ]; then
+#     cat profile.out >> coverage.txt
+#     rm profile.out
+# fi
+# go test -coverprofile=profile.out -covermode=atomic ./gg/dev
+# if [ -f profile.out ]; then
+#     cat profile.out >> coverage.txt
+#     rm profile.out
+# fi
+# go test -coverprofile=profile.out -covermode=atomic ./gg/player
+# if [ -f profile.out ]; then
+#     cat profile.out >> coverage.txt
+#     rm profile.out
+# fi
 go test -coverprofile=profile.out -covermode=atomic ./gevaerr
 if [ -f profile.out ]; then
     cat profile.out >> coverage.txt
