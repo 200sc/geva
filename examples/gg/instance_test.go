@@ -17,6 +17,8 @@ import (
 
 	"github.com/200sc/geva/gg/dev"
 	"github.com/200sc/geva/gg/player"
+
+	. "github.com/200sc/geva/gg"
 )
 
 func TestInstanceOne(t *testing.T) {

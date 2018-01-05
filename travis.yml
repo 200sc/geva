@@ -1,0 +1,8 @@
+language: go
+go:
+- 1.x
+install:
+- go get -t ./...
+script: ./cover.sh
+after_success:
+ - bash <(curl -s https://codecov.io/bash)

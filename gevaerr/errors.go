@@ -1,4 +1,4 @@
-package evoerr
+package gevaerr
 
 type InvalidLengthError struct{}
 

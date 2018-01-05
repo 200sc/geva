@@ -4,6 +4,8 @@ import (
 	"math/rand"
 	"time"
 
+	// This is an examples package, so we're dot importing the source
+	. "github.com/200sc/geva/eda"
 	"github.com/200sc/geva/mut"
 	"github.com/200sc/geva/selection"
 	"github.com/200sc/go-dist/floatrange"

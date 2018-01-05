@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/200sc/geva/env"
-	"github.com/200sc/geva/evoerr"
+	"github.com/200sc/geva/gevaerr"
 	"github.com/200sc/geva/mut"
 	"github.com/200sc/geva/pop"
 	"github.com/200sc/geva/selection"
@@ -71,16 +71,16 @@ func DefaultBase(opts ...Option) (Base, error) {
 		opt(b)
 	}
 	if b.length <= 0 {
-		return *b, evoerr.InvalidParamError{"length"}
+		return *b, gevaerr.InvalidParamError{"length"}
 	}
 	if b.samples <= 0 {
-		return *b, evoerr.InvalidParamError{"samples"}
+		return *b, gevaerr.InvalidParamError{"samples"}
 	}
 	if b.learningSamples <= 0 {
-		return *b, evoerr.InvalidParamError{"learningSamples"}
+		return *b, gevaerr.InvalidParamError{"learningSamples"}
 	}
 	if !b.valueRange.InRange(b.baseValue) {
-		return *b, evoerr.InvalidParamError{"baseValue"}
+		return *b, gevaerr.InvalidParamError{"baseValue"}
 	}
 	if b.trackFitness {
 		ofitness := b.fitness
