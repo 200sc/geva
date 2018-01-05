@@ -5,42 +5,47 @@ import (
 	"math/rand"
 )
 
-func PointCrossover(a []interface{}, b []interface{}, numPoints int) []interface{} {
+// RandomPoints returns a slice of numPoints float64s,
+// randomly distributed from 0.0 to 1.0, but limited
+// so that each point falls somewhere in the 1st, 2nd,
+// etc. portion of the slice as it would be split in
+// to as many parts as there are points.
+//
+// e.g. 2 points
+// out[0] will be between 0.0 and 0.5
+// out[1] will be between 0.5 and 1.0wdwdwwwwwwwww
+func RandomPoints(numPoints int) []float64 {
 	inc := 1.0 / float64(numPoints)
 	points := make([]float64, numPoints)
-
-	// Generate a series of random points to split on
 	i := 0
 	for pointRange := 0.0; pointRange < 1.0; pointRange += inc {
 		points[i] = (rand.Float64() / float64(numPoints)) + pointRange
 		i++
 	}
+	return points
+}
 
+func PointCrossover(a []interface{}, b []interface{}, numPoints int) []interface{} {
+
+	points := RandomPoints(numPoints)
 	short := b
 	if len(a) < len(b) {
 		short = a
 	}
-	activeFlag := false
 	active := a
+	inactive := b
 	start := 0
-	end := 0
-
 	var c []interface{}
 
 	// Populate our new empty individual
 	// combining the two parent individuals
 	// as according to the above split points
 	for _, v := range points {
-		end = int(math.Ceil(float64(len(short)) * v))
+		end := int(math.Ceil(float64(len(short)) * v))
 
 		c = append(c, active[start:end]...)
 
-		if !activeFlag {
-			active = b
-		} else {
-			active = a
-		}
-		activeFlag = !activeFlag
+		active, inactive = inactive, active
 		start = end
 	}
 
