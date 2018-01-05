@@ -13,7 +13,7 @@ install:
 - go get -t ./pairing
 - go get -t ./pop
 - go get -t ./selection
-- go get -t ./unique
+# - go get -t ./unique
 script: ./cover.sh
 after_success:
  - bash <(curl -s https://codecov.io/bash)
