@@ -55,7 +55,7 @@ func iRangeString(ir intrange.Range) string {
 	if i2 < i1 {
 		i1, i2 = i2, i1
 	}
-	return "Range: " + strconv.Itoa(i1) + ", " + strconv.Itoa(i1)
+	return "Range: " + strconv.Itoa(i1) + ", " + strconv.Itoa(i2)
 }
 
 func fRangeString(fr floatrange.Range) string {
