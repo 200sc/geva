@@ -15,7 +15,7 @@ type ECGA struct {
 	Base
 	P      *pop.Population
 	Blocks [][]int
-}
+} 
 
 // Adjust for an ecga creates an ecga population based on the ecga's
 // understanding of its building blocks and then refreshes those
