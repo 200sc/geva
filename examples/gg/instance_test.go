@@ -189,8 +189,8 @@ func TestInstanceOne(t *testing.T) {
 			),
 		},
 		Crosses: []cross.I{
-			cross.IPointCrossover{1},
-			cross.IPointCrossover{2},
+			cross.IPoint{1},
+			cross.IPoint{2},
 		},
 	}
 

@@ -25,6 +25,12 @@ func RandomPoints(numPoints int) []float64 {
 	return points
 }
 
+// PointCrossover will convert two slices of interfaces into a new slice
+// composed of elements from each slice. This composition will contain
+// long strings of components from each input slice, at the same indices
+// they were at in the original. The number of uninterrupted strings of
+// elements from one slice is noted by numPoints + 1, where numPoints 
+// is the number of points the slices are split at. 
 func PointCrossover(a []interface{}, b []interface{}, numPoints int) []interface{} {
 
 	points := RandomPoints(numPoints)

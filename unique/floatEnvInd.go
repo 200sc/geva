@@ -44,7 +44,7 @@ func NewEnvInd(size int, baseVal float64, g *Graph) *EnvInd {
 			mut.Or(mut.Add(.4), mut.Add(-.4), .5),
 			mut.Or(mut.Add(3), mut.Add(-3), .5),
 			.5),
-		crossover: cross.FPointCrossover{NumPoints: 2},
+		crossover: cross.FPoint{NumPoints: 2},
 		Graph:     g,
 	}
 }
@@ -80,7 +80,7 @@ func (ei *EnvInd) Mutate() {
 	ei.mutChance = ei.mutChanceMutator(ei.mutChance)
 	rnd := rand.Float64()
 	if rnd < 0.025 {
-		ei.crossover = cross.FPointCrossover{NumPoints: 2}
+		ei.crossover = cross.FPoint{NumPoints: 2}
 	} else if rnd < 0.5 {
 		ei.crossover = cross.FAverageCrossover{AWeight: .5}
 	}

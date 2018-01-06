@@ -2,7 +2,6 @@ package cross
 
 import (
 	"math"
-	"math/rand"
 
 	"github.com/200sc/geva/env"
 )
@@ -11,27 +10,19 @@ type F interface {
 	Crossover(a, b *env.F) *env.F
 }
 
-type FPointCrossover struct {
+type FPoint struct {
 	NumPoints int
 }
 
-func (fpc FPointCrossover) Crossover(a, b *env.F) *env.F {
-	inc := 1.0 / float64(fpc.NumPoints)
-	points := make([]float64, fpc.NumPoints)
-
-	// Generate a series of random points to split on
-	i := 0
-	for pointRange := 0.0; pointRange < 1.0; pointRange += inc {
-		points[i] = (rand.Float64() / float64(fpc.NumPoints)) + pointRange
-		i++
-	}
+func (fpc FPoint) Crossover(a, b *env.F) *env.F {
+	points := RandomPoints(fpc.NumPoints)
 
 	short := b
 	if len(*a) < len(*b) {
 		short = a
 	}
-	activeFlag := false
 	active := a
+	inactive := b
 	start := 0
 	end := 0
 
@@ -45,12 +36,7 @@ func (fpc FPointCrossover) Crossover(a, b *env.F) *env.F {
 
 		c = append(c, (*active)[start:end]...)
 
-		if !activeFlag {
-			active = b
-		} else {
-			active = a
-		}
-		activeFlag = !activeFlag
+		active, inactive = inactive, active
 		start = end
 	}
 

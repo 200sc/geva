@@ -6,8 +6,12 @@ import (
 	"github.com/oakmound/oak/alg"
 )
 
-type FloatRangeCrossover func(a, b floatrange.Range) floatrange.Range
+// FloatRange represents any function which can crossover
+// floatrange.Range types
+type FloatRange func(a, b floatrange.Range) floatrange.Range
 
+// LinearFloatRange combines two floatranges into a linear range
+// from the average of the minimum and maximum values of the inputs
 func LinearFloatRange(a, b floatrange.Range) floatrange.Range {
 	aMin := a.Percentile(0)
 	aMax := a.Percentile(1)
@@ -18,6 +22,12 @@ func LinearFloatRange(a, b floatrange.Range) floatrange.Range {
 	return floatrange.NewLinear(cMin, cMax)
 }
 
+// IntRange represents any function which can crossover
+// intrange.Range types
+type IntRange func(a, b intrange.Range) intrange.Range
+
+// LinearIntRange combines two intranges into a linear range
+// from the average of the minimum and maximum values of the inputs.
 func LinearIntRange(a, b intrange.Range) intrange.Range {
 	aMin := a.Percentile(0)
 	aMax := a.Percentile(1)
