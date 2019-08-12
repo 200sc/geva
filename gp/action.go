@@ -224,17 +224,17 @@ func AddStorage(spaces int, baseWeight float64) {
 
 func CalculateCumulativeActionWeights(args ...int) []float64 {
 	weightCount := 0
-	for i := 0; i < len(args); i++ {
-		weightCount += len(actions[args[i]])
+	for _, arg := range args {
+		weightCount += len(actions[arg])
 	}
 	w := make([]float64, weightCount)
-	w[0] = actionWeights[1][0]
-	k := 1
-	for i := 0; i < len(args); i++ {
-		for j := 0; j < len(actions[args[i]]); j++ {
+	w[len(w)-1] = actionWeights[1][0]
+	k := len(w) - 2
+	for i, arg := range args {
+		for j := 0; j < len(actions[arg]); j++ {
 			if i+j != 0 {
-				w[k] = w[k-1] + actionWeights[args[i]][j]
-				k++
+				w[k] = w[k+1] + actionWeights[arg][j]
+				k--
 			}
 		}
 	}
