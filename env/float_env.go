@@ -3,10 +3,9 @@ package env
 import (
 	"math"
 	"math/rand"
+	"strconv"
 
 	"github.com/200sc/geva/mut"
-
-	"github.com/200sc/go-compgeo/printutil"
 	"github.com/200sc/go-dist/floatrange"
 )
 
@@ -250,7 +249,7 @@ func NewF(size int, baseVal float64) *F {
 func (env *F) String() string {
 	str := "["
 	for _, v := range *env {
-		str += printutil.Stringf64(*v)
+		str += stringf64(*v)
 		str += " "
 	}
 	str += "]"
@@ -266,4 +265,21 @@ func AverageF(envs ...*F) *F {
 	}
 	mid.Divide(float64(len(envs)))
 	return mid
+}
+
+func stringf64(ks ...float64) string {
+	s := ""
+	for i, k := range ks {
+		if k == math.MaxFloat64*-1 {
+			s += "-∞"
+		} else if k == math.MaxFloat64 {
+			s += "∞"
+		} else {
+			s += strconv.FormatFloat(k, 'g', 5, 64)
+		}
+		if i != len(ks)-1 {
+			s += ", "
+		}
+	}
+	return s
 }

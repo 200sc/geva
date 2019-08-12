@@ -3,7 +3,7 @@ package cross
 import (
 	"github.com/200sc/go-dist/floatrange"
 	"github.com/200sc/go-dist/intrange"
-	"github.com/oakmound/oak/alg"
+	"math"
 )
 
 // FloatRange represents any function which can crossover
@@ -33,7 +33,18 @@ func LinearIntRange(a, b intrange.Range) intrange.Range {
 	aMax := a.Percentile(1)
 	bMin := b.Percentile(0)
 	bMax := b.Percentile(1)
-	cMin := alg.RoundF64(float64(aMin+bMin) / 2)
-	cMax := alg.RoundF64(float64(aMax+bMax) / 2)
+	cMin := roundF64(float64(aMin+bMin) / 2)
+	cMax := roundF64(float64(aMax+bMax) / 2)
 	return intrange.NewLinear(cMin, cMax)
 }
+
+func roundF64(a float64) int {
+	if a < 0 {
+		return int(math.Ceil(a - 0.5))
+	}
+	return int(math.Floor(a + 0.5))
+} 
+
+const (
+	ε = 1.0e-7
+)

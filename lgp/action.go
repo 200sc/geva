@@ -3,8 +3,6 @@ package lgp
 import (
 	"math/rand"
 	"strconv"
-
-	"github.com/oakmound/oak/alg"
 )
 
 type Instruction struct {
@@ -114,7 +112,40 @@ func (gp *LGP) GetInstruction() Instruction {
 }
 
 func getAction() Action {
-	return actions[alg.CumWeightedChooseOne(cumActionWeights)]
+	return actions[weightedChooseOne(cumActionWeights)]
+}
+
+// weightedChooseOne returns a single index from the weights given
+// at a rate relative to the magnitude of each weight. It expects
+// the input to be in the form of RemainingWeights, cumulative with
+// the total at index 0.
+func weightedChooseOne(remainingWeights []float64) int {
+	totalWeight := remainingWeights[0]
+	choice := rand.Float64() * totalWeight
+	i := len(remainingWeights) / 2
+	start := 0
+	end := len(remainingWeights) - 1
+	for {
+		if remainingWeights[i] < choice {
+			if remainingWeights[i-1] < choice {
+				end = i
+				i = (start + end) / 2
+			} else {
+				return i - 1
+			}
+		} else {
+			if i != len(remainingWeights)-1 && remainingWeights[i+1] > choice {
+				start = i
+
+				i = (start + end) / 2
+				if (start+end)%2 == 1 {
+					i++
+				}
+			} else {
+				return i
+			}
+		}
+	}
 }
 
 func getArgs(argCount int, limit int) []int {

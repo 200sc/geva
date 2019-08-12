@@ -27,7 +27,7 @@ func (r *Render) UnDraw() {
 	if r.CompositeR == nil {
 		return
 	}
-	r.CompositeR.UnDraw()
+	r.CompositeR.Undraw()
 }
 
 func (r *Render) SetGraph(g *Graph) {

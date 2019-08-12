@@ -10,7 +10,6 @@ import (
 	"github.com/200sc/geva/mut"
 	"github.com/200sc/geva/pop"
 	"github.com/200sc/go-dist/floatrange"
-	"github.com/oakmound/oak/alg/floatgeom"
 )
 
 // EnvInd is a wrapper around a float env that can be a member
@@ -52,9 +51,9 @@ func NewEnvInd(size int, baseVal float64, g *Graph) *EnvInd {
 func (ei *EnvInd) Fitness(input, expected [][]float64) int {
 	// calculate all pairs distance
 	// fitness is how different that is from the graph's all pairs distance
-	pts := make([]floatgeom.Point2, ei.F.Len()/2)
+	pts := make([][2]float64, ei.F.Len()/2)
 	for i := 0; i < ei.F.Len(); i += 2 {
-		pts[i/2] = floatgeom.Point2{ei.Get(i), ei.Get(i + 1)}
+		pts[i/2] = [2]float64{ei.Get(i), ei.Get(i + 1)}
 	}
 	distError := 0.0
 	for i := 0; i < len(pts); i++ {
@@ -66,13 +65,19 @@ func (ei *EnvInd) Fitness(input, expected [][]float64) int {
 			realDist, ok := n1.Distance(n2)
 			if ok {
 				pt2 := pts[j]
-				dist := pt1.Distance(pt2)
+				dist := distance(pt1[0], pt2[0], pt1[1], pt2[1])
 
 				distError += math.Abs(realDist - dist)
 			}
 		}
 	}
 	return int(distError) + 1
+}
+
+func distance(x1, x2, y1, y2 float64) float64 {
+	return math.Sqrt(
+		math.Pow(x1-x2, 2) +
+			math.Pow(y1-y2, 2))
 }
 
 func (ei *EnvInd) Mutate() {

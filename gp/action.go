@@ -1,10 +1,10 @@
 package gp
 
 import (
+	"math/rand"
 	"strconv"
 
 	"github.com/200sc/geva/env"
-	"github.com/oakmound/oak/alg"
 )
 
 // The effect of a given action is internally defined
@@ -116,7 +116,7 @@ func getAction(args ...int) (action Action, children int) {
 	// and treat that choice as an index
 	// as if the available arrays were attached end-on-end
 
-	choice := alg.CumWeightedChooseOne(CalculateCumulativeActionWeights(args...))
+	choice := weightedChooseOne(CalculateCumulativeActionWeights(args...))
 
 	for i := 0; i < len(args); i++ {
 		if len(actions[args[i]]) > choice {
@@ -133,7 +133,7 @@ func getZeroAction() (action Action) {
 	// Make a choice out of the options
 	// and treat that choice as an index
 	// as if the available arrays were attached end-on-end
-	choice := alg.CumWeightedChooseOne(cumZeroActionWeights)
+	choice := weightedChooseOne(cumZeroActionWeights)
 	action = actions[0][choice]
 	return
 }
@@ -142,7 +142,7 @@ func getNonZeroAction() (action Action, children int) {
 	// Make a choice out of the options
 	// and treat that choice as an index
 	// as if the available arrays were attached end-on-end
-	choice := alg.CumWeightedChooseOne(cumActionWeights)
+	choice := weightedChooseOne(cumActionWeights)
 
 	for i := 1; i < len(actions); i++ {
 		if len(actions[i]) > choice {
@@ -239,6 +239,39 @@ func CalculateCumulativeActionWeights(args ...int) []float64 {
 		}
 	}
 	return w
+}
+
+// weightedChooseOne returns a single index from the weights given
+// at a rate relative to the magnitude of each weight. It expects
+// the input to be in the form of RemainingWeights, cumulative with
+// the total at index 0.
+func weightedChooseOne(remainingWeights []float64) int {
+	totalWeight := remainingWeights[0]
+	choice := rand.Float64() * totalWeight
+	i := len(remainingWeights) / 2
+	start := 0
+	end := len(remainingWeights) - 1
+	for {
+		if remainingWeights[i] < choice {
+			if remainingWeights[i-1] < choice {
+				end = i
+				i = (start + end) / 2
+			} else {
+				return i - 1
+			}
+		} else {
+			if i != len(remainingWeights)-1 && remainingWeights[i+1] > choice {
+				start = i
+
+				i = (start + end) / 2
+				if (start+end)%2 == 1 {
+					i++
+				}
+			} else {
+				return i
+			}
+		}
+	}
 }
 
 // Returns whether the modification was successful (whether
