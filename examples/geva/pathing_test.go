@@ -1,9 +1,8 @@
 package geva
 
 import (
+	"math"
 	"testing"
-
-	"github.com/oakmound/oak/alg/intgeom"
 
 	"github.com/200sc/go-dist/intrange"
 
@@ -36,11 +35,17 @@ func PathingFitnessGP(g *gp.GP, inputs, outputs [][]float64) int {
 		pos := *(*g.Env)[position]
 		x1 := pos % 6
 		y1 := pos / 6
-		fitness += int(intgeom.Distance(x1, y1, 5, 5) * 100)
+		fitness += int(intDistance(x1, y1, 5, 5) * 100)
 		fitness += *(*g.Env)[actionCount]
 	}
 	fitness /= len(inputs)
 	return fitness
+}
+
+func intDistance(x1, y1, x2, y2 int) float64 {
+	return math.Sqrt(
+		math.Pow(float64(x1-x2), 2) +
+			math.Pow(float64(y1-y2), 2))
 }
 
 func PathingFitnessLGP(g *lgp.LGP, inputs, outputs [][]float64) int {
@@ -57,7 +62,7 @@ func PathingFitnessLGP(g *lgp.LGP, inputs, outputs [][]float64) int {
 		pos := *(*g.Env)[position]
 		x1 := pos % 6
 		y1 := pos / 6
-		fitness += int(intgeom.Distance(x1, y1, 5, 5) * 100)
+		fitness += int(intDistance(x1, y1, 5, 5) * 100)
 		fitness += *(*g.Env)[actionCount]
 	}
 	fitness /= len(inputs)
